@@ -1,4 +1,4 @@
-const cfg = require('./configs/config.json');
+require('dotenv').config();
 const {
   client
 } = require('./Identification');
@@ -19,9 +19,11 @@ const {
 const minInMs = 60 * 1000;
 
 class Giveaways {
+  static channelID = process.env.GiveawaysID;
+
   constructor() {
     // Initiates giveaway functions
-    this.channel = client.channels.cache.get(cfg.TestChanID);
+    this.channel = client.channels.cache.get(process.env.TestChanID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
@@ -37,8 +39,6 @@ class Giveaways {
     '<a class="large_title" href="',
     '<div class="bodytext" id="abody_'
   ];
-
-  static channelID = cfg.GiveawaysID;
 
   static commands = new Commands([
     Commands.Command(

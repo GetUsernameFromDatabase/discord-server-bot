@@ -1,4 +1,4 @@
-const cfg = require('./configs/config.json');
+require('dotenv').config();
 const {
   BotActivity
 } = require('./BotActivity');
@@ -15,7 +15,7 @@ const {
 const { prefix } = require('./Commands');
 
 function EngineStart() {
-  Identification.Server = client.guilds.cache.get(cfg.ServerID);
+  Identification.Server = client.guilds.cache.get(process.env.ServerID);
   // Gets the live version of my user
   client.users.fetch(Identification.MyUser.id)
     .then(x => { Identification.MyUser = x; })
@@ -45,4 +45,4 @@ client.on('message', msg => {
   }
 });
 
-client.login(cfg.TOKEN);
+client.login(process.env.TOKEN);
