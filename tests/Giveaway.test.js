@@ -46,7 +46,7 @@ describe('Checks giveaway object properties', () => {
     src.forEach(checkProperties);
   }
 
-  // I check giveaways in a hard-coded way since:
+  // I check giveaways in a semi hard-coded way since:
   // - cannot iterate over givFetchResults - defined in before all
   // - - it needs to be defined in before all since tests should be run synchronously
   // - nested loops are not allowed which would quarantee givFetchResults to be resolved
