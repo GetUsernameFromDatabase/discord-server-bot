@@ -19,7 +19,13 @@ class Giveaways {
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
 
-  static URL = { steam: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=4' };
+  static giveawaySites = {
+    steam:
+      {
+        url: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing',
+        callback: WebScraping.GetSteamAnnouncements
+      }
+  };
 
   giveawaysCmdResponse(msg) {
     let message = 'This channel will be notified about giveaways';
@@ -30,9 +36,11 @@ class Giveaways {
     this.PostGiveaways();
   }
 
+  // TODO: Have multiple giveaway sites to switch between should there be an error
   GetGiveaways() {
-    WebScraping.SimpleFetch(Giveaways.URL.steam).then(
-      (val) => this.PostGiveaways(WebScraping.GetSteamAnnouncements(val))
+    const steam = Giveaways.giveawaySites.steam;
+    WebScraping.SimpleFetch(steam.url).then(
+      (val) => this.PostGiveaways(steam.callback(val))
     ).catch(
       (error) => {
         /* eslint-disable no-console */
@@ -46,6 +54,7 @@ class Giveaways {
 
   // eslint-disable-next-line class-methods-use-this
   PostGiveaways(giveaways = []) {
+    // eslint-disable-next-line no-console
     console.log(giveaways.length);
   }
 }

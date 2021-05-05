@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require('axios').default;
 const cheerio = require('cheerio');
 
 class WebScraping {
@@ -23,7 +23,7 @@ class WebScraping {
       let body = $(el).find('div.bodytext');
       body.find('blockquote.bb_blockquote').replaceWith();
       // The body has leading and trailing spaces
-      body = cheerio.load(body.html().trim(), { decodeEntities: true }, false);
+      body = WebScraping.HTMLIntoMD(body.html());
       console.log(body.html() + '\n');
 
       let annTitle = $(el).children().first();
@@ -34,6 +34,12 @@ class WebScraping {
       });
     });
     return announcements;
+  }
+
+  static HTMLIntoMD(html = '') {
+    var $ = cheerio.load(html.trim(), { decodeEntities: true }, false);
+    console.log(null);
+    return $;
   }
 }
 
