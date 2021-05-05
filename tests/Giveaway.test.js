@@ -6,7 +6,7 @@ const {
   WebScraping
 } = require('../src/WebScraping');
 
-test('Testing if giveaways have been found', (done) => {
+test('Testing if giveaways can be found on giveaway websites', (done) => {
   function checkGiveaway(data) {
     try {
       let giveaways = WebScraping.GetSteamAnnouncements(data);
