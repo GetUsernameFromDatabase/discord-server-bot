@@ -21,7 +21,7 @@
   "scripts": {
     "start": "node ./src/Main.js",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "author": "Ryan Kruberg",
   "license": "GPL-3.0"
