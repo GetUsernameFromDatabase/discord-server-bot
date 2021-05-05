@@ -24,7 +24,7 @@ class WebScraping {
       body.find('blockquote.bb_blockquote').replaceWith();
       // The body has leading and trailing spaces
       body = cheerio.load(body.html().trim(), { decodeEntities: true }, false);
-      console.log(body.children());
+      console.log(body.html() + '\n');
 
       let annTitle = $(el).children().first();
       announcements.push({

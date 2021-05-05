@@ -19,7 +19,7 @@ class Giveaways {
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
 
-  static URL = { steam: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing' };
+  static URL = { steam: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=4' };
 
   giveawaysCmdResponse(msg) {
     let message = 'This channel will be notified about giveaways';
