@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const { Identification, client } = require("./Identification");
 const { Similarity } = require("./TextManipulation");
 const { Commands } = require("./Commands");
+const { Logging } = require("./Logging");
 
 const { Server } = Identification;
 
@@ -97,7 +98,7 @@ class Messaging {
         field = TextTooBig(field.value, field.name);
       }
 
-      if (typeof field === typeof []) {
+      if (Array.isArray(field)) {
         msgEmbedFields.concat(field);
       } else {
         msgEmbedFields.push(field);
@@ -158,9 +159,8 @@ class Messaging {
           return Array.from(
             chanMsgs.filter((msg) => msg.type === messageType).keys()
           );
-          // eslint-disable-next-line no-console
         })
-        .catch(console.error);
+        .catch(Logging.Error);
     }
 
     if (messageType === null) {

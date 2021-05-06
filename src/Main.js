@@ -2,37 +2,21 @@ const { BotActivity } = require("./BotActivity");
 const { Giveaways } = require("./Giveaways");
 const { Messaging } = require("./Messaging");
 const { Identification, client } = require("./Identification");
+const { Logging } = require("./Logging");
 const { prefix } = require("./Commands");
 
 client.login(process.env.TOKEN);
 
 client.once("ready", async () => {
   // eslint-disable-next-line no-console
-  console.log(`Logged in as ${client.user.tag}!`);
-  // Gets my up to date user data
-  await client.users
-    .fetch(Identification.MyUser.id)
-    .then((usr) => {
-      Identification.MyUser = usr;
-    })
-    .catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(err);
-    });
-  // Gets my server
-  await client.guilds
-    .fetch(process.env.ServerID)
-    .then((srv) => {
-      Identification.Server = srv;
-    })
-    .catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(err);
-    });
+  await Identification.UpdateMyUser(); // Gets my up to date user data
+  await Identification.UpdateServer(); // Gets my server
+
+  Logging.Greet();
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
   /* eslint-disable no-new */
-  new BotActivity(client);
+  new BotActivity();
   new Giveaways();
   /* eslint-enable no-new */
 });

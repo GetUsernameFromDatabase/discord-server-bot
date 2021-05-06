@@ -1,4 +1,5 @@
 const { client } = require("./Identification");
+const { Logging } = require("./Logging");
 
 class BotActivity {
   constructor() {
@@ -28,19 +29,16 @@ class BotActivity {
   iteration = 0; // Current activity index
 
   static MakeActObj(name, duration = 1, type = "PLAYING", several = false) {
-    if (!duration) {
-      // eslint-disable-next-line no-console
-      console.error(`Wrong duration inserted into
-    ${this.MakeActObj}\nName associated with the wrong input: "${name}"`);
+    if (!Number.isFinite(duration)) {
+      Logging.Error(`Wrong duration inserted into${this.MakeActObj}\n
+      Name associated with the wrong input: "${name}"`);
     }
-
-    const object = {
+    return {
       name,
       duration,
       type,
       several,
     };
-    return object;
   }
 
   activities = [

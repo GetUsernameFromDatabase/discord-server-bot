@@ -11,7 +11,6 @@ class WebScraping {
       .catch((error) => Promise.reject(error));
   }
 
-  /* eslint-disable no-console */
   static GetSteamAnnouncements(html) {
     const announcements = [];
     const $ = cheerio.load(html, { decodeEntities: true });
@@ -20,7 +19,6 @@ class WebScraping {
       body.find("blockquote.bb_blockquote").replaceWith();
       // The body has leading and trailing spaces
       body = WebScraping.HTMLIntoMD(body.html());
-      // console.log(body.html() + '\n');
 
       const annTitle = $(el).children().first();
       announcements.push({

@@ -1,6 +1,7 @@
 const { client } = require("./Identification");
 const { WebScraping } = require("./WebScraping");
 const { Messaging } = require("./Messaging");
+const { Logging } = require("./Logging");
 
 const minInMs = 60 * 1000;
 
@@ -36,21 +37,16 @@ class Giveaways {
     const { steam } = Giveaways.giveawaySites;
     WebScraping.SimpleFetch(steam.url)
       .then((val) => this.PostGiveaways(steam.callback(val)))
-      .catch((error) => {
-        /* eslint-disable no-console */
-        console.error("Failed to reach giveaway website");
-        console.error(error);
-        console.error();
-        /* eslint-enable no-console */
-      });
+      .catch((error) =>
+        Logging.Error(error, "Failed to reach giveaway website")
+      );
   }
 
   // eslint-disable-next-line class-methods-use-this
   PostGiveaways(giveaways = []) {
     giveaways.forEach((giv) => {
       const msg = Messaging.GetEmbeddedMsg(giv.title, giv.url, giv.body);
-      // eslint-disable-next-line no-console
-      console.log(msg);
+      Logging.Log(msg);
     });
   }
 }
