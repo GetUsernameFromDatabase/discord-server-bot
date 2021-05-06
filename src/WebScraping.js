@@ -54,20 +54,19 @@ class WebScraping {
     $('b').each((_i, el) => { $(el).replaceWith(`**${$(el).html()}**`); });
 
     // Headings into MD
-    const headingCSS = 'h1, h2, h3, h4, h5, h6, h11d'
+    const headingCSS = 'h1, h2, h3, h4, h5, h6'
       .concat(', .bb_h1'); // heading class I've seen used in steam
+    $(headingCSS).each((_i, el) => {
+      // Helps find problems if something has more than 6 #
+      const rgx = /\d*\d/;
 
-    let xd = cheerio.load('<h11d>Header1<h2>Header2</h2></h11d><div class="bb_h1">Instructions:</div>', { decodeEntities: true }, false);
-    xd(headingCSS).each((_i, el) => {
-      const rgx = /\d+(\B)/;
       const hLevel = rgx.test(el.tagName)
         ? rgx.exec(el.tagName)[0] : rgx.exec(el.attribs.class)?.[0];
-      console.log(hLevel);
-      const h = '#'.repeat(hLevel);
-      xd(el).replaceWith(`${h} ${xd(el).html()}`);
+      // replaceWith is fine since headings aren't nested
+      // - (class variant could pose a problem)
+      $(el).replaceWith(`${'#'.repeat(hLevel)} ${$(el).html()}\n`);
     });
-    // console.log($.html());
-    console.log(xd.html());
+    console.log($.html());
     return $;
   }
 }
