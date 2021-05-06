@@ -57,11 +57,9 @@ class WebScraping {
     const headingCSS = 'h1, h2, h3, h4, h5, h6'
       .concat(', .bb_h1'); // heading class I've seen used in steam
     $(headingCSS).each((_i, el) => {
-      // Helps find problems if something has more than 6 #
-      const rgx = /\d*\d/;
-
-      const hLevel = rgx.test(el.tagName)
-        ? rgx.exec(el.tagName)[0] : rgx.exec(el.attribs.class)?.[0];
+      const rgx = /h\d/;
+      const hLevel = (rgx.test(el.tagName)
+        ? rgx.exec(el.tagName) : rgx.exec(el.attribs.class))?.[0][1];
       // replaceWith is fine since headings aren't nested
       // - (class variant could pose a problem)
       $(el).replaceWith(`${'#'.repeat(hLevel)} ${$(el).html()}\n`);
