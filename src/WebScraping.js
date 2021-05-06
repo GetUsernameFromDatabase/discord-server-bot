@@ -1,5 +1,6 @@
 const axios = require('axios').default;
 const cheerio = require('cheerio');
+const TurndownService = require('turndown');
 
 class WebScraping {
   // FormatSymbolsIntoHTML method makes it acocount for tml tag format (<x> and </x>)
@@ -38,34 +39,10 @@ class WebScraping {
   }
 
   static HTMLIntoMD(html = '') {
-    var $ = cheerio.load(html.trim(), { decodeEntities: true }, false);
-    // Turns hyperlinks into MD links
-    $('a').each((_i, el) => {
-      const $el = $(el);
-      $el.replaceWith(`[${$el.text()}](${$el.attr('href')})`);
-    });
-    // Turns breaks into newlines
-    $('br').each((_i, el) => { $(el).replaceWith('\n'); });
-
-    // Converts <i> => _italic_ and <b> => **bold** (they need to be seperate
-    //  could be because replaceWith makes changes to children as well)
-    // - SF most use cases have had an * already in html, so using _ for i
-    $('i').each((_i, el) => { $(el).replaceWith(`_${$(el).html()}_`); });
-    $('b').each((_i, el) => { $(el).replaceWith(`**${$(el).html()}**`); });
-
-    // Headings into MD
-    const headingCSS = 'h1, h2, h3, h4, h5, h6'
-      .concat(', .bb_h1'); // heading class I've seen used in steam
-    $(headingCSS).each((_i, el) => {
-      const rgx = /h\d/;
-      const hLevel = (rgx.test(el.tagName)
-        ? rgx.exec(el.tagName) : rgx.exec(el.attribs.class))?.[0][1];
-      // replaceWith is fine since headings aren't nested
-      // - (class variant could pose a problem)
-      $(el).replaceWith(`${'#'.repeat(hLevel)} ${$(el).html()}\n`);
-    });
-    console.log($.html());
-    return $;
+    var turndownService = new TurndownService();
+    var md = turndownService.turndown(html);
+    console.log(md);
+    return md;
   }
 }
 
