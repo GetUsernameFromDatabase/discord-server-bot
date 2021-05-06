@@ -39,9 +39,8 @@ class WebScraping {
   }
 
   static HTMLIntoMD(html = '') {
-    var turndownService = new TurndownService();
+    const turndownService = new TurndownService({ bulletListMarker: '-' });
     var md = turndownService.turndown(html);
-    console.log(md);
     return md;
   }
 }

@@ -8,7 +8,17 @@ const {
 } = require('../src/WebScraping');
 
 const giveawaySites = Giveaways.giveawaySites;
-var givFetchResult = null;
+const giveawaySources = Object.keys(giveawaySites);
+var givFetchResult = null; // Will be changed in beforeAll
+
+function checkGiveaways(source, checkFunction) {
+  expect(givFetchResult).not.toBeNull();
+  let i = Object.keys(giveawaySites).indexOf(source);
+  let src = givFetchResult[i];
+  expect(src).not.toHaveLength(0);
+  src.forEach(checkFunction);
+}
+
 function fetchGivSites() {
   var promises = [];
 
@@ -39,19 +49,10 @@ describe('Checks giveaway object properties', () => {
       expect(giveaway[prop]).not.toHaveLength(0);
     });
   }
-  function checkGiveaways(source) {
-    expect(givFetchResult).not.toBeNull();
-    let i = Object.keys(giveawaySites).indexOf(source);
-    let src = givFetchResult[i];
-    expect(src).not.toHaveLength(0);
-    src.forEach(checkProperties);
-  }
 
-  // I check giveaways in a semi hard-coded way since:
-  // - cannot iterate over givFetchResults - defined in before all
-  // - - it needs to be defined in before all since tests should be run synchronously
-  // - nested loops are not allowed which would quarantee givFetchResults to be resolved
-  test('Test giveaway properties from steam', () => {
-    checkGiveaways('steam');
+  giveawaySources.forEach((source) => {
+    test(`Test giveaway properties from ${source}`, () => {
+      checkGiveaways(source, checkProperties);
+    });
   });
 });
