@@ -1,9 +1,9 @@
 class TextManipulation {
-  static ReplacerAll(base, replacee, replacement = "") {
+  static ReplacerAll(base, replacee, replacement = '') {
     return base.split(replacee).join(replacement);
   }
 
-  static Similarity(s1 = "", s2 = "") {
+  static Similarity(s1 = '', s2 = '') {
     let longer = s1.length >= s2.length ? s1 : s2;
     let shorter = s1 === longer ? s2 : s1;
 

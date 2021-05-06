@@ -1,5 +1,5 @@
-const { client } = require("./Identification");
-const { Logging } = require("./Logging");
+const { client } = require('./Identification');
+const { Logging } = require('./Logging');
 
 class BotActivity {
   constructor() {
@@ -28,7 +28,7 @@ class BotActivity {
 
   iteration = 0; // Current activity index
 
-  static MakeActObj(name, duration = 1, type = "PLAYING", several = false) {
+  static MakeActObj(name, duration = 1, type = 'PLAYING', several = false) {
     if (!Number.isFinite(duration)) {
       Logging.Error(`Wrong duration inserted into${this.MakeActObj}\n
       Name associated with the wrong input: "${name}"`);
@@ -45,12 +45,12 @@ class BotActivity {
     BotActivity.MakeActObj(
       "How I'm disassembled and reassembled differently",
       1.1,
-      "WATCHING",
+      'WATCHING',
       true
     ),
-    BotActivity.MakeActObj("with my vodka bottle"),
-    BotActivity.MakeActObj("𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼"),
-    BotActivity.MakeActObj(" ʍıʇɥ ɹǝɐlıʇʎ"),
+    BotActivity.MakeActObj('with my vodka bottle'),
+    BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
+    BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
     BotActivity.MakeActObj(
       "Jesus Christ, that's a pretty face",
       this.SongLyricInterval

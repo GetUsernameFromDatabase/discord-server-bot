@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-const { Giveaways } = require("../src/Giveaways");
-const { WebScraping } = require("../src/WebScraping");
+const { Giveaways } = require('../src/Giveaways');
+const { WebScraping } = require('../src/WebScraping');
 
 const { giveawaySites } = Giveaways;
 const giveawaySources = Object.keys(giveawaySites);
@@ -31,15 +31,15 @@ beforeAll(async () => {
   givFetchResult = await fetchGivSites();
 });
 
-test("Tests if all http requests were handled", () => {
+test('Tests if all http requests were handled', () => {
   givFetchResult.forEach((givSite) => {
     expect(givSite).not.toHaveLength(0);
   });
 });
 
-describe("Checks giveaway object properties", () => {
+describe('Checks giveaway object properties', () => {
   function checkProperties(giveaway) {
-    const properties = ["title", "url", "body"];
+    const properties = ['title', 'url', 'body'];
     properties.forEach((prop) => {
       expect(giveaway).toHaveProperty(prop);
       expect(giveaway[prop]).not.toHaveLength(0);

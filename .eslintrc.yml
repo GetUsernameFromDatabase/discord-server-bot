@@ -1,12 +1,14 @@
 env:
     node: true
-parser: "@babel/eslint-parser"
+parser: '@babel/eslint-parser'
 parserOptions:
     requireConfigFile: false
 extends: ['airbnb-base', 'prettier']
 rules:
+  prettier/prettier: ['error', 
+    {'singleQuote': true}]
   no-plusplus: 0
   func-names: 0
-  prettier/prettier: ['error']
+
 plugins:
   - 'prettier'

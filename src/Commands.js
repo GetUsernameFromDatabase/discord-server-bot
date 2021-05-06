@@ -1,7 +1,7 @@
-const prefix = "€";
+const prefix = '€';
 
 class Commands {
-  constructor(commands = [], description = "", header = "") {
+  constructor(commands = [], description = '', header = '') {
     this.commands = commands;
     this.description = description;
     this.header = header;
@@ -12,7 +12,7 @@ class Commands {
   static Command(
     cmd,
     response = function () {},
-    description = "",
+    description = '',
     parameters = Commands.Parameters()
   ) {
     const object = {
@@ -26,15 +26,15 @@ class Commands {
     return object;
   }
 
-  static Parameters(usage = "", permissions = [], allowedRoles = []) {
+  static Parameters(usage = '', permissions = [], allowedRoles = []) {
     // Permissions: https://discord.com/developers/docs/topics/permissions
     // eslint-disable-next-line no-param-reassign
     allowedRoles =
-      typeof permissions === typeof "" ? new Array(allowedRoles) : allowedRoles;
+      typeof permissions === 'string' ? new Array(allowedRoles) : allowedRoles;
 
     // eslint-disable-next-line no-param-reassign
     permissions =
-      typeof permissions === typeof "" ? new Array(permissions) : permissions;
+      typeof permissions === 'string' ? new Array(permissions) : permissions;
 
     const object = {
       usage,
