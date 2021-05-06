@@ -15,16 +15,17 @@ class WebScraping {
       });
   }
 
+  /* eslint-disable no-console */
   static GetSteamAnnouncements(html) {
-    /* eslint-disable no-console */
     var announcements = [];
+
     var $ = cheerio.load(html, { decodeEntities: true });
     $('div.announcement').each((_i, el) => {
       let body = $(el).find('div.bodytext');
       body.find('blockquote.bb_blockquote').replaceWith();
       // The body has leading and trailing spaces
       body = WebScraping.HTMLIntoMD(body.html());
-      console.log(body.html() + '\n');
+      // console.log(body.html() + '\n');
 
       let annTitle = $(el).children().first();
       announcements.push({
@@ -38,7 +39,35 @@ class WebScraping {
 
   static HTMLIntoMD(html = '') {
     var $ = cheerio.load(html.trim(), { decodeEntities: true }, false);
-    console.log(null);
+    // Turns hyperlinks into MD links
+    $('a').each((_i, el) => {
+      const $el = $(el);
+      $el.replaceWith(`[${$el.text()}](${$el.attr('href')})`);
+    });
+    // Turns breaks into newlines
+    $('br').each((_i, el) => { $(el).replaceWith('\n'); });
+
+    // Converts <i> => _italic_ and <b> => **bold** (they need to be seperate
+    //  could be because replaceWith makes changes to children as well)
+    // - SF most use cases have had an * already in html, so using _ for i
+    $('i').each((_i, el) => { $(el).replaceWith(`_${$(el).html()}_`); });
+    $('b').each((_i, el) => { $(el).replaceWith(`**${$(el).html()}**`); });
+
+    // Headings into MD
+    const headingCSS = 'h1, h2, h3, h4, h5, h6, h11d'
+      .concat(', .bb_h1'); // heading class I've seen used in steam
+
+    let xd = cheerio.load('<h11d>Header1<h2>Header2</h2></h11d><div class="bb_h1">Instructions:</div>', { decodeEntities: true }, false);
+    xd(headingCSS).each((_i, el) => {
+      const rgx = /\d+(\B)/;
+      const hLevel = rgx.test(el.tagName)
+        ? rgx.exec(el.tagName)[0] : rgx.exec(el.attribs.class)?.[0];
+      console.log(hLevel);
+      const h = '#'.repeat(hLevel);
+      xd(el).replaceWith(`${h} ${xd(el).html()}`);
+    });
+    // console.log($.html());
+    console.log(xd.html());
     return $;
   }
 }

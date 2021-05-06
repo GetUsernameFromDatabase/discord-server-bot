@@ -22,7 +22,7 @@ class Giveaways {
   static giveawaySites = {
     steam:
       {
-        url: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing',
+        url: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=7',
         callback: WebScraping.GetSteamAnnouncements
       }
   };

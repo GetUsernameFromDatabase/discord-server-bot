@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 /* eslint-disable no-undef */
+/* eslint-disable no-console */
 const {
   Giveaways
 } = require('../src/Giveaways');
@@ -40,6 +40,7 @@ describe('Checks giveaway object properties', () => {
     });
   }
   function checkGiveaways(source) {
+    expect(givFetchResult).not.toBeNull();
     let i = Object.keys(giveawaySites).indexOf(source);
     let src = givFetchResult[i];
     expect(src).not.toHaveLength(0);
