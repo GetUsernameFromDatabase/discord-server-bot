@@ -1,48 +1,44 @@
-require('dotenv').config();
-const {
-  BotActivity
-} = require('./BotActivity');
-const {
-  Giveaways
-} = require('./Giveaways');
-const {
-  Messaging
-} = require('./Messaging');
-const {
-  Identification,
-  client
-} = require('./Identification');
-const { prefix } = require('./Commands');
+const { BotActivity } = require("./BotActivity");
+const { Giveaways } = require("./Giveaways");
+const { Messaging } = require("./Messaging");
+const { Identification, client } = require("./Identification");
+const { prefix } = require("./Commands");
 
-function EngineStart() {
-  Identification.Server = client.guilds.cache.get(process.env.ServerID);
-  // Gets the live version of my user
-  client.users.fetch(Identification.MyUser.id)
-    .then(x => { Identification.MyUser = x; })
-    .catch(error => {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    });
+client.login(process.env.TOKEN);
 
-  /* eslint-disable no-new */
-  // Starts the bot activity
-  new BotActivity();
-  // Initiates giveaway functions
-  new Giveaways();
-}
-
-client.once('ready', () => {
+client.once("ready", async () => {
   // eslint-disable-next-line no-console
   console.log(`Logged in as ${client.user.tag}!`);
+  // Gets my up to date user data
+  await client.users
+    .fetch(Identification.MyUser.id)
+    .then((usr) => {
+      Identification.MyUser = usr;
+    })
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(err);
+    });
+  // Gets my server
+  await client.guilds
+    .fetch(process.env.ServerID)
+    .then((srv) => {
+      Identification.Server = srv;
+    })
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(err);
+    });
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
-  EngineStart();
+  /* eslint-disable no-new */
+  new BotActivity(client);
+  new Giveaways();
+  /* eslint-enable no-new */
 });
 
-client.on('message', msg => {
+client.on("message", (msg) => {
   if (msg.content[0] === prefix) {
     Messaging.ReactToCommand(msg);
   }
 });
-
-client.login(process.env.TOKEN);

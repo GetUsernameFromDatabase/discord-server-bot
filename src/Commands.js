@@ -1,42 +1,45 @@
-const prefix = '€';
+const prefix = "€";
 
 class Commands {
-  constructor(commands = [], description = '', header = '') {
+  constructor(commands = [], description = "", header = "") {
     this.commands = commands;
     this.description = description;
     this.header = header;
 
-    this.callouts = Array.from(commands.map(x => {
-      return x.cmd;
-    }));
+    this.callouts = Array.from(commands.map((x) => x.cmd));
   }
 
-  static Command(cmd, response = function () {}, description = '', parameters = Commands.Parameters()) {
-    let object = {
+  static Command(
+    cmd,
+    response = function () {},
+    description = "",
+    parameters = Commands.Parameters()
+  ) {
+    const object = {
       cmd: prefix + cmd,
-      response: response,
-      description: description,
-      parameters: parameters,
+      response,
+      description,
+      parameters,
 
-      name: cmd
+      name: cmd,
     };
     return object;
   }
 
-  static Parameters(usage = '', permissions = [], allowedRoles = []) {
+  static Parameters(usage = "", permissions = [], allowedRoles = []) {
     // Permissions: https://discord.com/developers/docs/topics/permissions
     // eslint-disable-next-line no-param-reassign
-    allowedRoles = typeof (permissions) === typeof ('')
-      ? new Array(allowedRoles) : allowedRoles;
+    allowedRoles =
+      typeof permissions === typeof "" ? new Array(allowedRoles) : allowedRoles;
 
     // eslint-disable-next-line no-param-reassign
-    permissions = typeof (permissions) === typeof ('')
-      ? new Array(permissions) : permissions;
+    permissions =
+      typeof permissions === typeof "" ? new Array(permissions) : permissions;
 
-    let object = {
-      usage: usage,
-      permissions: permissions,
-      allowed_roles: allowedRoles
+    const object = {
+      usage,
+      permissions,
+      allowed_roles: allowedRoles,
     };
     return object;
   }

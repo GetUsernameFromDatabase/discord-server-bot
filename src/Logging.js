@@ -3,12 +3,12 @@
 class Logging {
   static LogNewDay() {
     function newDayAnnouncement() {
-      let now = new Date();
-      let h = now.getHours();
+      const now = new Date();
+      const h = now.getHours();
 
       function announcement() {
-        let fullDate = now.getDate() + '.' + now.getMonth() + '.' + now.getFullYear();
-        console.warn('  Current Date: ' + fullDate);
+        const fullDate = `${now.getDate()}.${now.getMonth()}.${now.getFullYear()}`;
+        console.warn(`  Current Date: ${fullDate}`);
         console.log();
       }
 
@@ -24,12 +24,12 @@ class Logging {
       announcement();
     }
     // Gets what time is it - in order for it to be able to calculate when new day starts
-    let now = new Date();
-    let dh = 24 - now.getHours() - 1; // -1 accounts for minutes
-    let dm = 60 - now.getMinutes() - 1; // -1 accounts for seconds
-    let ds = 60 - now.getSeconds();
+    const now = new Date();
+    const dh = 24 - now.getHours() - 1; // -1 accounts for minutes
+    const dm = 60 - now.getMinutes() - 1; // -1 accounts for seconds
+    const ds = 60 - now.getSeconds();
 
-    let dms = dh * 60 * 60 * 1000 + dm * 60 * 1000 + ds * 1000;
+    const dms = dh * 60 * 60 * 1000 + dm * 60 * 1000 + ds * 1000;
     this.NDLIID = setTimeout(newDayAnnouncement, dms);
     setTimeout(function () {
       this.NDLIID = setInterval(newDayAnnouncement, 86400000);

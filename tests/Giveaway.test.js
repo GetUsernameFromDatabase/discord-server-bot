@@ -1,30 +1,26 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-const {
-  Giveaways
-} = require('../src/Giveaways');
-const {
-  WebScraping
-} = require('../src/WebScraping');
+const { Giveaways } = require("../src/Giveaways");
+const { WebScraping } = require("../src/WebScraping");
 
-const giveawaySites = Giveaways.giveawaySites;
+const { giveawaySites } = Giveaways;
 const giveawaySources = Object.keys(giveawaySites);
-var givFetchResult = null; // Will be changed in beforeAll
+let givFetchResult = null; // Will be changed in beforeAll
 
 function checkGiveaways(source, checkFunction) {
   expect(givFetchResult).not.toBeNull();
-  let i = Object.keys(giveawaySites).indexOf(source);
-  let src = givFetchResult[i];
+  const i = Object.keys(giveawaySites).indexOf(source);
+  const src = givFetchResult[i];
   expect(src).not.toHaveLength(0);
   src.forEach(checkFunction);
 }
 
 function fetchGivSites() {
-  var promises = [];
+  const promises = [];
 
   Object.keys(giveawaySites).forEach((key) => {
-    let url = giveawaySites[key].url;
-    let callback = giveawaySites[key].callback;
+    const { url } = giveawaySites[key];
+    const { callback } = giveawaySites[key];
     promises.push(WebScraping.SimpleFetch(url).then(callback));
   });
 
@@ -35,15 +31,15 @@ beforeAll(async () => {
   givFetchResult = await fetchGivSites();
 });
 
-test('Tests if all http requests were handled', ()=> {
+test("Tests if all http requests were handled", () => {
   givFetchResult.forEach((givSite) => {
     expect(givSite).not.toHaveLength(0);
   });
 });
 
-describe('Checks giveaway object properties', () => {
+describe("Checks giveaway object properties", () => {
   function checkProperties(giveaway) {
-    const properties = ['title', 'url', 'body'];
+    const properties = ["title", "url", "body"];
     properties.forEach((prop) => {
       expect(giveaway).toHaveProperty(prop);
       expect(giveaway[prop]).not.toHaveLength(0);

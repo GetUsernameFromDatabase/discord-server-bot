@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'My Discord Server Bot',
-  testEnvironment: 'node',
+  displayName: "My Discord Server Bot",
+  testEnvironment: "node",
   verbose: true,
-  bail: true
+  bail: true,
 };
