@@ -18,7 +18,7 @@ class Giveaways {
   static giveawaySites = {
     steam: {
       url:
-        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=7',
+        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing',
       callback: WebScraping.GetSteamAnnouncements,
     },
   };
@@ -42,12 +42,21 @@ class Giveaways {
       );
   }
 
-  // eslint-disable-next-line class-methods-use-this
   PostGiveaways(giveaways = []) {
-    giveaways.forEach((giv) => {
-      const msg = Messaging.GetEmbeddedMsg(giv.title, giv.url, giv.body);
-      Logging.Log(msg);
-    });
+    function modifyCredits(giv) {
+      let newBody = null;
+      const credit = giv.body.split('\n').pop();
+      if (credit.includes(' join our ')) {
+        const newCredit = `Information taken from:\n${giv.url}`;
+        newBody = giv.body.replace(credit, newCredit);
+      }
+      return newBody || giv.body;
+    }
+
+    const embGiveaways = giveaways.map((giv) =>
+      Messaging.GetEmbeddedMsg(giv.title, giv.url, modifyCredits(giv))
+    );
+    Messaging.MassMessageSend(this.channel, embGiveaways, true);
   }
 }
 exports.Giveaways = Giveaways;

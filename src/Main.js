@@ -11,7 +11,6 @@ client.once('ready', async () => {
   // eslint-disable-next-line no-console
   await Identification.UpdateMyUser(); // Gets my up to date user data
   await Identification.UpdateServer(); // Gets my server
-
   Logging.Greet();
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS

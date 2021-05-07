@@ -132,48 +132,50 @@ class Messaging {
     return MsgEmbed;
   }
 
-  static CheckDuplicateMessage(message, messages) {
-    function GetMsgValue(msg) {
-      return msg.fields.length === 0 ? msg.description : msg.fields[0].value;
-    }
+  /**
+   * @param {String | Discord.MessageEmbed |Discord.Message} message
+   * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages
+   * @return {Boolean} Wheter it was a duplicate or not
+   */
+  static IsDuplicateMessage(message, messages) {
+    const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
+    const checkAgainstEmbeds = (obj) => obj.embeds[0].title === message.title;
+    const checkAgainstContent = (obj) =>
+      obj.content === (message.content || message);
 
-    if (message.type === 'rich') {
-      return messages.some((msg) => GetMsgValue(msg) === GetMsgValue(message));
-    }
-    return messages.some((msg) => msg.content === message.content);
+    const callback = msgEmbedTypes.includes(message.type)
+      ? checkAgainstEmbeds
+      : checkAgainstContent;
+    return messages.some(callback);
   }
 
-  static MassMessageSend(messages, channel, messageType = null) {
-    function GetFilteredArray(TextChanMsgs) {
-      return TextChanMsgs.fetch({
-        limit: 100,
-      })
-        .then((chanMsgs) => {
-          if (messageType === 'rich') {
-            let embeds = [];
-            chanMsgs.forEach((msg) => {
-              embeds = embeds.concat(msg.embeds);
-            });
-            return embeds;
-          }
-          return Array.from(
-            chanMsgs.filter((msg) => msg.type === messageType).keys()
-          );
-        })
-        .catch(Logging.Error);
+  /**
+   * Messages should be all the same type
+   * @param {Discord.TextChannel} channel
+   * @param {Discord.MessageEmbed[] | Discord.Message[]} messages
+   * @returns {Boolean} Wether it was successful or not
+   */
+  static async MassMessageSend(channel, messages, checkDupes = true) {
+    if (!checkDupes) {
+      messages.forEach((msg) => channel.send(msg));
+      return true;
     }
 
-    if (messageType === null) {
-      messages.forEach((msg) => channel.send(msg));
-    } else {
-      GetFilteredArray(channel.messages).then((chanMsgs) => {
-        messages.forEach((msg) => {
-          if (!this.CheckDuplicateMessage(msg, chanMsgs)) {
-            channel.send(msg);
-          }
-        });
-      });
+    const maxChanMsgs = await channel.messages
+      .fetch({ limit: 100 })
+      .catch(Logging.Error);
+    if (typeof maxChanMsgs === 'undefined') {
+      Logging.Error(`Couldn't fetch ${channel.name} messages`);
+      return false;
     }
+
+    const filteredChanMsgs = maxChanMsgs
+      .filter((msg) => msg.author.id === client.user.id)
+      .map((msg) => ({ content: msg.content, embeds: msg.embeds }));
+    messages
+      .filter((msg) => !Messaging.IsDuplicateMessage(msg, filteredChanMsgs))
+      .forEach((msg) => channel.send(msg));
+    return true;
   }
 }
 exports.Messaging = Messaging;
