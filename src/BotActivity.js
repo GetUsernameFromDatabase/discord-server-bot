@@ -2,6 +2,22 @@ const { client } = require('./Identification');
 const { Logging } = require('./Logging');
 
 class BotActivity {
+  iteration = 0; // Current activity index
+
+  activities = [
+    BotActivity.MakeActObj(
+      "How I'm disassembled and reassembled differently",
+      1.1,
+      'WATCHING',
+      true
+    ),
+    BotActivity.MakeActObj('Poppet', undefined, undefined, true),
+    BotActivity.MakeActObj('with my vodka bottle'),
+    BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
+    BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
+    BotActivity.MakeActObj("Jesus Christ, that's a pretty face", 0),
+  ];
+
   constructor() {
     // Makes activities that should repeat repeat
     const nonRepAct = [];
@@ -20,8 +36,6 @@ class BotActivity {
     // Starts iterating through activities
     this.ChangeActivity(this);
   }
-
-  iteration = 0; // Current activity index
 
   /**
    * @param {String} name Name of the activity displayed
@@ -46,20 +60,6 @@ class BotActivity {
       several: repeat,
     };
   }
-
-  activities = [
-    BotActivity.MakeActObj(
-      "How I'm disassembled and reassembled differently",
-      1.1,
-      'WATCHING',
-      true
-    ),
-    BotActivity.MakeActObj('Poppet', undefined, undefined, true),
-    BotActivity.MakeActObj('with my vodka bottle'),
-    BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-    BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
-    BotActivity.MakeActObj("Jesus Christ, that's a pretty face", 0),
-  ];
 
   /* eslint-disable class-methods-use-this */
   /** A workaround to get it to be called with this. and for it to continue working
