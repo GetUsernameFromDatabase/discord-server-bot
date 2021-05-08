@@ -45,79 +45,47 @@ class Messaging {
     const cmd = value[0];
   }
 
-  static MakeCustomField(title, value, inline = false) {
-    return {
-      name: title === '' ? '\u200B' : title,
-      value,
-      inline,
-    };
-  }
-
-  static GetEmbeddedMsg(title = '', titleURL = '', fields = [], imageURL = '') {
+  /**
+   * @param {String | String[] | Discord.EmbedField[]} fields
+   * @param {{title: String, url: String}} title
+   * @returns {Discord.MessageEmbed}
+   */
+  static GetEmbeddedMsg(fields, title = { title: '', url: '' }, imageURL = '') {
     /* eslint-disable no-param-reassign */
     const maxFieldValue = 1024;
-    if (typeof fields === 'string') {
-      fields = new Array(fields);
-    }
+    // https://stackoverflow.com/questions/6259515/how-can-i-split-a-string-into-segments-of-n-characters
+    // https://regex101.com/ I love this site
+    const sizeRe = new RegExp(`[\\s\\S]{1,${maxFieldValue}}(?<=\\n|$)`, 'g');
 
-    function TextIntoField(text) {
-      return {
-        name: Messaging.blank,
-        value: text,
-        inline: false,
-      };
-    }
-
-    // TODO: Make it account for markdown links and similar things
-    function TextTooBig(text, fieldTitle = Messaging.blank) {
-      // https://stackoverflow.com/questions/6259515/how-can-i-split-a-string-into-segments-of-n-characters
-      const sizeRe = new RegExp(`.{1,${maxFieldValue}}`, 'g');
-      const texts = text.match(sizeRe) || [];
-
-      // Neccessary if there is a need for a field title
-      const newFields = new Array({
-        name: fieldTitle,
-        value: texts[0],
-        inline: false,
-      });
-      // Adds the rest of the strings into the fields array
-      for (let i = 1; i < texts.length; i++) {
-        newFields.push(TextIntoField(texts[i]));
-      }
-      return newFields;
-    }
-
-    const msgEmbedFields = [];
-    fields.forEach((field) => {
-      if (typeof field === 'string') {
-        field =
-          field.length >= maxFieldValue
-            ? TextTooBig(field)
-            : TextIntoField(field);
-      } else if (field.value.length >= maxFieldValue) {
-        field = TextTooBig(field.value, field.name);
-      }
-
-      if (Array.isArray(field)) {
-        msgEmbedFields.concat(field);
+    let embedFields = [];
+    if (typeof fields === 'string' || typeof fields[0] === 'string') {
+      if (Array.isArray(fields)) {
+        fields.forEach((str) => str.match(sizeRe));
       } else {
-        msgEmbedFields.push(field);
+        fields = fields.match(sizeRe);
       }
-    });
+      fields.forEach((field) =>
+        embedFields.push({ name: Messaging.blank, value: field, inline: false })
+      );
+    } else {
+      embedFields = fields;
+    }
 
-    // fields input can be just a string in an array
     const MesEmb = new Discord.MessageEmbed()
-      .setTitle(title)
-      .addFields(msgEmbedFields);
-    if (titleURL !== '') {
-      MesEmb.setURL(titleURL);
-    }
-    if (imageURL !== '') {
-      MesEmb.setImage(imageURL);
-    }
+      .setTitle(title.title)
+      .addFields(embedFields);
+    if (typeof title.url !== 'undefined' && title.url !== '')
+      MesEmb.setURL(title.url);
+    if (imageURL !== '') MesEmb.setImage(imageURL);
+
     return this.Signature(MesEmb);
   } /* eslint-enable no-param-reassign */
 
+  /**
+   * @param {Discord.MessageEmbed} MsgEmbed
+   * @param {Boolean} hexColour To use bot role colour or not
+   * @returns {Discord.MessageEmbed}
+   */
   static Signature(MsgEmbed, hexColour = false) {
     const me = Identification.MyUser;
 
@@ -133,17 +101,18 @@ class Messaging {
   }
 
   /**
-   * @param {String | Discord.MessageEmbed |Discord.Message} message
-   * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages
+   * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck Message to be checked
+   * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages Messages to check against
    * @return {Boolean} Wheter it was a duplicate or not
    */
-  static IsDuplicateMessage(message, messages) {
+  static IsDuplicateMessage(msgToCheck, messages) {
     const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
-    const checkAgainstEmbeds = (obj) => obj.embeds[0].title === message.title;
+    const checkAgainstEmbeds = (obj) =>
+      obj.embeds[0].title === msgToCheck.title;
     const checkAgainstContent = (obj) =>
-      obj.content === (message.content || message);
+      obj.content === (msgToCheck.content || msgToCheck);
 
-    const callback = msgEmbedTypes.includes(message.type)
+    const callback = msgEmbedTypes.includes(msgToCheck.type)
       ? checkAgainstEmbeds
       : checkAgainstContent;
     return messages.some(callback);
@@ -151,8 +120,9 @@ class Messaging {
 
   /**
    * Messages should be all the same type
-   * @param {Discord.TextChannel} channel
-   * @param {Discord.MessageEmbed[] | Discord.Message[]} messages
+   * @param {Discord.TextChannel} channel TextChannel where to send
+   * @param {Discord.MessageEmbed[] | Discord.Message[]} messages Messages to send
+   * @param {Boolean} [checkDupes] Default is true
    * @returns {Boolean} Wether it was successful or not
    */
   static async MassMessageSend(channel, messages, checkDupes = true) {

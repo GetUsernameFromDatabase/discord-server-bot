@@ -18,7 +18,7 @@ class Giveaways {
   static giveawaySites = {
     steam: {
       url:
-        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing',
+        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=8',
       callback: WebScraping.GetSteamAnnouncements,
     },
   };
@@ -43,20 +43,27 @@ class Giveaways {
   }
 
   PostGiveaways(giveaways = []) {
-    function modifyCredits(giv) {
+    /**
+     * @param {String} body String where the credit is
+     * @param {String} referenceURL CreditURL
+     * @returns {String} Modified string
+     */
+    function modifyCredits(body, referenceURL) {
       let newBody = null;
-      const credit = giv.body.split('\n').pop();
+      const credit = body.split('\n').pop();
       if (credit.includes(' join our ')) {
-        const newCredit = `Information taken from:\n${giv.url}`;
-        newBody = giv.body.replace(credit, newCredit);
+        const newCredit = `Information taken from:\n${referenceURL}`;
+        newBody = body.replace(credit, newCredit);
       }
-      return newBody || giv.body;
+      return newBody || body;
     }
 
-    const embGiveaways = giveaways.map((giv) =>
-      Messaging.GetEmbeddedMsg(giv.title, giv.url, modifyCredits(giv))
-    );
-    Messaging.MassMessageSend(this.channel, embGiveaways, true);
+    const embGiveaways = giveaways.map((giv) => {
+      const { body, ...title } = giv;
+      return Messaging.GetEmbeddedMsg(modifyCredits(body, giv.url), title);
+    });
+    // TODO: Change to true - false for testing purposes
+    Messaging.MassMessageSend(this.channel, embGiveaways, false);
   }
 }
 exports.Giveaways = Giveaways;
