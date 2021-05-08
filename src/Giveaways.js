@@ -1,4 +1,4 @@
-const { client } = require('./Identification');
+const { ID } = require('./Identification');
 const { WebScraping } = require('./WebScraping');
 const { Messaging } = require('./Messaging');
 const { Logging } = require('./Logging');
@@ -10,7 +10,7 @@ class Giveaways {
 
   constructor() {
     // Initiates giveaway functions
-    this.channel = client.channels.cache.get(this.channelID);
+    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
@@ -58,7 +58,7 @@ class Giveaways {
       return newBody || body;
     }
 
-    const embGiveaways = giveaways.map((giv) => {
+    const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, ...title } = giv;
       return Messaging.GetEmbeddedMsg(modifyCredits(body, giv.url), title);
     });
