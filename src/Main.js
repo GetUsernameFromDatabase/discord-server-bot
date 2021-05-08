@@ -1,7 +1,7 @@
 const { BotActivity } = require('./BotActivity');
 const { Giveaways } = require('./Giveaways');
 const { Messaging } = require('./Messaging');
-const { Identification, client } = require('./Identification');
+const { Update, client } = require('./Identification');
 const { Logging } = require('./Logging');
 const { prefix } = require('./Commands');
 
@@ -9,9 +9,9 @@ client.login(process.env.TOKEN);
 
 client.once('ready', async () => {
   // eslint-disable-next-line no-console
-  await Identification.UpdateMyUser(); // Gets my up to date user data
-  await Identification.UpdateServer(); // Gets my server
-  Logging.Greet();
+  await Update.Maintainer(); // Gets my up to date user data
+  await Update.Server(); // Gets my server
+  Logging.Greet(client);
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
   /* eslint-disable no-new */

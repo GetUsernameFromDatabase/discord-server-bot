@@ -10,7 +10,7 @@ class Giveaways {
 
   constructor() {
     // Initiates giveaway functions
-    this.channel = client.channels.cache.get(process.env.TestChanID);
+    this.channel = client.channels.cache.get(this.channelID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
@@ -18,7 +18,7 @@ class Giveaways {
   static giveawaySites = {
     steam: {
       url:
-        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?p=8',
+        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
       callback: WebScraping.GetSteamAnnouncements,
     },
   };
@@ -62,8 +62,7 @@ class Giveaways {
       const { body, ...title } = giv;
       return Messaging.GetEmbeddedMsg(modifyCredits(body, giv.url), title);
     });
-    // TODO: Change to true - false for testing purposes
-    Messaging.MassMessageSend(this.channel, embGiveaways, false);
+    Messaging.MassMessageSend(this.channel, embGiveaways);
   }
 }
 exports.Giveaways = Giveaways;

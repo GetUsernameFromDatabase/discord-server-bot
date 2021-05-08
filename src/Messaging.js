@@ -1,10 +1,8 @@
 const Discord = require('discord.js');
-const { Identification, client } = require('./Identification');
+const { ID, client } = require('./Identification');
 const { Similarity, TextManipulation } = require('./TextManipulation');
 const { Commands } = require('./Commands');
 const { Logging } = require('./Logging');
-
-const { Server } = Identification;
 
 class Messaging {
   /* Minimum prediction similarity -
@@ -57,21 +55,29 @@ class Messaging {
    */
   static GetEmbeddedMsg(fields, title = { title: '', url: '' }, imageURL = '') {
     /* eslint-disable no-param-reassign */
-    let embedFields = [];
-
     const segmentStr = TextManipulation.SegmentString;
-    if (typeof fields === 'string' || typeof fields[0] === 'string') {
-      if (Array.isArray(fields)) {
+    const { normalizeField } = Discord.MessageEmbed;
+    let embedFields = [];
+    if (typeof fields.name === 'undefined') {
+      if (Array.isArray(fields))
         fields = fields.reduce((acc, curr) => acc.concat(segmentStr(curr)), []);
-      } else {
-        fields = segmentStr(fields);
-      }
-      fields.forEach((field) =>
-        embedFields.push({ name: Messaging.blank, value: field, inline: false })
-      );
-    } else {
-      embedFields = fields;
-    }
+      else fields = segmentStr(fields);
+
+      // Gives
+      const mdH = '#';
+      fields.forEach((field) => {
+        const fieldWithH = field.split(new RegExp(`(${mdH}+[^${mdH}]*)`));
+        fieldWithH.forEach((h) => {
+          if (h === '') return;
+          let name = null;
+          if (h.startsWith(mdH)) {
+            [name] = h.split('\n');
+            h = h.replace(`${name}\n`, '');
+          }
+          embedFields.push(normalizeField(name || Messaging.blank, h));
+        });
+      });
+    } else embedFields = fields;
 
     const MesEmb = new Discord.MessageEmbed()
       .setTitle(title.title)
@@ -88,14 +94,13 @@ class Messaging {
    * @param {Boolean} hexColour To use bot role colour or not
    * @returns {Discord.MessageEmbed}
    */
-  static Signature(MsgEmbed, hexColour = false) {
-    const me = Identification.MyUser;
+  static Signature(MsgEmbed, hexColour = true) {
+    const me = ID.Maintainer;
 
     MsgEmbed.setFooter(`Bot by ${me.tag}`, me.avatarURL()).setTimestamp();
 
     if (hexColour) {
-      // let colour = Server.members.cache.get(client.user.id).displayHexColor;
-      const colour = Server.member(client.user).displayHexColor;
+      const colour = ID.Server.member(client.user).displayHexColor;
       MsgEmbed.setColor(colour);
     }
 
@@ -135,7 +140,9 @@ class Messaging {
 
     const maxChanMsgs = await channel.messages
       .fetch({ limit: 100 })
-      .catch(Logging.Error);
+      .catch((err) => {
+        Logging.Error(err, undefined, false);
+      });
     if (typeof maxChanMsgs === 'undefined') {
       Logging.Error(`Couldn't fetch ${channel.name} messages`);
       return false;

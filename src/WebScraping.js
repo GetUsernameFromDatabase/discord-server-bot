@@ -25,7 +25,6 @@ class WebScraping {
     $('div.announcement').each((_i, el) => {
       let body = $(el).find('div.bodytext');
       body.find('blockquote.bb_blockquote').replaceWith();
-      // The body has leading and trailing spaces
       body = WebScraping.HTMLIntoMD(body.html());
 
       const annTitle = $(el).children().first();
@@ -39,9 +38,19 @@ class WebScraping {
   }
 
   static HTMLIntoMD(html = '') {
-    const turndownService = new TurndownService({ bulletListMarker: '-' });
-    const md = turndownService.turndown(html);
-    return md;
+    const $ = cheerio.load(html, { decodeEntities: true }, false);
+    // So that turndown would convert them properly
+    const headingCSS = '.bb_h1'; // heading class I've seen used in steam
+    $(headingCSS).each((_i, el) => {
+      const hLevel = /h\d/.exec(el.attribs.class)?.[0][1];
+      if (hLevel) $(el).replaceWith(`<h${hLevel}>${$(el).html()}</h${hLevel}>`);
+    });
+
+    const turndownService = new TurndownService({
+      bulletListMarker: '-',
+      headingStyle: 'atx', // MD headings with # not underlying =*13
+    });
+    return turndownService.turndown($.html());
   }
 }
 

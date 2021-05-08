@@ -1,17 +1,19 @@
 /* eslint-disable no-console */
-const { client } = require('./Identification');
-
 class Logging {
-  static Greet() {
+  /**
+   * @param {import("discord.js").Client} client The bot
+   */
+  static Greet(client) {
     console.log(`Logged in as ${client.user.tag}!`);
   }
 
-  static Error(err, description = '') {
-    if (description !== '') {
-      console.error(description);
-    }
+  /**
+   * @param {Boolean} spacer To add a spacer after logging error
+   */
+  static Error(err, description = '', spacer = true) {
+    if (description !== '') console.error(description);
     console.error(err);
-    console.error();
+    if (spacer) console.error('\n');
   }
 
   static Log(msg) {
