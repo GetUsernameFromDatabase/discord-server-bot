@@ -4,40 +4,46 @@ const { Logging } = require('./Logging');
 class BotActivity {
   constructor() {
     // Makes activities that should repeat repeat
-    for (
-      let i = 0;
-      i < Math.floor(this.activities.length / this.ratf - 0.5);
-      i++
-    ) {
-      const index = (i + 1) * this.ratf + i;
+    const nonRepAct = [];
+    const repAct = this.activities.filter((x) => {
+      if (x.several === true) return true;
+      nonRepAct.push(x);
+      return false;
+    });
+    this.activities = [];
 
-      const repActvts = Array.from(
-        this.activities.filter((x) => x.several === true)
-      );
-      repActvts.forEach((x) => {
-        this.activities.splice(index, 0, x);
-      });
+    const raI = 3; // Interval of repetitive activities
+    for (let i = 0; i < nonRepAct.length; i++) {
+      if (i % (raI - 1) === 0) this.activities.push(...repAct);
+      this.activities.push(nonRepAct[i]);
     }
     // Starts iterating through activities
     this.ChangeActivity(this);
   }
 
-  SongLyricInterval = 0.5;
-
-  ratf = 3; // Dictates how many other activities have to between repetitive ones
-
   iteration = 0; // Current activity index
 
-  static MakeActObj(name, duration = 1, type = 'PLAYING', several = false) {
-    if (!Number.isFinite(duration)) {
-      Logging.Error(`Wrong duration inserted into${this.MakeActObj}\n
-      Name associated with the wrong input: "${name}"`);
+  /**
+   * @param {String} name Name of the activity displayed
+   * @param {Number} duration How long activity is displayed in min
+   * @param {String} type [PLAYING], WATCHING
+   * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
+   */
+  static MakeActObj(name, duration = 1, type = 'PLAYING', repeat = false) {
+    if (!Number.isFinite(duration) || duration < 0) {
+      Logging.Error(`Wrong duration (${duration}) inserted into${this.MakeActObj}\n
+      Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
+      // eslint-disable-next-line no-param-reassign
+      duration = 1;
+    } else if (duration === 0) {
+      // eslint-disable-next-line no-param-reassign
+      duration = name.length / 60;
     }
     return {
       name,
       duration,
-      type,
-      several,
+      type: type.toUpperCase(),
+      several: repeat,
     };
   }
 
@@ -48,28 +54,27 @@ class BotActivity {
       'WATCHING',
       true
     ),
+    BotActivity.MakeActObj('Poppet', undefined, undefined, true),
     BotActivity.MakeActObj('with my vodka bottle'),
     BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
     BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
-    BotActivity.MakeActObj(
-      "Jesus Christ, that's a pretty face",
-      this.SongLyricInterval
-    ),
+    BotActivity.MakeActObj("Jesus Christ, that's a pretty face", 0),
   ];
 
   /* eslint-disable class-methods-use-this */
+  /** A workaround to get it to be called with this. and for it to continue working
+   * @param {BotActivity} ActivityClass
+   */
   ChangeActivity(ActivityClass) {
     const cls = ActivityClass;
-    const activity = ActivityClass.activities[cls.iteration];
+    const activity = cls.activities[cls.iteration];
 
     client.user.setActivity(activity.name, {
       type: activity.type,
     });
 
     cls.iteration += 1;
-    if (cls.iteration >= cls.activities.length) {
-      cls.iteration = 0;
-    }
+    if (cls.iteration >= cls.activities.length) cls.iteration = 0;
 
     setTimeout(cls.ChangeActivity, activity.duration * 60 * 1000, cls);
   }

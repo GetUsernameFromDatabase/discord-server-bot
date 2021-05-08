@@ -9,13 +9,13 @@ class Commands {
     this.callouts = Array.from(commands.map((x) => x.cmd));
   }
 
-  static Command(
+  static MakeCommand(
     cmd,
     response = function () {},
     description = '',
     parameters = Commands.Parameters()
   ) {
-    const object = {
+    return {
       cmd: prefix + cmd,
       response,
       description,
@@ -23,7 +23,6 @@ class Commands {
 
       name: cmd,
     };
-    return object;
   }
 
   static Parameters(usage = '', permissions = [], allowedRoles = []) {

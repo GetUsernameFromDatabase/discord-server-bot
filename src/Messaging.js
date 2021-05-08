@@ -11,7 +11,7 @@ class Messaging {
 
   static blank = '\u200B'; // A way to not fill a field element
 
-  static HelpCMD = Commands.Command('help');
+  static HelpCMD = Commands.MakeCommand('help');
 
   static ALLCOMMANDS = []; // Placeholder
 
@@ -42,6 +42,9 @@ class Messaging {
     return response;
   }
 
+  /**
+   * @param {Discord.Message} msg
+   */
   static ReactToCommand(msg) {
     const value = msg.content.split(' ');
     // eslint-disable-next-line no-unused-vars
@@ -63,7 +66,7 @@ class Messaging {
         fields = fields.reduce((acc, curr) => acc.concat(segmentStr(curr)), []);
       else fields = segmentStr(fields);
 
-      // Gives
+      // Accounts for MD headings while making embedFields
       const mdH = '#';
       fields.forEach((field) => {
         const fieldWithH = field.split(new RegExp(`(${mdH}+[^${mdH}]*)`));
@@ -72,7 +75,7 @@ class Messaging {
           let name = null;
           if (h.startsWith(mdH)) {
             [name] = h.split('\n');
-            h = h.replace(`${name}\n`, '');
+            h = h.replace(`${name}\n`, Messaging.blank);
           }
           embedFields.push(normalizeField(name || Messaging.blank, h));
         });
