@@ -33,7 +33,7 @@ class BotActivity {
       this.activities.push(nonRepAct[i]);
     }
     // Starts iterating through activities
-    this.ChangeActivity(this);
+    this.ChangeActivity();
   }
 
   /**
@@ -60,22 +60,18 @@ class BotActivity {
     };
   }
 
-  /* eslint-disable class-methods-use-this */
-  /** A workaround to get it to be called with this. and for it to continue working
-   * @param {BotActivity} ActivityClass
-   */
-  ChangeActivity(ActivityClass) {
-    const cls = ActivityClass;
-    const activity = cls.activities[cls.iteration];
+  ChangeActivity() {
+    // Just to make it look prettier in VSC
+    const activity = this.activities[this.iteration];
 
     client.user.setActivity(activity.name, {
       type: activity.type,
     });
 
-    cls.iteration += 1;
-    if (cls.iteration >= cls.activities.length) cls.iteration = 0;
+    this.iteration += 1;
+    if (this.iteration >= this.activities.length) this.iteration = 0;
 
-    setTimeout(cls.ChangeActivity, activity.duration * 60 * 1000, cls);
+    setTimeout(this.ChangeActivity.bind(this), activity.duration * 5 * 1000);
   }
 }
 exports.BotActivity = BotActivity;

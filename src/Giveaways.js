@@ -8,14 +8,6 @@ const minInMs = 60 * 1000;
 class Giveaways {
   static channelID = process.env.GiveawaysID;
 
-  constructor() {
-    // Initiates giveaway functions
-    // TODO: CHANGE \/ this.channel = ID.Server.channels.cache.get(Giveaways.channelID); after testing
-    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
-    this.GetGiveaways();
-    setInterval(this.GetGiveaways, 60 * minInMs);
-  }
-
   static giveawaySites = {
     grabFreeGames: {
       url: 'https://grabfreegames.com/',
@@ -27,6 +19,14 @@ class Giveaways {
       callback: WebScraping.GetSteamAnnouncements,
     },
   };
+
+  constructor() {
+    // Initiates giveaway functions
+    // TODO: CHANGE \/ this.channel = ID.Server.channels.cache.get(Giveaways.channelID); after testing
+    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
+    this.GetGiveaways();
+    setInterval(this.GetGiveaways, 60 * minInMs);
+  }
 
   giveawaysCmdResponse(msg) {
     const message = 'This channel will be notified about giveaways';
@@ -42,12 +42,12 @@ class Giveaways {
     for (let i = 0; i < sources.length; i++) {
       const source = Giveaways.giveawaySites[sources[i]];
       // eslint-disable-next-line no-await-in-loop
-      const fetch = await WebScraping.SimpleFetch(source.url)
+      const results = await WebScraping.SimpleFetch(source.url)
         .then((val) => source.callback(val))
         .catch((err) => Logging.Error(err, 'Failed to reach giveaway website'));
 
-      if (typeof fetch !== 'undefined' && fetch.length !== 0) {
-        this.PostGiveaways(fetch);
+      if (typeof results !== 'undefined' && results.length !== 0) {
+        this.PostGiveaways(results);
         return true;
       }
     }
