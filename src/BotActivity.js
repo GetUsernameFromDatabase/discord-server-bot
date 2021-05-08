@@ -11,7 +11,6 @@ class BotActivity {
       'WATCHING',
       true
     ),
-    BotActivity.MakeActObj('Poppet', undefined, undefined, true),
     BotActivity.MakeActObj('with my vodka bottle'),
     BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
     BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),

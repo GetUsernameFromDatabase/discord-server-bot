@@ -25,3 +25,9 @@ client.on('message', (msg) => {
     Messaging.ReactToCommand(msg);
   }
 });
+
+client.on('disconnect', () => {
+  Logging.Error('Bot has disconnected!');
+});
+
+client.on('error', Logging.Error);

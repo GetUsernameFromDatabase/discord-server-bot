@@ -8,7 +8,7 @@ class Logging {
   }
 
   /**
-   * @param {Boolean} spacer To add a spacer after logging error
+   * @param {Boolean} spacer [true] adds a spacer after logging if true
    */
   static Error(err, description = '', spacer = true) {
     if (description !== '') console.error(description);

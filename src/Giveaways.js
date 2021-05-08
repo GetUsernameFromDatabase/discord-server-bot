@@ -10,12 +10,17 @@ class Giveaways {
 
   constructor() {
     // Initiates giveaway functions
-    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
+    // TODO: CHANGE \/ this.channel = ID.Server.channels.cache.get(Giveaways.channelID); after testing
+    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
 
   static giveawaySites = {
+    grabFreeGames: {
+      url: 'https://grabfreegames.com/',
+      callback: WebScraping.GetSteamAnnouncements,
+    },
     steam: {
       url:
         'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
@@ -32,16 +37,27 @@ class Giveaways {
     this.PostGiveaways();
   }
 
-  // TODO: Have multiple giveaway sites to switch between should there be an error
-  GetGiveaways() {
-    const { steam } = Giveaways.giveawaySites;
-    WebScraping.SimpleFetch(steam.url)
-      .then((val) => this.PostGiveaways(steam.callback(val)))
-      .catch((error) =>
-        Logging.Error(error, 'Failed to reach giveaway website')
-      );
+  async GetGiveaways() {
+    const sources = Object.keys(Giveaways.giveawaySites);
+    for (let i = 0; i < sources.length; i++) {
+      const source = Giveaways.giveawaySites[sources[i]];
+      // eslint-disable-next-line no-await-in-loop
+      const fetch = await WebScraping.SimpleFetch(source.url)
+        .then((val) => source.callback(val))
+        .catch((err) => Logging.Error(err, 'Failed to reach giveaway website'));
+
+      if (typeof fetch !== 'undefined' && fetch.length !== 0) {
+        this.PostGiveaways(fetch);
+        return true;
+      }
+    }
+    Logging.Error(new Error('No giveaways were found'));
+    return false;
   }
 
+  /**
+   * @param {{title:String, url: String, body: String}[]} giveaways
+   */
   PostGiveaways(giveaways = []) {
     /**
      * @param {String} body String where the credit is
@@ -59,8 +75,12 @@ class Giveaways {
     }
 
     const embGiveaways = giveaways.reverse().map((giv) => {
-      const { body, ...title } = giv;
-      return Messaging.GetEmbeddedMsg(modifyCredits(body, giv.url), title);
+      const { body, imageURL, ...title } = giv;
+      return Messaging.GetEmbeddedMsg(
+        modifyCredits(body, giv.url),
+        title,
+        imageURL
+      );
     });
     Messaging.MassMessageSend(this.channel, embGiveaways);
   }
