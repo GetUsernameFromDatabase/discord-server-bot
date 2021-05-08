@@ -3,7 +3,10 @@ const cheerio = require('cheerio');
 const TurndownService = require('turndown');
 
 class WebScraping {
-  // FormatSymbolsIntoHTML method makes it acocount for tml tag format (<x> and </x>)
+  /**
+   * @param {String} URL The url for get request
+   * @returns {Promise<any>} Get request promise
+   */
   static SimpleFetch(URL) {
     return axios
       .get(URL)
@@ -11,6 +14,11 @@ class WebScraping {
       .catch((error) => Promise.reject(error));
   }
 
+  /**
+   * Gets giv announcements from steamcommunity.com/.../announcements/?
+   * @param {String} html
+   * @returns {{title: String, url: String, body: String}[]} an array of announcements
+   */
   static GetSteamAnnouncements(html) {
     const announcements = [];
     const $ = cheerio.load(html, { decodeEntities: true });

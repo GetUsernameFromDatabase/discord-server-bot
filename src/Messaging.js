@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { Identification, client } = require('./Identification');
-const { Similarity } = require('./TextManipulation');
+const { Similarity, TextManipulation } = require('./TextManipulation');
 const { Commands } = require('./Commands');
 const { Logging } = require('./Logging');
 
@@ -17,6 +17,11 @@ class Messaging {
 
   static ALLCOMMANDS = []; // Placeholder
 
+  /**
+   * Gets a response for a wrong command
+   * @param {Discord.Message} msg Message to respond to
+   * @returns {String} The response for the message
+   */
   static WrongCommand(msg) {
     const suggestion =
       'I do not recognize this command\nDid you mean to write: `';
@@ -52,17 +57,14 @@ class Messaging {
    */
   static GetEmbeddedMsg(fields, title = { title: '', url: '' }, imageURL = '') {
     /* eslint-disable no-param-reassign */
-    const maxFieldValue = 1024;
-    // https://stackoverflow.com/questions/6259515/how-can-i-split-a-string-into-segments-of-n-characters
-    // https://regex101.com/ I love this site
-    const sizeRe = new RegExp(`[\\s\\S]{1,${maxFieldValue}}(?<=\\n|$)`, 'g');
-
     let embedFields = [];
+
+    const segmentStr = TextManipulation.SegmentString;
     if (typeof fields === 'string' || typeof fields[0] === 'string') {
       if (Array.isArray(fields)) {
-        fields.forEach((str) => str.match(sizeRe));
+        fields = fields.reduce((acc, curr) => acc.concat(segmentStr(curr)), []);
       } else {
-        fields = fields.match(sizeRe);
+        fields = segmentStr(fields);
       }
       fields.forEach((field) =>
         embedFields.push({ name: Messaging.blank, value: field, inline: false })

@@ -1,9 +1,23 @@
 class TextManipulation {
-  static ReplacerAll(base, replacee, replacement = '') {
-    return base.split(replacee).join(replacement);
+  /**
+   * @param {String} string String to segment
+   * @param {Number} [limit] Maximum segment size - DEFAULT: 1024
+   * @returns {RegExpMatchArray} Segmented string
+   */
+  static SegmentString(string, limit = 1024) {
+    // https://stackoverflow.com/questions/6259515/how-can-i-split-a-string-into-segments-of-n-characters
+    // https://regex101.com/ I love this site
+    const rgx = new RegExp(`[\\s\\S]{1,${limit}}(?<=\\n|$)`, 'g');
+    return string.match(rgx);
   }
 
-  static Similarity(s1 = '', s2 = '') {
+  /**
+   * Checks how similar strings are
+   * @param {String} s1 One string
+   * @param {String} s2 Second string
+   * @returns {Number} How similar they are - from 0 till 1
+   */
+  static Similarity(s1, s2) {
     let longer = s1.length >= s2.length ? s1 : s2;
     let shorter = s1 === longer ? s2 : s1;
 
@@ -19,6 +33,12 @@ class TextManipulation {
     return editDist / parseFloat(longer.length);
   }
 
+  /**
+   * How many edits need to be done to make the shorter string be the same as the longer one
+   * @param {String} longer The longer string
+   * @param {String} shorter The shorter string
+   * @returns {Number} Integer - how many edits need to be done
+   */
   static editDistance(longer, shorter) {
     const costs = [];
     for (let i = 0; i <= longer.length; i++) {
