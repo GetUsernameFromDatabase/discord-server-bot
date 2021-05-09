@@ -11,6 +11,21 @@ class TextManipulation {
     return string.match(rgx);
   }
 
+  /** This goes by the assumption that credits are at the bottom line
+   * @param {String} body String where the credit is
+   * @param {String} referenceURL CreditURL
+   * @returns {String} Modified body
+   */
+  static modifyCredits(body, referenceURL) {
+    let newBody = null;
+    const credit = body.split('\n').pop();
+    if (credit.includes(' join our ')) {
+      const newCredit = `Information taken from:\n${referenceURL}`;
+      newBody = body.replace(credit, newCredit);
+    }
+    return newBody ?? body;
+  }
+
   /**
    * Checks how similar strings are
    * @param {String} s1 One string

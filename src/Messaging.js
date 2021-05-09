@@ -74,19 +74,19 @@ class Messaging {
           if (h === '') return;
           let name = null;
           if (h.startsWith(mdH)) {
-            [name] = h.split('\n');
+            [name] = h.split('\n').trim();
             h = h.replace(`${name}\n`, Messaging.blank);
           }
-          embedFields.push(normalizeField(name || Messaging.blank, h));
+          embedFields.push(normalizeField(name || Messaging.blank, h.trim()));
         });
       });
     } else embedFields = fields;
 
     const MesEmb = new Discord.MessageEmbed()
-      .setTitle(title.title)
+      .setTitle(title.title.trim())
       .addFields(embedFields);
     if (typeof title.url !== 'undefined' && title.url !== '')
-      MesEmb.setURL(title.url);
+      MesEmb.setURL(title.url.trim());
     if (imageURL !== '') MesEmb.setImage(imageURL);
 
     return this.Signature(MesEmb);
@@ -117,10 +117,17 @@ class Messaging {
    */
   static IsDuplicateMessage(msgToCheck, messages) {
     const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
-    const checkAgainstEmbeds = (obj) =>
-      obj.embeds[0].title === msgToCheck.title;
+    const checkAgainstEmbeds = (obj) => {
+      const objEmb = obj.embeds[0];
+      const titles = {
+        obj: objEmb.title.toLowerCase(),
+        msg: msgToCheck.title.toLowerCase(),
+      };
+      const cond1 = titles.obj === titles.msg;
+      return cond1;
+    };
     const checkAgainstContent = (obj) =>
-      obj.content === (msgToCheck.content || msgToCheck);
+      obj.content === (msgToCheck.content ?? msgToCheck);
 
     const callback = msgEmbedTypes.includes(msgToCheck.type)
       ? checkAgainstEmbeds

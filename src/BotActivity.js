@@ -71,7 +71,10 @@ class BotActivity {
     this.iteration += 1;
     if (this.iteration >= this.activities.length) this.iteration = 0;
 
-    setTimeout(this.ChangeActivity.bind(this), activity.duration * 5 * 1000);
+    setTimeout(
+      this.ChangeActivity.bind(this),
+      activity.duration * Logging.minInMs
+    );
   }
 }
 exports.BotActivity = BotActivity;

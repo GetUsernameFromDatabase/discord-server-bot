@@ -19,8 +19,7 @@ function fetchGivSites() {
   const promises = [];
 
   Object.keys(giveawaySites).forEach((key) => {
-    const { url } = giveawaySites[key];
-    const { callback } = giveawaySites[key];
+    const { url, callback } = giveawaySites[key];
     promises.push(WebScraping.SimpleFetch(url).then(callback));
   });
 
@@ -39,7 +38,7 @@ test('Tests if all http requests were handled', () => {
 
 describe('Checks giveaway object properties', () => {
   function checkProperties(giveaway) {
-    const properties = ['title', 'url', 'body'];
+    const properties = ['title', 'url', 'body']; // Required properties
     properties.forEach((prop) => {
       expect(giveaway).toHaveProperty(prop);
       expect(giveaway[prop]).not.toHaveLength(0);

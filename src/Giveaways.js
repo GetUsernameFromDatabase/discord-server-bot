@@ -3,15 +3,13 @@ const { WebScraping } = require('./WebScraping');
 const { Messaging } = require('./Messaging');
 const { Logging } = require('./Logging');
 
-const minInMs = 60 * 1000;
-
 class Giveaways {
   static channelID = process.env.GiveawaysID;
 
   static giveawaySites = {
     grabFreeGames: {
-      url: 'https://grabfreegames.com/',
-      callback: WebScraping.GetSteamAnnouncements,
+      url: 'https://grabfreegames.com/free',
+      callback: WebScraping.GiveawaysFromGrabFreeGames,
     },
     steam: {
       url:
@@ -22,10 +20,10 @@ class Giveaways {
 
   constructor() {
     // Initiates giveaway functions
-    // TODO: CHANGE \/ this.channel = ID.Server.channels.cache.get(Giveaways.channelID); after testing
-    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
+    // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
+    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
-    setInterval(this.GetGiveaways, 60 * minInMs);
+    setInterval(this.GetGiveaways, 60 * Logging.minInMs);
   }
 
   giveawaysCmdResponse(msg) {
@@ -44,7 +42,7 @@ class Giveaways {
       // eslint-disable-next-line no-await-in-loop
       const results = await WebScraping.SimpleFetch(source.url)
         .then((val) => source.callback(val))
-        .catch((err) => Logging.Error(err, 'Failed to reach giveaway website'));
+        .catch((err) => Logging.Error(err, `${source}: FAILED`));
 
       if (typeof results !== 'undefined' && results.length !== 0) {
         this.PostGiveaways(results);
@@ -56,7 +54,7 @@ class Giveaways {
   }
 
   /**
-   * @param {{title:String, url: String, body: String}[]} giveaways
+   * @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways
    */
   PostGiveaways(giveaways = []) {
     /**
@@ -64,23 +62,12 @@ class Giveaways {
      * @param {String} referenceURL CreditURL
      * @returns {String} Modified string
      */
-    function modifyCredits(body, referenceURL) {
-      let newBody = null;
-      const credit = body.split('\n').pop();
-      if (credit.includes(' join our ')) {
-        const newCredit = `Information taken from:\n${referenceURL}`;
-        newBody = body.replace(credit, newCredit);
-      }
-      return newBody || body;
-    }
 
+    // Reversing this to make newer (top of array) giveaways
+    // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, imageURL, ...title } = giv;
-      return Messaging.GetEmbeddedMsg(
-        modifyCredits(body, giv.url),
-        title,
-        imageURL
-      );
+      return Messaging.GetEmbeddedMsg(body, title, imageURL);
     });
     Messaging.MassMessageSend(this.channel, embGiveaways);
   }

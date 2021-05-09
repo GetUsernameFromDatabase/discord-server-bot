@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 class Logging {
+  static minInMs = 60 * 1000;
+
   /**
    * @param {import("discord.js").Client} client The bot
    */

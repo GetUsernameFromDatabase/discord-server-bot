@@ -1,8 +1,8 @@
 {
   "name": "a",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "My server bot",
-  "main": "main.js",
+  "main": "src/Main.js",
   "dependencies": {
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.6",
@@ -28,6 +28,12 @@
     "lint": "eslint .",
     "test": "jest --forceExit --detectOpenHandles"
   },
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.14.4"
+  },
+  "repository": "github:GetUsernameFromDatabase/discord-server-bot",
+  "private": true,
   "author": "Ryan Kruberg",
   "license": "GPL-3.0"
 }
