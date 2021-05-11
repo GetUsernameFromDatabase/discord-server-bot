@@ -1,6 +1,6 @@
-const prefix = '€';
+export const prefix = '€';
 
-class Commands {
+export default class Commands {
   constructor(commands = [], description = '', header = '') {
     this.commands = commands;
     this.description = description;
@@ -43,4 +43,3 @@ class Commands {
     return object;
   }
 }
-exports.Commands = Commands;

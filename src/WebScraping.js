@@ -1,10 +1,11 @@
-const axios = require('axios').default;
-const cheerio = require('cheerio');
-const TurndownService = require('turndown');
-const { Logging } = require('./Logging');
-const { TextManipulation } = require('./TextManipulation');
+import axios from 'axios';
+import { load } from 'cheerio';
+import TurndownService from 'turndown';
 
-class WebScraping {
+import Logging from './Logging.js';
+import TextManipulation from './TextManipulation.js';
+
+export default class WebScraping {
   /**
    * @param {String} URL The url for get request
    * @returns {Promise<any>} Get request promise
@@ -23,7 +24,7 @@ class WebScraping {
    */
   static GetSteamAnnouncements(html) {
     const announcements = [];
-    const $ = cheerio.load(html, { decodeEntities: true });
+    const $ = load(html, { decodeEntities: true });
     $('div.announcement').each((_i, el) => {
       const annTitle = $(el).children().first();
       const title = annTitle.text();
@@ -46,7 +47,7 @@ class WebScraping {
    */
   static async GiveawaysFromGrabFreeGames(html) {
     const giveaways = [];
-    const $ = cheerio.load(html, { decodeEntities: true }, false);
+    const $ = load(html, { decodeEntities: true }, false);
     $('div.free-image > a > img').each((_i, el) => {
       const { src: imgURL, alt: title } = el.attribs;
       const url = $(el.parent).attr('href');
@@ -54,7 +55,7 @@ class WebScraping {
       const bodyCSS = 'p.article-content';
       const body = WebScraping.SimpleFetch(url)
         .then((val) =>
-          cheerio.load(val, { decodeEntities: true }, false)(bodyCSS).html()
+          load(val, { decodeEntities: true }, false)(bodyCSS).html()
         )
         .then(WebScraping.HTMLIntoMD)
         .catch(Logging.Error);
@@ -75,7 +76,7 @@ class WebScraping {
   }
 
   static HTMLIntoMD(html = '') {
-    const $ = cheerio.load(html, { decodeEntities: true }, false);
+    const $ = load(html, { decodeEntities: true }, false);
     // So that turndown would convert them properly
     const headingCSS = '.bb_h1'; // heading class I've seen used in steam
     $(headingCSS).each((_i, el) => {
@@ -90,5 +91,3 @@ class WebScraping {
     return turndownService.turndown($.html());
   }
 }
-
-exports.WebScraping = WebScraping;

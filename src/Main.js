@@ -1,9 +1,9 @@
-const { BotActivity } = require('./BotActivity');
-const { Giveaways } = require('./Giveaways');
-const { Messaging } = require('./Messaging');
-const { Update, client } = require('./Identification');
-const { Logging } = require('./Logging');
-const { prefix } = require('./Commands');
+import BotActivity from './BotActivity.js';
+import Giveaways from './Giveaways.js';
+import Messaging from './Messaging.js';
+import { Update, client } from './Identification.js';
+import Logging from './Logging.js';
+import { prefix } from './Commands.js';
 
 client.login(process.env.TOKEN);
 

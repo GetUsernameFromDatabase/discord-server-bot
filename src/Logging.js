@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-class Logging {
+export default class Logging {
   static minInMs = 60 * 1000;
 
   /**
@@ -22,4 +22,3 @@ class Logging {
     console.log(msg);
   }
 }
-exports.Logging = Logging;

@@ -1,8 +1,32 @@
 {
-  "name": "a",
-  "version": "0.1.0",
-  "description": "My server bot",
   "main": "src/Main.js",
+  "name": "my-discord-server-bot",
+  "author": "Ryan Kruberg",
+  "description": "Discord bot that I'm making for a discord server I'm co-owner of",
+  "version": "0.1.0",
+
+  "license": "GPL-3.0",
+  "repository": "github:GetUsernameFromDatabase/discord-server-bot",
+  "private": true,
+
+  "type": "module",
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.14.4"
+  },
+
+  "scripts": {
+    "start": "node --trace-warnings -r dotenv/config ./src/Main.js",
+    "lint": "eslint .",
+    "test": "jest --forceExit --detectOpenHandles"
+  },
+  "jest": {
+    "displayName": "My Discord Server Bot",
+    "testEnvironment": "node",
+    "verbose": true,
+    "bail": true
+  },
+
   "dependencies": {
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.6",
@@ -23,18 +47,5 @@
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1"
-  },
-  "scripts": {
-    "start": "node --trace-warnings -r dotenv/config ./src/Main.js",
-    "lint": "eslint .",
-    "test": "jest --forceExit --detectOpenHandles"
-  },
-  "engines": {
-    "node": ">= 14.0.0",
-    "npm": ">= 6.14.4"
-  },
-  "repository": "github:GetUsernameFromDatabase/discord-server-bot",
-  "private": true,
-  "author": "Ryan Kruberg",
-  "license": "GPL-3.0"
+  }
 }

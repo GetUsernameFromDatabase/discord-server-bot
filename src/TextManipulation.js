@@ -1,4 +1,4 @@
-class TextManipulation {
+export default class TextManipulation {
   /**
    * @param {String} string String to segment
    * @param {Number} [limit] Maximum segment size - DEFAULT: 1024
@@ -77,4 +77,3 @@ class TextManipulation {
     return costs[shorter.length];
   }
 }
-exports.TextManipulation = TextManipulation;

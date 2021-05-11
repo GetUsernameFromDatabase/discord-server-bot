@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-const { Giveaways } = require('../src/Giveaways');
-const { WebScraping } = require('../src/WebScraping');
+import Giveaways from '../src/Giveaways.js';
+import WebScraping from '../src/WebScraping.js';
 
 const { giveawaySites } = Giveaways;
 const giveawaySources = Object.keys(giveawaySites);

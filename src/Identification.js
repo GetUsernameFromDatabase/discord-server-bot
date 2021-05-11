@@ -1,15 +1,15 @@
-const Discord = require('discord.js');
-const { Logging } = require('./Logging');
+import { Client, User, Guild } from 'discord.js';
+import Logging from './Logging.js';
 
-const client = new Discord.Client();
+const client = new Client();
 const ID = {
-  Maintainer: new Discord.User(client, {
+  Maintainer: new User(client, {
     username: 'MiniGamer',
     discriminator: '4738',
     id: '186439588229677056',
     avatar: '24c90ae8f89d2b9989ba3cb4ff7e6eb1',
   }),
-  Server: new Discord.Guild(),
+  Server: new Guild(),
 };
 
 class Update {
@@ -31,6 +31,4 @@ class Update {
       .catch(Logging.Error);
   }
 }
-exports.Update = Update;
-exports.client = client;
-exports.ID = ID;
+export { Update, client, ID };

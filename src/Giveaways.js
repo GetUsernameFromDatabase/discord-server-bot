@@ -1,9 +1,9 @@
-const { ID } = require('./Identification');
-const { WebScraping } = require('./WebScraping');
-const { Messaging } = require('./Messaging');
-const { Logging } = require('./Logging');
+import { ID } from './Identification.js';
+import WebScraping from './WebScraping.js';
+import Messaging from './Messaging.js';
+import Logging from './Logging.js';
 
-class Giveaways {
+export default class Giveaways {
   static channelID = process.env.GiveawaysID;
 
   static giveawaySites = {
@@ -72,4 +72,3 @@ class Giveaways {
     Messaging.MassMessageSend(this.channel, embGiveaways);
   }
 }
-exports.Giveaways = Giveaways;

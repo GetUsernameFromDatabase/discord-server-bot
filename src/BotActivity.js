@@ -1,7 +1,7 @@
-const { client } = require('./Identification');
-const { Logging } = require('./Logging');
+import { client } from './Identification.js';
+import Logging from './Logging.js';
 
-class BotActivity {
+export default class BotActivity {
   iteration = 0; // Current activity index
 
   activities = [
@@ -77,4 +77,3 @@ class BotActivity {
     );
   }
 }
-exports.BotActivity = BotActivity;

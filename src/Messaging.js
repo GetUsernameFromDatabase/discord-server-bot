@@ -1,10 +1,11 @@
-const Discord = require('discord.js');
-const { ID, client } = require('./Identification');
-const { Similarity, TextManipulation } = require('./TextManipulation');
-const { Commands } = require('./Commands');
-const { Logging } = require('./Logging');
+import { MessageEmbed } from 'discord.js';
 
-class Messaging {
+import { ID, client } from './Identification.js';
+import TextManipulation from './TextManipulation.js';
+import Commands from './Commands.js';
+import Logging from './Logging.js';
+
+export default class Messaging {
   /* Minimum prediction similarity -
   is used to determine how similar text has to be to a command before it suggests it to the user */
   static mps = 0.3;
@@ -28,7 +29,7 @@ class Messaging {
     // Finds how similar the message is to all commands
     const predictions = {};
     Messaging.ALLCOMMANDS.forEach((x) => {
-      const chance = Similarity(x.cmd, msg);
+      const chance = TextManipulation.Similarity(x.cmd, msg);
       predictions[chance] = x.cmd;
     });
 
@@ -59,7 +60,7 @@ class Messaging {
   static GetEmbeddedMsg(fields, title = { title: '', url: '' }, imageURL = '') {
     /* eslint-disable no-param-reassign */
     const segmentStr = TextManipulation.SegmentString;
-    const { normalizeField } = Discord.MessageEmbed;
+    const { normalizeField } = MessageEmbed;
     let embedFields = [];
     if (typeof fields.name === 'undefined') {
       if (Array.isArray(fields))
@@ -82,7 +83,7 @@ class Messaging {
       });
     } else embedFields = fields;
 
-    const MesEmb = new Discord.MessageEmbed()
+    const MesEmb = new MessageEmbed()
       .setTitle(title.title.trim())
       .addFields(embedFields);
     if (typeof title.url !== 'undefined' && title.url !== '')
@@ -167,4 +168,3 @@ class Messaging {
     return true;
   }
 }
-exports.Messaging = Messaging;
