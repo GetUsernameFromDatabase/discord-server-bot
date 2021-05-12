@@ -1,20 +1,44 @@
 import { client } from './Identification.js';
 import Logging from './Logging.js';
 
+/**
+ * @param {String} name Name of the activity displayed
+ * @param {Number} duration How long activity is displayed in min
+ * @param {String} type [PLAYING], WATCHING
+ * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
+ */
+function MakeActObj(name, duration = 1, type = 'PLAYING', repeat = false) {
+  if (!Number.isFinite(duration) || duration < 0) {
+    Logging.Error(`Wrong duration (${duration}) inserted into${this.MakeActObj}\n
+      Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
+    // eslint-disable-next-line no-param-reassign
+    duration = 1;
+  } else if (duration === 0) {
+    // eslint-disable-next-line no-param-reassign
+    duration = name.length / 60;
+  }
+  return {
+    name,
+    duration,
+    type: type.toUpperCase(),
+    several: repeat,
+  };
+}
+
 export default class BotActivity {
   iteration = 0; // Current activity index
 
   activities = [
-    BotActivity.MakeActObj(
+    MakeActObj(
       "How I'm disassembled and reassembled differently",
       1.1,
       'WATCHING',
       true
     ),
-    BotActivity.MakeActObj('with my vodka bottle'),
-    BotActivity.MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-    BotActivity.MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
-    BotActivity.MakeActObj("Jesus Christ, that's a pretty face", 0),
+    MakeActObj('with my vodka bottle'),
+    MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
+    MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
+    MakeActObj("Jesus Christ, that's a pretty face", 0),
   ];
 
   constructor() {
@@ -34,30 +58,6 @@ export default class BotActivity {
     }
     // Starts iterating through activities
     this.ChangeActivity();
-  }
-
-  /**
-   * @param {String} name Name of the activity displayed
-   * @param {Number} duration How long activity is displayed in min
-   * @param {String} type [PLAYING], WATCHING
-   * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
-   */
-  static MakeActObj(name, duration = 1, type = 'PLAYING', repeat = false) {
-    if (!Number.isFinite(duration) || duration < 0) {
-      Logging.Error(`Wrong duration (${duration}) inserted into${this.MakeActObj}\n
-      Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
-      // eslint-disable-next-line no-param-reassign
-      duration = 1;
-    } else if (duration === 0) {
-      // eslint-disable-next-line no-param-reassign
-      duration = name.length / 60;
-    }
-    return {
-      name,
-      duration,
-      type: type.toUpperCase(),
-      several: repeat,
-    };
   }
 
   ChangeActivity() {
