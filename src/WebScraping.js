@@ -3,7 +3,7 @@ import { load } from 'cheerio';
 import TurndownService from 'turndown';
 
 import Logging from './Logging.js';
-import TextManipulation from './TextManipulation.js';
+import { ModifyCredits } from './TextManipulation.js';
 
 export default class WebScraping {
   /**
@@ -33,7 +33,7 @@ export default class WebScraping {
       let body = $(el).find('div.bodytext');
       body.find('blockquote.bb_blockquote').replaceWith();
       body = WebScraping.HTMLIntoMD(body.html());
-      body = TextManipulation.modifyCredits(body);
+      body = ModifyCredits(body);
 
       announcements.push({ title, url, body });
     });
@@ -46,7 +46,9 @@ export default class WebScraping {
    * @returns {{title: String, url: String, body: String, imageURL: String}[]} Giveaways from GrabFreeGames
    */
   static async GiveawaysFromGrabFreeGames(html) {
+    /** @type {{title: String,url:String, body:Promise<String> imageURL: String}[]} */
     const giveaways = [];
+
     const $ = load(html, { decodeEntities: true }, false);
     $('div.free-image > a > img').each((_i, el) => {
       const { src: imgURL, alt: title } = el.attribs;
@@ -60,7 +62,7 @@ export default class WebScraping {
         .then(WebScraping.HTMLIntoMD)
         .catch(Logging.Error);
 
-      giveaways.push({ title, imageURL: imgURL, url, body });
+      giveaways.push({ title, url, body, imageURL: imgURL });
     });
 
     const resolvedGiv = [];

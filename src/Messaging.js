@@ -1,8 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 
 import { ID, client } from './Identification.js';
-import TextManipulation from './TextManipulation.js';
-import Commands from './Commands.js';
+import { SegmentString } from './TextManipulation.js';
 import Logging from './Logging.js';
 
 export default class Messaging {
@@ -11,37 +10,6 @@ export default class Messaging {
   static mps = 0.3;
 
   static blank = '\u200B'; // A way to not fill a field element
-
-  static HelpCMD = Commands.MakeCommand('help');
-
-  static ALLCOMMANDS = []; // Placeholder
-
-  /**
-   * Gets a response for a wrong command
-   * @param {Discord.Message} msg Message to respond to
-   * @returns {String} The response for the message
-   */
-  static WrongCommand(msg) {
-    const suggestion =
-      'I do not recognize this command\nDid you mean to write: `';
-    const noIdea = `Write \`${Messaging.HelpCMD.cmd}\` to know what commands are available`;
-
-    // Finds how similar the message is to all commands
-    const predictions = {};
-    Messaging.ALLCOMMANDS.forEach((x) => {
-      const chance = TextManipulation.Similarity(x.cmd, msg);
-      predictions[chance] = x.cmd;
-    });
-
-    const maxChance = predictions.keys().reduce((a, b) => Math.max(a, b));
-
-    const response =
-      maxChance >= this.mps
-        ? `${suggestion + predictions[maxChance]}\``
-        : noIdea;
-
-    return response;
-  }
 
   /**
    * @param {Discord.Message} msg
@@ -59,13 +27,15 @@ export default class Messaging {
    */
   static GetEmbeddedMsg(fields, title = { title: '', url: '' }, imageURL = '') {
     /* eslint-disable no-param-reassign */
-    const segmentStr = TextManipulation.SegmentString;
     const { normalizeField } = MessageEmbed;
     let embedFields = [];
     if (typeof fields.name === 'undefined') {
       if (Array.isArray(fields))
-        fields = fields.reduce((acc, curr) => acc.concat(segmentStr(curr)), []);
-      else fields = segmentStr(fields);
+        fields = fields.reduce(
+          (acc, curr) => acc.concat(SegmentString(curr)),
+          []
+        );
+      else fields = SegmentString(fields);
 
       // Accounts for MD headings while making embedFields
       const mdH = '#';

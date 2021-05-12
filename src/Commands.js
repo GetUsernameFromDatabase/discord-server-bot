@@ -1,6 +1,12 @@
+import TextManipulation from './TextManipulation.js';
+
 export const prefix = '€';
 
-export default class Commands {
+const extracted = class Commands {
+  static HelpCMD = Commands.MakeCommand('help');
+
+  static ALLCOMMANDS = []; // Placeholder
+
   constructor(commands = [], description = '', header = '') {
     this.commands = commands;
     this.description = description;
@@ -42,4 +48,32 @@ export default class Commands {
     };
     return object;
   }
-}
+
+  /**
+   * Gets a response for a wrong command
+   * @param {Discord.Message} msg Message to respond to
+   * @returns {String} The response for the message
+   */
+  static WrongCommand(msg) {
+    const suggestion =
+      'I do not recognize this command\nDid you mean to write: `';
+    const noIdea = `Write \`${Commands.HelpCMD.cmd}\` to know what commands are available`;
+
+    // Finds how similar the message is to all commands
+    const predictions = {};
+    Commands.ALLCOMMANDS.forEach((x) => {
+      const chance = TextManipulation.Similarity(x.cmd, msg);
+      predictions[chance] = x.cmd;
+    });
+
+    const maxChance = predictions.keys().reduce((a, b) => Math.max(a, b));
+
+    const response =
+      maxChance >= this.mps
+        ? `${suggestion + predictions[maxChance]}\``
+        : noIdea;
+
+    return response;
+  }
+};
+export default extracted;
