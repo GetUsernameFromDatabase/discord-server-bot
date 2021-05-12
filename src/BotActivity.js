@@ -1,5 +1,5 @@
 import { client } from './Identification.js';
-import Logging from './Logging.js';
+import Logging, { minInMs } from './Logging.js';
 
 /**
  * @param {String} name Name of the activity displayed
@@ -71,9 +71,6 @@ export default class BotActivity {
     this.iteration += 1;
     if (this.iteration >= this.activities.length) this.iteration = 0;
 
-    setTimeout(
-      this.ChangeActivity.bind(this),
-      activity.duration * Logging.minInMs
-    );
+    setTimeout(this.ChangeActivity.bind(this), activity.duration * minInMs);
   }
 }

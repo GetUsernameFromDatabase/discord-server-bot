@@ -1,6 +1,6 @@
 import { ID } from './Identification.js';
 import { GetEmbeddedMsg, MassMessageSend } from './Messaging.js';
-import Logging from './Logging.js';
+import Logging, { minInMs } from './Logging.js';
 import {
   GiveawaysFromGrabFreeGames,
   GetSteamAnnouncements,
@@ -27,7 +27,7 @@ export default class Giveaways {
     // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
     this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
-    setInterval(this.GetGiveaways, 60 * Logging.minInMs);
+    setInterval(this.GetGiveaways, 60 * minInMs);
   }
 
   giveawaysCmdResponse(msg) {
