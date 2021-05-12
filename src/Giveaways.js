@@ -1,5 +1,5 @@
 import { ID } from './Identification.js';
-import Messaging from './Messaging.js';
+import { GetEmbeddedMsg, MassMessageSend } from './Messaging.js';
 import Logging from './Logging.js';
 import {
   GiveawaysFromGrabFreeGames,
@@ -71,8 +71,8 @@ export default class Giveaways {
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, imageURL, ...title } = giv;
-      return Messaging.GetEmbeddedMsg(body, title, imageURL);
+      return GetEmbeddedMsg(body, title, imageURL);
     });
-    Messaging.MassMessageSend(this.channel, embGiveaways);
+    MassMessageSend(this.channel, embGiveaways);
   }
 }

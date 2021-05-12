@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
 import Giveaways from '../src/Giveaways.js';
-import WebScraping from '../src/WebScraping.js';
+import { SimpleFetch } from '../src/WebScraping.js';
 
 const { giveawaySites } = Giveaways;
 const giveawaySources = Object.keys(giveawaySites);
@@ -20,7 +20,7 @@ function fetchGivSites() {
 
   Object.keys(giveawaySites).forEach((key) => {
     const { url, callback } = giveawaySites[key];
-    promises.push(WebScraping.SimpleFetch(url).then(callback));
+    promises.push(SimpleFetch(url).then(callback));
   });
 
   return Promise.all(promises);

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { load } from 'cheerio';
 import TurndownService from 'turndown';
+import { load } from 'cheerio';
 
 import Logging from './Logging.js';
 import { ModifyCredits } from './TextManipulation.js';

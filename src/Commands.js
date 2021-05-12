@@ -1,6 +1,12 @@
-import TextManipulation from './TextManipulation.js';
+import { Similarity } from './TextManipulation.js';
 
 export const prefix = '€';
+/*  -
+  is used to determine how similar text has to be to a command before it suggests it to the user */
+/** Minimum prediction similarity
+ *
+ */
+const mps = 0.3;
 
 const extracted = class Commands {
   static HelpCMD = Commands.MakeCommand('help');
@@ -62,16 +68,14 @@ const extracted = class Commands {
     // Finds how similar the message is to all commands
     const predictions = {};
     Commands.ALLCOMMANDS.forEach((x) => {
-      const chance = TextManipulation.Similarity(x.cmd, msg);
+      const chance = Similarity(x.cmd, msg);
       predictions[chance] = x.cmd;
     });
 
     const maxChance = predictions.keys().reduce((a, b) => Math.max(a, b));
 
     const response =
-      maxChance >= this.mps
-        ? `${suggestion + predictions[maxChance]}\``
-        : noIdea;
+      maxChance >= mps ? `${suggestion + predictions[maxChance]}\`` : noIdea;
 
     return response;
   }

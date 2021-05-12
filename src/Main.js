@@ -1,8 +1,8 @@
+import Logging from './Logging.js';
 import BotActivity from './BotActivity.js';
 import Giveaways from './Giveaways.js';
-import Messaging from './Messaging.js';
+import { ReactToCommand } from './Messaging.js';
 import { Update, client } from './Identification.js';
-import Logging from './Logging.js';
 import { prefix } from './Commands.js';
 
 client.login(process.env.TOKEN);
@@ -22,7 +22,7 @@ client.once('ready', async () => {
 
 client.on('message', (msg) => {
   if (msg.content[0] === prefix) {
-    Messaging.ReactToCommand(msg);
+    ReactToCommand(msg);
   }
 });
 
