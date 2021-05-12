@@ -1,7 +1,11 @@
 import { ID } from './Identification.js';
-import WebScraping from './WebScraping.js';
 import Messaging from './Messaging.js';
 import Logging from './Logging.js';
+import {
+  GiveawaysFromGrabFreeGames,
+  GetSteamAnnouncements,
+  SimpleFetch,
+} from './WebScraping.js';
 
 export default class Giveaways {
   static channelID = process.env.GiveawaysID;
@@ -9,12 +13,12 @@ export default class Giveaways {
   static giveawaySites = {
     grabFreeGames: {
       url: 'https://grabfreegames.com/free',
-      callback: WebScraping.GiveawaysFromGrabFreeGames,
+      callback: GiveawaysFromGrabFreeGames,
     },
     steam: {
       url:
         'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
-      callback: WebScraping.GetSteamAnnouncements,
+      callback: GetSteamAnnouncements,
     },
   };
 
@@ -40,7 +44,7 @@ export default class Giveaways {
     for (let i = 0; i < sources.length; i++) {
       const source = Giveaways.giveawaySites[sources[i]];
       // eslint-disable-next-line no-await-in-loop
-      const results = await WebScraping.SimpleFetch(source.url)
+      const results = await SimpleFetch(source.url)
         .then((val) => source.callback(val))
         .catch((err) => Logging.Error(err, `${source}: FAILED`));
 
