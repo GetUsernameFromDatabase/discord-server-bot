@@ -11,7 +11,7 @@ export default {
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
   execute(message) {
-    const giv = handlers.giveaways;
+    const giv = handlers.Giveaways;
     giv.channel = message.channel;
     giv.channel.send('This channel will be notified about giveaways');
 

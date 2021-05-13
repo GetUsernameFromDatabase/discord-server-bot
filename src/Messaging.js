@@ -131,7 +131,7 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
  * @param {Discord.TextChannel} channel
  * @returns {Boolean} Wether it failed or not (true if it failed)
  */
-export function CheckArgLength(args, usage, channel) {
+export function CheckArgLength(channel, args, usage = '') {
   const argReq = {
     required: usage.match(/\[/g)?.length,
     optional: usage.match(/\(/g)?.length,

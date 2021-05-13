@@ -31,8 +31,6 @@ export async function LoadCommands() {
       commands.set(cmd.name, cmd);
     })
   );
-  // Trying to find a way to update changes to modules on runtime
-  console.log(commands);
 }
 
 /**
