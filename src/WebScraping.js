@@ -48,7 +48,7 @@ export function GetSteamAnnouncements(html) {
     let body = $(el).find('div.bodytext');
     body.find('blockquote.bb_blockquote').replaceWith();
     body = HTMLIntoMD(body.html());
-    body = ModifyCredits(body);
+    body = ModifyCredits(body, url);
 
     announcements.push({ title, url, body });
   });

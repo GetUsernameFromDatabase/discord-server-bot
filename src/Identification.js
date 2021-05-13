@@ -3,7 +3,7 @@ import Logging from './Logging.js';
 
 const client = new Client();
 const ID = {
-  Maintainer: new User(client, {
+  Me: new User(client, {
     username: 'MiniGamer',
     discriminator: '4738',
     id: '186439588229677056',
@@ -15,9 +15,9 @@ const ID = {
 class Update {
   static Maintainer() {
     return client.users
-      .fetch(ID.Maintainer.id)
+      .fetch(ID.Me.id)
       .then((usr) => {
-        ID.Maintainer = usr;
+        ID.Me = usr;
       })
       .catch(Logging.Error);
   }

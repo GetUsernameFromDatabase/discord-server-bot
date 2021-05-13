@@ -25,18 +25,20 @@ export default class Giveaways {
   constructor() {
     // Initiates giveaway functions
     // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
-    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
+    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
 
+  /**
+   * @param {import("discord.js").Message} msg */
   giveawaysCmdResponse(msg) {
     const message = 'This channel will be notified about giveaways';
     // Changes the giveaway channel and notifies about the change
     this.channel = msg.channel;
     this.channel.send(message);
 
-    this.PostGiveaways();
+    this.GetGiveaways();
   }
 
   async GetGiveaways() {

@@ -12,8 +12,9 @@ export default class Logging {
    * @param {Boolean} spacer [true] adds a spacer after logging if true
    */
   static Error(err, description = '', spacer = true) {
-    if (description !== '') console.error(description);
-    console.error(err);
+    if (description !== '') console.error(description, err);
+    else console.error(err);
+
     if (spacer) console.error('\n');
   }
 
