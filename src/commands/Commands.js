@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js';
-import { readdirSync } from 'fs';
 import { Similarity } from '../TextManipulation.js';
+import { GetFolders, GetImportsFromFolders } from '../DynamicImport.js';
 
 export const prefix = '€';
 export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
@@ -9,27 +9,15 @@ export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
 export const commands = new Discord.Collection();
 export function LoadCommands() {
   commands.clear();
-  const cmdPath = './src/commands';
-  const promises = [];
+  const promises = GetImportsFromFolders(GetFolders('./src/commands'));
 
-  const cmdFolders = readdirSync(cmdPath).filter(
-    (folder) => !folder.includes('.')
-  );
-  cmdFolders.forEach((folder) => {
-    const cmdFiles = readdirSync(`${cmdPath}/${folder}`).filter((file) =>
-      file.endsWith('.js')
-    );
-    cmdFiles.forEach((file) => {
-      promises.push(import(`${`./${folder}`}/${file}`));
-    });
-  });
-
-  return Promise.all(promises).then((impPromises) =>
+  const importPromise = Promise.all(promises).then((impPromises) =>
     impPromises.forEach((module) => {
       const cmd = module.default;
       commands.set(cmd.name, cmd);
     })
   );
+  return importPromise;
 }
 
 /** Gets the command by it's name or alias
