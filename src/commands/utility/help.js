@@ -1,6 +1,13 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
 import { MessageEmbed } from 'discord.js';
-import { prefix, commands, categories, GetCommand } from '../Commands.js';
+import {
+  prefix,
+  commands,
+  categories,
+  GetCommand,
+  GetMostSimilarCommands,
+  PredictionsAsString,
+} from '../Commands.js';
 import { GetMsgEmbed } from '../../Messaging.js';
 
 export default {
@@ -32,7 +39,10 @@ export default {
     const arg = args[0].toLowerCase();
     const cmd = GetCommand(arg);
     if (!cmd) {
-      return message.reply("that's not a valid command!");
+      const [, predictions] = GetMostSimilarCommands(arg);
+      return message.reply(
+        `did you want to know about ${PredictionsAsString(predictions)}`
+      );
     }
 
     // Gets what command parameters I want to display
@@ -41,11 +51,11 @@ export default {
       .filter(([key]) => wantedEntries.includes(key))
       .map(([key, val]) => {
         switch (key) {
-          case wantedEntries[0]:
+          case wantedEntries[0]: // Aliases is String[]
             return [key, val.join(', ')];
-          case wantedEntries[2]:
+          case wantedEntries[2]: // Usage has only args
             return [key, `${prefix + cmd.name} ${val}`];
-          case wantedEntries[3]:
+          case wantedEntries[3]: // Cooldown doesn't have time format
             return [key, `${val} seconds`];
           default:
             return [key, val];

@@ -4,9 +4,6 @@ import { Similarity } from '../TextManipulation.js';
 
 export const prefix = '€';
 export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
-/** Minimum similarity with other commands:
- * - If less than this, then it's suggested to just use the help command */
-const minSim = 0.3;
 
 /** @type {Discord.Collection<String, import('../interfaces/interfaces').CommandObject>} */
 export const commands = new Discord.Collection();
@@ -48,24 +45,30 @@ export function GetCommand(name) {
 /**
  * Gets a response for a wrong command
  * @param {String} msg Message to respond to
- * @returns {String} The response for the message
+ * @return {[Number, String[]]} An array: **[0]** = *maximum chance*, **[1]** = *predictions*
  */
-export function WrongCommand(msg) {
-  const suggestion = `I do not recognize this command
-  Did you mean to write: \`${prefix}`; // ` = MD Inline code start
-  const unsure = `Write \`${prefix}help\` to know what commands are available`;
-
+export function GetMostSimilarCommands(msg) {
   // Finds how similar the message is to all commands
-  const predictions = {};
-  [...commands.keys()].forEach((cmd) => {
-    const chance = Similarity(cmd, msg);
-    predictions[chance] = cmd;
-  });
+  const predictions = [...commands.keys()]
+    .map((cmd) => {
+      const chance = Similarity(msg, cmd);
+      /** @type {[Number, String]} */
+      const entry = [chance, cmd];
+      return entry;
+    })
+    .sort(([key1], [key2]) => key1 - key2);
+  // Gets predictions with the highest chance
+  const maxPred = predictions[predictions.length - 1][0];
+  const maxPreds = predictions
+    .filter(([key]) => key === maxPred)
+    .map(([, cmd]) => cmd);
+  return [maxPred, maxPreds];
+}
 
-  const maxChance = Object.keys(predictions).reduce((a, b) => Math.max(a, b));
-
-  const response =
-    maxChance >= minSim ? `${suggestion + predictions[maxChance]}\`` : unsure;
-
-  return response;
+/** Joins predictions into string seperated with ` or ${prefix}`
+ * Which is wrapped in MD Inline code
+ * @param {String[]} predictions
+ */
+export function PredictionsAsString(predictions) {
+  return `\`${prefix + predictions.join(` or ${prefix}`)}\``;
 }

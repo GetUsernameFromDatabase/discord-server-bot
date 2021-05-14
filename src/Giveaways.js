@@ -27,7 +27,7 @@ export default class Giveaways {
     // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
     this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
-    setInterval(this.GetGiveaways, 60 * minInMs);
+    setInterval(this.GetGiveaways.bind(this), 60 * minInMs);
   }
 
   /**

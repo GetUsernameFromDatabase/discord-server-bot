@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// TODO: Start using winston https://github.com/winstonjs/winston
 export const minInMs = 60000;
 export default class Logging {
   /**

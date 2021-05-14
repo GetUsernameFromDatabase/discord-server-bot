@@ -5,7 +5,8 @@ import Giveaways from './Giveaways.js';
 import { Update, client } from './Identification.js';
 import {
   prefix,
-  WrongCommand,
+  GetMostSimilarCommands,
+  PredictionsAsString,
   LoadCommands,
   commands,
   GetCommand,
@@ -39,7 +40,15 @@ client.on('message', (msg) => {
     // Finds the command
     /** @type {import('./interfaces/interfaces').CommandObject} */
     const cmd = GetCommand(cmdName);
-    if (!cmd) return chan.send(WrongCommand(msg.content));
+    if (!cmd) {
+      const [chance, predictions] = GetMostSimilarCommands(cmdName);
+      const response =
+        chance >= 0.3
+          ? `I do not recognize this command
+        Did you mean to write${PredictionsAsString(predictions)}`
+          : `Write \`${prefix}help\` to know what commands are available`;
+      return chan.send(response);
+    }
 
     // Checks if the command should be used
     if (cmd.guildOnly && chan.type === 'dm')
@@ -47,7 +56,7 @@ client.on('message', (msg) => {
     if (cmd.permissions) {
       const authorPerms = chan.permissionsFor(msg.author);
       if (!authorPerms || !authorPerms.has(cmd.permissions))
-        return msg.reply("You don't have permissions to do that!");
+        return msg.reply("You don't have permissions for that!");
     }
     const argLenCheck = CheckArgLength(args, cmd.usage);
     if (argLenCheck) return msg.reply(argLenCheck);
