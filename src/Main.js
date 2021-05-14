@@ -8,6 +8,7 @@ import {
   WrongCommand,
   LoadCommands,
   commands,
+  GetCommand,
 } from './commands/Commands.js';
 // eslint-disable-next-line no-unused-vars
 import { CheckArgLength } from './Messaging.js';
@@ -25,7 +26,7 @@ client.once('ready', async () => {
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
   handlers.BotActivity = new BotActivity();
   handlers.Giveaways = new Giveaways();
-  LoadCommands();
+  await LoadCommands();
 });
 
 // eslint-disable-next-line consistent-return
@@ -35,12 +36,12 @@ client.on('message', (msg) => {
     const cmdName = args.shift().toLowerCase();
     const chan = msg.channel;
 
-    if (!commands.has(cmdName)) return chan.send(WrongCommand(msg.content));
-    /** @type {import('./interfaces/interfaces').ExampleCommand} */
-    const cmd =
-      commands.get(cmdName) ||
-      commands.find((x) => x.aliases && x.aliases.includes(cmdName));
+    // Finds the command
+    /** @type {import('./interfaces/interfaces').CommandObject} */
+    const cmd = GetCommand(cmdName);
+    if (!cmd) return chan.send(WrongCommand(msg.content));
 
+    // Checks if the command should be used
     if (cmd.guildOnly && chan.type === 'dm')
       return msg.reply("This command won't be executed inside DMs!");
     if (cmd.permissions) {
@@ -48,11 +49,13 @@ client.on('message', (msg) => {
       if (!authorPerms || !authorPerms.has(cmd.permissions))
         return msg.reply("You don't have permissions to do that!");
     }
-    if (CheckArgLength(chan, args, cmd.usage)) return false;
+    const argLenCheck = CheckArgLength(args, cmd.usage);
+    if (argLenCheck) return msg.reply(argLenCheck);
     // TODO: Have cooldowns for commands
 
+    // Executes the command
     try {
-      commands.get(cmdName).execute(msg, args);
+      commands.get(cmd.name).execute(msg, args);
     } catch (error) {
       Logging.Error(error);
       msg.reply('Command could not be executed :(');

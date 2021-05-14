@@ -3,12 +3,14 @@ import { readdirSync } from 'fs';
 import { Similarity } from '../TextManipulation.js';
 
 export const prefix = '€';
+export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
 /** Minimum similarity with other commands:
  * - If less than this, then it's suggested to just use the help command */
 const minSim = 0.3;
 
+/** @type {Discord.Collection<String, import('../interfaces/interfaces').CommandObject>} */
 export const commands = new Discord.Collection();
-export async function LoadCommands() {
+export function LoadCommands() {
   commands.clear();
   const cmdPath = './src/commands';
   const promises = [];
@@ -25,11 +27,21 @@ export async function LoadCommands() {
     });
   });
 
-  await Promise.all(promises).then((impPromises) =>
+  return Promise.all(promises).then((impPromises) =>
     impPromises.forEach((module) => {
       const cmd = module.default;
       commands.set(cmd.name, cmd);
     })
+  );
+}
+
+/** Gets the command by it's name or alias
+ * @param {String} name
+ */
+export function GetCommand(name) {
+  return (
+    commands.get(name) ||
+    commands.find((c) => c.aliases && c.aliases.includes(name))
   );
 }
 

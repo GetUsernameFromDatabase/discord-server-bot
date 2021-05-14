@@ -1,63 +1,61 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
-import { prefix, commands } from '../Commands.js';
-import Logging from '../../Logging.js';
-// TODO: Make this use MessageEmbeds
+import { MessageEmbed } from 'discord.js';
+import { prefix, commands, categories, GetCommand } from '../Commands.js';
+import { GetMsgEmbed } from '../../Messaging.js';
+
 export default {
   name: 'help',
   description: 'List all of my commands or info about a specific command.',
+  category: categories.Utility,
   aliases: ['commands'],
-  usage: '[command name]',
+  usage: '(command name)',
   cooldown: 5,
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
-  // eslint-disable-next-line consistent-return
   execute(message, args) {
-    const data = [];
-
+    const chan = message.channel;
+    // If no arguments were supplied sends all usable commands
     if (!args.length) {
-      data.push("Here's a list of all my commands:");
-      data.push(commands.map((command) => command.name).join(', '));
-      data.push(
-        `\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`
+      const CmdCat = {};
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [key, value] of commands.entries()) {
+        CmdCat[value.category] = `•${CmdCat[value.category] || ''}${key}\n`;
+      }
+
+      const embedFields = Object.keys(CmdCat).map((key) =>
+        MessageEmbed.normalizeField(key, CmdCat[key], true)
       );
-
-      return message.author
-        .send(data, { split: true })
-        .then(() => {
-          if (message.channel.type === 'dm') return;
-          message.reply("I've sent you a DM with all my commands!");
-        })
-        .catch((error) => {
-          Logging.Error(
-            error,
-            `Could not send help DM to ${message.author.tag}.\n`
-          );
-          message.reply(
-            "it seems like I can't DM you! Do you have DMs disabled?"
-          );
-        });
+      return chan.send(GetMsgEmbed(embedFields, 'All of my commands'));
     }
-    const name = args[0].toLowerCase();
-    const command =
-      commands.get(name) ||
-      commands.find((c) => c.aliases && c.aliases.includes(name));
-
-    if (!command) {
+    // Gets the command
+    const arg = args[0].toLowerCase();
+    const cmd = GetCommand(arg);
+    if (!cmd) {
       return message.reply("that's not a valid command!");
     }
 
-    data.push(`**Name:** ${command.name}`);
+    // Gets what command parameters I want to display
+    const wantedEntries = ['aliases', 'description', 'usage', 'cooldown'];
+    const filteredEntries = Object.entries(cmd)
+      .filter(([key]) => wantedEntries.includes(key))
+      .map(([key, val]) => {
+        switch (key) {
+          case wantedEntries[0]:
+            return [key, val.join(', ')];
+          case wantedEntries[2]:
+            return [key, `${prefix + cmd.name} ${val}`];
+          case wantedEntries[3]:
+            return [key, `${val} seconds`];
+          default:
+            return [key, val];
+        }
+      });
 
-    if (command.aliases)
-      data.push(`**Aliases:** ${command.aliases.join(', ')}`);
-    if (command.description)
-      data.push(`**Description:** ${command.description}`);
-    if (command.usage)
-      data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
-
-    data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
-
-    message.channel.send(data, { split: true });
+    // Sends the response
+    const embedFields = filteredEntries.map(([key, value]) =>
+      MessageEmbed.normalizeField(key, value)
+    );
+    return chan.send(GetMsgEmbed(embedFields, cmd.name));
   },
 };

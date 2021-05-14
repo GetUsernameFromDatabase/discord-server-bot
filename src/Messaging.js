@@ -35,17 +35,22 @@ function MdHAsEmbedFieldTitle(fields) {
 }
 
 /**
- * @param {String | String[] | Discord.EmbedField[]} fields
+ * @param {String | String[] | Discord.EmbedField | Discord.EmbedField[]} fields
+ * @param {String | {title: String, url: String}} title
  * @returns {Discord.MessageEmbed}
  */
-export function GetEmbeddedMsg(
+export function GetMsgEmbed(
   fields,
   title = { title: '', url: '' },
   imageURL = ''
 ) {
   /* eslint-disable no-param-reassign */
-  if (typeof fields.name === 'undefined') {
+  if (
+    (Array.isArray(fields) && typeof fields[0] === 'string') ||
+    typeof fields === 'string'
+  ) {
     if (Array.isArray(fields))
+      // Flattening the array while also checking if string isn't bigger than 1024
       fields = fields.reduce(
         (acc, curr) => acc.concat(SegmentString(curr)),
         []
@@ -54,11 +59,12 @@ export function GetEmbeddedMsg(
 
     fields = MdHAsEmbedFieldTitle(fields);
   }
+  /* eslint-enable no-param-reassign */
   const embedFields = fields;
 
   const MesEmb = new Discord.MessageEmbed()
     .setColor(ID.Server.member(client.user)?.displayHexColor)
-    .setTitle(title.title?.trim())
+    .setTitle(title.title?.trim() ?? title.trim())
     .setURL(title.url?.trim())
     .addFields(embedFields)
     .setImage(imageURL)
@@ -66,7 +72,7 @@ export function GetEmbeddedMsg(
     .setTimestamp();
 
   return MesEmb;
-} /* eslint-enable no-param-reassign */
+}
 
 /**
  * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck Message to be checked
@@ -128,25 +134,22 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
 /**
  * @param {String[]} args
  * @param {String} usage
- * @param {Discord.TextChannel} channel
  * @returns {Boolean} Wether it failed or not (true if it failed)
  */
-export function CheckArgLength(channel, args, usage = '') {
+export function CheckArgLength(args, usage = '') {
   const argReq = {
-    required: usage.match(/\[/g)?.length,
-    optional: usage.match(/\(/g)?.length,
+    required: usage.match(/\[/g)?.length ?? 0,
+    optional: usage.match(/\(/g)?.length ?? 0,
   };
+  const sum = argReq.optional + argReq.required;
 
   let response;
   if (args.length < argReq) {
     response = `This command requires ${argReq.required} arguments
       ${args.length} given`;
-  } else if (args.length > argReq.optional + argReq.required) {
+  } else if (args.length > sum) {
     response = `You have given more arguments than required
-      given: ${args.length}, maximum: ${argReq.optional + argReq.optional}`;
+      \`given:\` **${args.length}** | \`maximum:\` **${sum}**`;
   }
-
-  const failure = typeof response === 'string';
-  if (failure) channel.send(response);
-  return failure;
+  return response;
 }

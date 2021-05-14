@@ -1,5 +1,5 @@
 import { ID } from './Identification.js';
-import { GetEmbeddedMsg, MassMessageSend } from './Messaging.js';
+import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
 import Logging, { minInMs } from './Logging.js';
 import {
   GiveawaysFromGrabFreeGames,
@@ -25,7 +25,7 @@ export default class Giveaways {
   constructor() {
     // Initiates giveaway functions
     // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
-    this.channel = ID.Server.channels.cache.get(process.env.TestChanID);
+    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways, 60 * minInMs);
   }
@@ -73,7 +73,7 @@ export default class Giveaways {
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, imageURL, ...title } = giv;
-      return GetEmbeddedMsg(body, title, imageURL);
+      return GetMsgEmbed(body, title, imageURL);
     });
     MassMessageSend(this.channel, embGiveaways);
   }
