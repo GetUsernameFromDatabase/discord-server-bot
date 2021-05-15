@@ -1,31 +1,27 @@
 import { readdirSync, lstatSync } from 'fs';
+import { pathToFileURL } from 'url';
 
-/** Gets all folders in a given path using <URL> file: protocol
- * @param {String} path Path should start with `./ or /`:
- * - Use `.` to have it converted into the current working directory
- * - Use `/` in case of hostnames (untested)
+/** Gets all folders in a given path
+ * @param {String | URL} path
+ * @returns
  */
 export function GetFolders(path) {
-  // Checks if string starts properly and that ther aren't any //...
-  if (!/^.?[/](?!.+[/]{2,})/.test(path)) throw Error('Path is incorrect');
-  // eslint-disable-next-line no-param-reassign
-  if (path[path.length - 1] !== '/') path += '/';
-
-  const FullPath = (folder) =>
-    new URL(`file:///${path.replace('.', process.cwd()) + folder}`);
-  const HostPath = (folder) => new URL(`file://${path}${folder}`);
-
-  const addPath = path[0] === '.' ? FullPath : HostPath;
-  const folders = readdirSync(path).filter((folder) =>
-    lstatSync(addPath(folder)).isDirectory()
-  );
-  return folders.map(addPath);
+  const folders = readdirSync(path)
+    .map((dirContent) => {
+      const URL = pathToFileURL(path);
+      URL.pathname += `/${dirContent}`;
+      return URL;
+    })
+    .filter((folder) => lstatSync(folder).isDirectory());
+  return folders;
 }
 
 /** Imports all files from folders, does not search from subdirectories
- * @param {String[]} folders Paths to folders must be absolute
+ * @param {URL[]} folders Paths to folders must be absolute
  */
 export function GetImportsFromFolders(folders, fileType = 'js') {
+  // eslint-disable-next-line no-param-reassign
+  if (!Array.isArray(folders)) folders = [folders];
   const promises = folders
     .map((folder) => {
       const files = readdirSync(folder).filter((file) =>

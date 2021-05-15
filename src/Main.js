@@ -1,21 +1,26 @@
 /* eslint-disable import/prefer-default-export */
+import { pathToFileURL } from 'url';
 import Logging from './Logging.js';
 import BotActivity from './BotActivity.js';
 import Giveaways from './Giveaways.js';
 import { Update, client } from './Identification.js';
-import {
-  prefix,
-  GetMostSimilarCommands,
-  PredictionsAsString,
-  LoadCommands,
-  commands,
-  GetCommand,
-} from './commands/Commands.js';
-// eslint-disable-next-line no-unused-vars
-import { CheckArgLength } from './Messaging.js';
+import { LoadCommands } from './commands/Commands.js';
+import { GetImportsFromFolders } from './DynamicImport.js';
 
 /** @type {{Giveaways: Giveaways}} */
 export const handlers = {};
+function LoadEvents() {
+  const promises = GetImportsFromFolders(pathToFileURL('./src/events'));
+  return Promise.all(promises).then((impPromises) =>
+    impPromises.forEach((module) => {
+      /** @type {import('./interfaces/events').EventObject} */
+      const event = module.default;
+      if (event.once)
+        client.once(event.name, (...args) => event.execute(...args));
+      else client.on(event.name, (...args) => event.execute(...args));
+    })
+  );
+}
 
 client.login(process.env.TOKEN);
 
@@ -28,48 +33,7 @@ client.once('ready', async () => {
   handlers.BotActivity = new BotActivity();
   handlers.Giveaways = new Giveaways();
   await LoadCommands();
-});
-
-// eslint-disable-next-line consistent-return
-client.on('message', (msg) => {
-  if (msg.content[0] === prefix) {
-    const args = msg.content.slice(prefix.length).trim().split(/ +/);
-    const cmdName = args.shift().toLowerCase();
-    const chan = msg.channel;
-
-    // Finds the command
-    /** @type {import('./interfaces/interfaces').CommandObject} */
-    const cmd = GetCommand(cmdName);
-    if (!cmd) {
-      const [chance, predictions] = GetMostSimilarCommands(cmdName);
-      const response =
-        chance >= 0.3
-          ? `I do not recognize this command
-        Did you mean to write${PredictionsAsString(predictions)}`
-          : `Write \`${prefix}help\` to know what commands are available`;
-      return chan.send(response);
-    }
-
-    // Checks if the command should be used
-    if (cmd.guildOnly && chan.type === 'dm')
-      return msg.reply("This command won't be executed inside DMs!");
-    if (cmd.permissions) {
-      const authorPerms = chan.permissionsFor(msg.author);
-      if (!authorPerms || !authorPerms.has(cmd.permissions))
-        return msg.reply("You don't have permissions for that!");
-    }
-    const argLenCheck = CheckArgLength(args, cmd.usage);
-    if (argLenCheck) return msg.reply(argLenCheck);
-    // TODO: Have cooldowns for commands
-
-    // Executes the command
-    try {
-      commands.get(cmd.name).execute(msg, args);
-    } catch (error) {
-      Logging.Error(error);
-      msg.reply('Command could not be executed :(');
-    }
-  }
+  await LoadEvents();
 });
 
 client.on('disconnect', () => {

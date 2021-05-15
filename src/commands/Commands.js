@@ -5,19 +5,19 @@ import { GetFolders, GetImportsFromFolders } from '../DynamicImport.js';
 export const prefix = '€';
 export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
 
-/** @type {Discord.Collection<String, import('../interfaces/interfaces').CommandObject>} */
+/** @type {Discord.Collection<String, import('../interfaces/commands').CommandObject>} */
 export const commands = new Discord.Collection();
+// TODO: Make it possible to reload commands on runtime (so far been a failure)
 export function LoadCommands() {
   commands.clear();
   const promises = GetImportsFromFolders(GetFolders('./src/commands'));
-
-  const importPromise = Promise.all(promises).then((impPromises) =>
+  return Promise.all(promises).then((impPromises) =>
     impPromises.forEach((module) => {
+      /** @type {import('../interfaces/commands').CommandObject} */
       const cmd = module.default;
       commands.set(cmd.name, cmd);
     })
   );
-  return importPromise;
 }
 
 /** Gets the command by it's name or alias
