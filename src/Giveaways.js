@@ -63,12 +63,6 @@ export default class Giveaways {
    * @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways
    */
   PostGiveaways(giveaways = []) {
-    /**
-     * @param {String} body String where the credit is
-     * @param {String} referenceURL CreditURL
-     * @returns {String} Modified string
-     */
-
     // Reversing this to make newer (top of array) giveaways
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
