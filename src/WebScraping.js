@@ -1,14 +1,12 @@
 import axios from 'axios';
 import TurndownService from 'turndown';
 import { load } from 'cheerio';
-
 import Logging from './Logging.js';
 import { ModifyCredits } from './TextManipulation.js';
 
 /**
  * @param {String} URL The url for get request
- * @returns {Promise<any>} Get request promise
- */
+ * @returns {Promise<any>} Get request promise */
 export function SimpleFetch(URL) {
   return axios
     .get(URL)
@@ -32,11 +30,9 @@ export function HTMLIntoMD(html = '') {
   return turndownService.turndown($.html());
 }
 
-/**
- * Gets giv announcements from steamcommunity.com/.../announcements/?
+/** Gets giv announcements from steamcommunity.com/.../announcements/?
  * @param {String} html
- * @returns {{title: String, url: String, body: String}[]} Steam announcements
- */
+ * @returns {{title: String, url: String, body: String}[]} */
 export function GetSteamAnnouncements(html) {
   const announcements = [];
   const $ = load(html, { decodeEntities: true });
@@ -55,11 +51,9 @@ export function GetSteamAnnouncements(html) {
   return announcements;
 }
 
-/**
- * Gets giveaways from grabfreegames.com
+/** Gets giveaways from grabfreegames.com
  * @param {String} html
- * @returns {{title: String, url: String, body: String, imageURL: String}[]} Giveaways from GrabFreeGames
- */
+ * @returns {{title: String, url: String, body: String, imageURL: String}[]} */
 export async function GiveawaysFromGrabFreeGames(html) {
   /** @type {{title: String,url:String, body:Promise<String> imageURL: String}[]} */
   const giveaways = [];

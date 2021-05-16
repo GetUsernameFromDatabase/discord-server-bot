@@ -1,13 +1,16 @@
-import * as Discord from 'discord.js';
+import { Collection } from 'discord.js';
 import { Similarity } from '../TextManipulation.js';
 import { GetFolders, GetImportsFromFolders } from '../DynamicImport.js';
 
 export const prefix = '€';
-export const categories = { Utility: 'Utility', Giveaways: 'Giveaways' };
+export const categories = {
+  Utility: '🧰 Utility 🧰',
+  Giveaways: '🎁 Giveaways 🎁',
+};
 
-/** @type {Discord.Collection<String, import('../interfaces/commands').CommandObject>} */
-export const commands = new Discord.Collection();
-// TODO: Make it possible to reload commands on runtime (so far been a failure)
+// TODO: Make it possible to reload commands on runtime (so far :[ )
+/** @type {Collection<String, import('../interfaces/commands').CommandObject>} */
+export const commands = new Collection();
 export function LoadCommands() {
   commands.clear();
   const promises = GetImportsFromFolders(GetFolders('./src/commands'));
@@ -21,8 +24,7 @@ export function LoadCommands() {
 }
 
 /** Gets the command by it's name or alias
- * @param {String} name
- */
+ * @param {String} name */
 export function GetCommand(name) {
   return (
     commands.get(name) ||
@@ -30,11 +32,10 @@ export function GetCommand(name) {
   );
 }
 
-/**
- * Gets a response for a wrong command
+/** Gets a response for a wrong command
  * @param {String} msg Message to respond to
- * @return {[Number, String[]]} An array: **[0]** = *maximum chance*, **[1]** = *predictions*
- */
+ * @return {[Number, String[]]} An array: **[0]** = *maximum chance*,
+ * **[1]** = *predictions* */
 export function GetMostSimilarCommands(msg) {
   // Finds how similar the message is to all commands
   const predictions = [...commands.keys()]
@@ -55,8 +56,7 @@ export function GetMostSimilarCommands(msg) {
 
 /** Joins predictions into string seperated with ` or ${prefix}`
  * Which is wrapped in MD Inline code
- * @param {String[]} predictions
- */
+ * @param {String[]} predictions */
 export function PredictionsAsString(predictions) {
   return `\`${prefix + predictions.join(` or ${prefix}`)}\``;
 }

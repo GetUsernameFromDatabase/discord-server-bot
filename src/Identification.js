@@ -1,8 +1,8 @@
 import { Client, User, Guild } from 'discord.js';
 import Logging from './Logging.js';
 
-const client = new Client();
-const ID = {
+export const client = new Client();
+export const ID = {
   Me: new User(client, {
     username: 'MiniGamer',
     discriminator: '4738',
@@ -12,7 +12,7 @@ const ID = {
   Server: new Guild(),
 };
 
-class Update {
+export class Update {
   static Maintainer() {
     return client.users
       .fetch(ID.Me.id)
@@ -31,4 +31,3 @@ class Update {
       .catch(Logging.Error);
   }
 }
-export { Update, client, ID };

@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { pathToFileURL } from 'url';
+import { Collection } from 'discord.js';
 import Logging from './Logging.js';
 import BotActivity from './BotActivity.js';
 import Giveaways from './Giveaways.js';
@@ -34,6 +35,9 @@ client.once('ready', async () => {
   handlers.Giveaways = new Giveaways();
   await LoadCommands();
   await LoadEvents();
+
+  // TODO: Have cooldowns for commands
+  client.cooldowns = new Collection();
 });
 
 client.on('disconnect', () => {

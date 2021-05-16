@@ -1,4 +1,5 @@
 import { CheckArgLength } from '../Messaging.js';
+import Logging from '../Logging.js';
 import {
   prefix,
   commands,
@@ -6,14 +7,11 @@ import {
   GetMostSimilarCommands,
   PredictionsAsString,
 } from '../commands/Commands.js';
-import Logging from '../Logging.js';
 
 // eslint-disable-next-line consistent-return
 export default {
   name: 'message',
-  /**
-   * @param {import('discord.js').Message} msg
-   */
+  /** @param {import('discord.js').Message} msg */
   // eslint-disable-next-line consistent-return
   execute(msg) {
     if (msg.content[0] === prefix) {
@@ -34,7 +32,7 @@ export default {
         return chan.send(response);
       }
 
-      // Checks if the command should be used
+      // Checks if the command should be executed
       if (cmd.guildOnly && chan.type === 'dm')
         return msg.reply("This command won't be executed inside DMs!");
       if (cmd.permissions) {
@@ -44,7 +42,6 @@ export default {
       }
       const argLenCheck = CheckArgLength(args, cmd.usage);
       if (argLenCheck) return msg.reply(argLenCheck);
-      // TODO: Have cooldowns for commands
 
       // Executes the command
       try {

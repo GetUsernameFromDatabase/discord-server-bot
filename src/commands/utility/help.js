@@ -41,7 +41,7 @@ export default {
     if (!cmd) {
       const [, predictions] = GetMostSimilarCommands(arg);
       return message.reply(
-        `did you want to know about ${PredictionsAsString(predictions)}`
+        `did you want to know about ${PredictionsAsString(predictions)}?`
       );
     }
 
@@ -51,9 +51,9 @@ export default {
       .filter(([key]) => wantedEntries.includes(key))
       .map(([key, val]) => {
         switch (key) {
-          case wantedEntries[0]: // Aliases is String[]
+          case wantedEntries[0]: // Since aliases is String[]
             return [key, val.join(', ')];
-          case wantedEntries[2]: // Usage has only args
+          case wantedEntries[2]: // Since usage has only args
             return [key, `${prefix + cmd.name} ${val}`];
           case wantedEntries[3]: // Cooldown doesn't have time format
             return [key, `${val} seconds`];

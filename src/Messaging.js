@@ -5,12 +5,10 @@ import { ID, client } from './Identification.js';
 import { SegmentString } from './TextManipulation.js';
 
 const blank = '\u200B';
-// Used to simulate TS in JS
 
 /** Accounts for MD headings while making embedFields
  * @param {String[]} fields
- * @returns {Discord.EmbedField[]}
- */
+ * @returns {Discord.EmbedField[]} */
 function MdHAsEmbedFieldTitle(fields) {
   const { normalizeField } = Discord.MessageEmbed;
   const embedFields = [];
@@ -37,8 +35,7 @@ function MdHAsEmbedFieldTitle(fields) {
 /**
  * @param {String | String[] | Discord.EmbedField | Discord.EmbedField[]} fields
  * @param {String | {title: String, url: String}} title
- * @returns {Discord.MessageEmbed}
- */
+ * @returns {Discord.MessageEmbed} */
 export function GetMsgEmbed(
   fields,
   title = { title: '', url: '' },
@@ -50,7 +47,8 @@ export function GetMsgEmbed(
     typeof fields === 'string'
   ) {
     if (Array.isArray(fields))
-      // Flattening the array while also checking if string isn't bigger than 1024
+      // Flattening the array while dealing with the situation
+      // where string might be over 1024 lines
       fields = fields.reduce(
         (acc, curr) => acc.concat(SegmentString(curr)),
         []
@@ -75,10 +73,9 @@ export function GetMsgEmbed(
 }
 
 /**
- * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck Message to be checked
- * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages Messages to check against
- * @return {Boolean} Wheter it was a duplicate or not
- */
+ * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck
+ * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages to check against
+ * @return {Boolean} Wheter it was a duplicate or not */
 export function IsDuplicateMessage(msgToCheck, messages) {
   const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
   const EmbedCheck = (obj) => {
@@ -99,13 +96,11 @@ export function IsDuplicateMessage(msgToCheck, messages) {
   return messages.some(callback);
 }
 
-/**
- * Messages should be all the same type
+/** Messages should be all the same type
  * @param {Discord.TextChannel} channel TextChannel where to send
  * @param {Discord.MessageEmbed[] | Discord.Message[]} messages Messages to send
  * @param {Boolean} [checkDupes] Default is true
- * @returns {Boolean} Wether it was successful or not
- */
+ * @returns {Boolean} Wether it was successful or not */
 export async function MassMessageSend(channel, messages, checkDupes = true) {
   if (!checkDupes) {
     messages.forEach((msg) => channel.send(msg));
@@ -134,8 +129,7 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
 /**
  * @param {String[]} args
  * @param {String} usage
- * @returns {Boolean} Wether it failed or not (true if it failed)
- */
+ * @returns {Boolean} Wether it failed or not (true if it failed) */
 export function CheckArgLength(args, usage = '') {
   const argReq = {
     required: usage.match(/\[/g)?.length ?? 0,

@@ -1,21 +1,17 @@
 /**
  * @param {String} string String to segment
  * @param {Number} [limit] Maximum segment size - DEFAULT: 1024
- * @returns {RegExpMatchArray} Segmented string
- */
+ * @returns {RegExpMatchArray} Segmented string */
 export function SegmentString(string, limit = 1024) {
-  // https://stackoverflow.com/questions/6259515/how-can-i-split-a-string-into-segments-of-n-characters
   // https://regex101.com/ I love this site
   const rgx = new RegExp(`[\\s\\S]{1,${limit}}(?<=\\n|$)`, 'g');
   return string.match(rgx);
 }
 
-/**
- * How many edits need to be done to make the shorter string be the same as the longer one
- * @param {String} longer The longer string
- * @param {String} shorter The shorter string
- * @returns {Number} Integer - how many edits need to be done
- */
+/** How many edits need to be done to make the shorter string be the same as the longer one
+ * @param {String} longer
+ * @param {String} shorter
+ * @returns {Number} Integer - how many edits need to be done */
 function editDistance(longer, shorter) {
   const costs = [];
   for (let i = 0; i <= longer.length; i++) {
@@ -39,16 +35,13 @@ function editDistance(longer, shorter) {
   return costs[shorter.length];
 }
 
-/**
- * Checks how similar strings are
+/** Checks how similar strings are
  * @param {String} s1 One string
  * @param {String} s2 Second string
- * @returns {Number} How similar they are - from 0 till 1
- */
+ * @returns {Number} How similar they are - from 0 till 1 */
 export function Similarity(s1, s2) {
   let longer = s1.length >= s2.length ? s1 : s2;
   let shorter = s1 === longer ? s2 : s1;
-
   if (longer.length === 0) {
     return 1.0;
   }
@@ -63,8 +56,7 @@ export function Similarity(s1, s2) {
 /** This goes by the assumption that credits are at the bottom line
  * @param {String} body String where the credit is
  * @param {String} referenceURL CreditURL
- * @returns {String} Modified body
- */
+ * @returns {String} Modified body */
 export function ModifyCredits(body, referenceURL) {
   let newBody = null;
   const credit = body.split('\n').pop();

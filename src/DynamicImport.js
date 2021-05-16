@@ -2,9 +2,7 @@ import { readdirSync, lstatSync } from 'fs';
 import { pathToFileURL } from 'url';
 
 /** Gets all folders in a given path
- * @param {String | URL} path
- * @returns
- */
+ * @param {String | URL} path */
 export function GetFolders(path) {
   const folders = readdirSync(path)
     .map((dirContent) => {
@@ -17,8 +15,7 @@ export function GetFolders(path) {
 }
 
 /** Imports all files from folders, does not search from subdirectories
- * @param {URL[]} folders Paths to folders must be absolute
- */
+ * @param {URL[]} folders Paths to folders must be absolute */
 export function GetImportsFromFolders(folders, fileType = 'js') {
   // eslint-disable-next-line no-param-reassign
   if (!Array.isArray(folders)) folders = [folders];

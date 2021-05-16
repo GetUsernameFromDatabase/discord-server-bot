@@ -48,9 +48,7 @@ export default class Giveaways {
     return false;
   }
 
-  /**
-   * @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways
-   */
+  /** @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways */
   PostGiveaways(giveaways = []) {
     // Reversing this to make newer (top of array) giveaways
     // be sent last as the newest message

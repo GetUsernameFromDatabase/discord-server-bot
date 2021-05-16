@@ -1,13 +1,15 @@
+import { prefix } from './commands/Commands.js';
 import { client } from './Identification.js';
 import Logging, { minInMs } from './Logging.js';
 
 /**
  * @param {String} name Name of the activity displayed
- * @param {Number} duration How long activity is displayed in min
- * @param {String} type [PLAYING], WATCHING
+ * @param {Number} duration How long activity is displayed in min\
+ * if it's 0, then the duration will be calculated based on str.length
+ * @param {import('discord.js').ActivityType} type [PLAYING]
  * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
  */
-function MakeActObj(name, duration = 1, type = 'PLAYING', repeat = false) {
+function MakeAct(name, duration = 1, type = 'PLAYING', repeat = false) {
   if (!Number.isFinite(duration) || duration < 0) {
     Logging.Error(`Wrong duration (${duration}) inserted into${this.MakeActObj}\n
       Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
@@ -29,20 +31,15 @@ export default class BotActivity {
   iteration = 0; // Current activity index
 
   activities = [
-    MakeActObj(
-      "How I'm disassembled and reassembled differently",
-      1.1,
-      'WATCHING',
-      true
-    ),
-    MakeActObj('with my vodka bottle'),
-    MakeActObj('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-    MakeActObj(' ʍıʇɥ ɹǝɐlıʇʎ'),
-    MakeActObj("Jesus Christ, that's a pretty face", 0),
+    MakeAct(`${prefix}help`, 1.1, 'WATCHING', true),
+    MakeAct('with my vodka bottle'),
+    MakeAct('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
+    MakeAct(' ʍıʇɥ ɹǝɐlıʇʎ'),
+    MakeAct("Jesus Christ, that's a pretty face", 0),
   ];
 
   constructor() {
-    // Makes activities that should repeat repeat
+    // Repeats activities that should
     const nonRepAct = [];
     const repAct = this.activities.filter((x) => {
       if (x.several === true) return true;
@@ -61,13 +58,11 @@ export default class BotActivity {
   }
 
   ChangeActivity() {
-    // Just to make it look prettier in VSC
     const activity = this.activities[this.iteration];
 
     client.user.setActivity(activity.name, {
       type: activity.type,
     });
-
     this.iteration += 1;
     if (this.iteration >= this.activities.length) this.iteration = 0;
 
