@@ -54,7 +54,7 @@ export function GetSteamAnnouncements(html) {
 /** Gets giveaways from grabfreegames.com
  * @param {String} html
  * @returns {{title: String, url: String, body: String, imageURL: String}[]} */
-export async function GiveawaysFromGrabFreeGames(html) {
+export async function GrabFreeGames(html) {
   /** @type {{title: String,url:String, body:Promise<String> imageURL: String}[]} */
   const giveaways = [];
 

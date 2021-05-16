@@ -21,7 +21,7 @@ function MdHAsEmbedFieldTitle(fields) {
       let name = null;
 
       if (h.startsWith(mdH)) {
-        [name] = h.split('\n').trim();
+        name = h.split('\n')[0].trim();
         // eslint-disable-next-line no-param-reassign
         h = h.replace(`${name}\n`, blank);
       }
@@ -101,7 +101,7 @@ export function IsDuplicateMessage(msgToCheck, messages) {
  * @param {Discord.MessageEmbed[] | Discord.Message[]} messages Messages to send
  * @param {Boolean} [checkDupes] Default is true
  * @returns {Boolean} Wether it was successful or not */
-export async function MassMessageSend(channel, messages, checkDupes = true) {
+export async function MassMessageSend(channel, messages, checkDupes = false) {
   if (!checkDupes) {
     messages.forEach((msg) => channel.send(msg));
     return true;

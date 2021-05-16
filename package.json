@@ -36,6 +36,7 @@
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.14.1",
     "@babel/types": "^7.14.2",
+    "@jest/globals": "^26.6.2",
     "@types/jest": "^26.0.23",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.1",

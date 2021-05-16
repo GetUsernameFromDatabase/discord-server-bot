@@ -1,53 +1,64 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
+import { jest } from '@jest/globals';
+import { readFileSync } from 'fs';
+import { guild, TextChannel } from './DiscordMock.js';
 import Giveaways from '../src/Giveaways.js';
-import { SimpleFetch } from '../src/WebScraping.js';
+import * as WS from '../src/WebScraping.js';
+import { ID } from '../src/Identification.js';
 
-const { giveawaySites } = Giveaways;
-const giveawaySources = Object.keys(giveawaySites);
-let givFetchResult = null; // Will be changed in beforeAll
+ID.Server = guild;
 
-function checkGiveaways(source, checkFunction) {
-  expect(givFetchResult).not.toBeNull();
-  const i = Object.keys(giveawaySites).indexOf(source);
-  const src = givFetchResult[i];
-  expect(src).not.toHaveLength(0);
-  src.forEach(checkFunction);
-}
-
-function fetchGivSites() {
-  const promises = [];
-
-  Object.keys(giveawaySites).forEach((key) => {
-    const { url, callback } = giveawaySites[key];
-    promises.push(SimpleFetch(url).then(callback));
-  });
-
-  return Promise.all(promises);
-}
-
-beforeAll(async () => {
-  givFetchResult = await fetchGivSites();
+const givSites = Giveaways.giveawaySites;
+Object.assign(givSites.GrabFreeGames, {
+  file: './tests/Websites/GrabGreeGames_Copy.html',
+  count: 12,
+});
+Object.assign(givSites.steam, {
+  file: './tests/Websites/SteamAnnouncements_Copy.html',
+  count: 5,
 });
 
-test('Tests if all http requests were handled', () => {
-  givFetchResult.forEach((givSite) => {
-    expect(givSite).not.toHaveLength(0);
-  });
+const mockFetch = jest
+  .fn((URL) => {
+    const givSiteValues = Object.values(givSites).map(({ url, file }) => [
+      url,
+      file,
+    ]);
+
+    const site = givSiteValues.find(([givURL]) => givURL === URL);
+    const res = site ? readFileSync(site[1]) : undefined;
+    return Promise.resolve(res);
+  })
+  .mockName('SimpleFetch mock');
+WS.SimpleFetch = mockFetch;
+
+beforeEach(() => {
+  // Clearing message collection before each was not robust enough
+  const channel = new TextChannel(guild);
+  Giveaways.channelID = channel.id;
 });
 
-describe('Checks giveaway object properties', () => {
-  function checkProperties(giveaway) {
-    const properties = ['title', 'url', 'body']; // Required properties
-    properties.forEach((prop) => {
-      expect(giveaway).toHaveProperty(prop);
-      expect(giveaway[prop]).not.toHaveLength(0);
-    });
-  }
+describe('giveaway fetches', () => {
+  Object.keys(givSites).forEach((source, i) => {
+    const sourceInfo = givSites[source];
+    test(`if got ${sourceInfo.count} giveaways from ${source}`, async () => {
+      // Previous source needs to fail in order for it to fallback to a different one
+      for (let j = 0; j < i; j++) mockFetch.mockResolvedValueOnce('NoBueno');
 
-  giveawaySources.forEach((source) => {
-    test(`Test giveaway properties from ${source}`, () => {
-      checkGiveaways(source, checkProperties);
+      const giv = new Giveaways();
+      /** @type {import('discord.js').TextChannel} */
+      const chan = giv.channel; // For type and eslint error
+
+      // Waits till giveaways have been sent
+      const wt = 200; // Wait Time in ms
+      while (Date.now() - (chan.lastMessage?.createdTimestamp || 0) > wt) {
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, wt));
+      }
+
+      expect(chan.lastMessage.content).toBeDefined();
+      expect(chan.messages.cache.size).toBe(sourceInfo.count);
     });
   });
 });

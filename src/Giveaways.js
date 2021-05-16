@@ -2,7 +2,7 @@ import { ID } from './Identification.js';
 import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
 import Logging, { minInMs } from './Logging.js';
 import {
-  GiveawaysFromGrabFreeGames,
+  GrabFreeGames,
   GetSteamAnnouncements,
   SimpleFetch,
 } from './WebScraping.js';
@@ -11,9 +11,9 @@ export default class Giveaways {
   static channelID = process.env.GiveawaysID;
 
   static giveawaySites = {
-    grabFreeGames: {
+    GrabFreeGames: {
       url: 'https://grabfreegames.com/free',
-      callback: GiveawaysFromGrabFreeGames,
+      callback: GrabFreeGames,
     },
     steam: {
       url:
