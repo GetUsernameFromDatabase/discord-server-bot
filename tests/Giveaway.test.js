@@ -11,7 +11,7 @@ ID.Server = guild;
 
 const givSites = Giveaways.giveawaySites;
 Object.assign(givSites.GrabFreeGames, {
-  file: './tests/Websites/GrabGreeGames_Copy.html',
+  file: './tests/Websites/GrabFreeGames_Copy.html',
   count: 13,
 });
 Object.assign(givSites.steam, {
