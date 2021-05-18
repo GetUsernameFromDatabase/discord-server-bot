@@ -32,7 +32,7 @@ function MdHAsEmbedFieldTitle(fields) {
  * @param {String | String[] | Discord.EmbedField | Discord.EmbedField[]} fields
  * @param options
  * @returns {Discord.MessageEmbed} */
-export function GetMsgEmbed(fields, { title = '', url = '' }, imageURL = '') {
+export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
   /* eslint-disable no-param-reassign */
   if (
     (Array.isArray(fields) && typeof fields[0] === 'string') ||
@@ -68,7 +68,7 @@ function IsDuplicateMessage(msgToCheck, messages) {
   const EmbedCheck = (obj) => {
     const objEmb = obj.embeds[0];
     const titles = {
-      obj: objEmb?.title.toLowerCase(),
+      obj: objEmb?.title?.toLowerCase(),
       msg: msgToCheck.title.toLowerCase(),
     };
     const cond1 = titles.obj === titles.msg;

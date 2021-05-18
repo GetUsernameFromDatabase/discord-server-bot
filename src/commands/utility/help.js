@@ -10,6 +10,56 @@ import {
   PredictionsAsString,
 } from '../Commands.js';
 
+/** Takes in an array which will be used to make an EmbedField for discord
+ * @param {[String, String]} array [0]-name ; [1]-value
+ * @param {Boolean} inline =[true], if inline EmbedField or not
+ */
+function MakeEmbedFields(array, inline = true) {
+  return array.map(([k, v]) => MessageEmbed.normalizeField(k, v, inline));
+}
+
+/** Gets a MessageEmbed of all commands with a category\
+ * Commands with the same category will shown in the same field */
+function HelpForAllCommands() {
+  const CmdCat = {};
+  for (const [key, value] of commands.entries()) {
+    if (typeof value.category === 'string')
+      CmdCat[value.category] = `•${CmdCat[value.category] || ''}${key}\n`;
+  }
+  const embedFields = MakeEmbedFields(Object.entries(CmdCat));
+  return GetMsgEmbed(embedFields, { title: 'All of my commands' });
+}
+
+/** Gets a MessageEmbed of a command with descriptions\
+ * @param {import('../../interfaces/commands').CommandObject} command
+ * parameters that will be shown:
+ * - aliases
+ * - description
+ * - usage
+ * - cooldown
+ */
+function HelpForCommand(command) {
+  const wantedParameters = ['aliases', 'description', 'usage', 'cooldown'];
+  const filteredParameters = Object.entries(command).filter(([key]) =>
+    wantedParameters.includes(key)
+  );
+  const proccesedEntries = filteredParameters.map(([key, val]) => {
+    // Deals with different parameters
+    switch (key) {
+      case wantedParameters[0]: // Since aliases is String[]
+        return [key, val.join(', ')];
+      case wantedParameters[2]: // Since usage has only args
+        return [key, `${prefix + command.name} ${val}`];
+      case wantedParameters[3]: // Cooldown doesn't have time format
+        return [key, `${val} seconds`];
+      default:
+        return [key, val];
+    }
+  });
+  const embedFields = MakeEmbedFields(proccesedEntries, false);
+  return GetMsgEmbed(embedFields, { title: prefix + command.name });
+}
+
 export default {
   name: 'help',
   description: 'List all of my commands or info about a specific command.',
@@ -23,19 +73,9 @@ export default {
   execute(message, args) {
     const chan = message.channel;
     // If no arguments were supplied sends all usable commands
-    // eslint-disable-next-line unicorn/explicit-length-check
-    if (!args.length) {
-      const CmdCat = {};
-      for (const [key, value] of commands.entries()) {
-        CmdCat[value.category] = `•${CmdCat[value.category] || ''}${key}\n`;
-      }
+    if (args.length === 0) return chan.send(HelpForAllCommands(chan));
 
-      const embedFields = Object.keys(CmdCat).map((key) =>
-        MessageEmbed.normalizeField(key, CmdCat[key], true)
-      );
-      return chan.send(GetMsgEmbed(embedFields, 'All of my commands'));
-    }
-    // Gets the command
+    // Gets the command that the user wants to know about
     const arg = args[0].toLowerCase();
     const cmd = GetCommand(arg);
     if (!cmd) {
@@ -44,28 +84,6 @@ export default {
         `did you want to know about ${PredictionsAsString(predictions)}?`
       );
     }
-
-    // Gets what command parameters I want to display
-    const wantedEntries = ['aliases', 'description', 'usage', 'cooldown'];
-    const filteredEntries = Object.entries(cmd)
-      .filter(([key]) => wantedEntries.includes(key))
-      .map(([key, val]) => {
-        switch (key) {
-          case wantedEntries[0]: // Since aliases is String[]
-            return [key, val.join(', ')];
-          case wantedEntries[2]: // Since usage has only args
-            return [key, `${prefix + cmd.name} ${val}`];
-          case wantedEntries[3]: // Cooldown doesn't have time format
-            return [key, `${val} seconds`];
-          default:
-            return [key, val];
-        }
-      });
-
-    // Sends the response
-    const embedFields = filteredEntries.map(([key, value]) =>
-      MessageEmbed.normalizeField(key, value)
-    );
-    return chan.send(GetMsgEmbed(embedFields, cmd.name));
+    return chan.send(HelpForCommand(cmd));
   },
 };

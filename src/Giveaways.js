@@ -52,8 +52,8 @@ export default class Giveaways {
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
-      const { body, imageURL, ...title } = giv;
-      return GetMsgEmbed(body, title, imageURL);
+      const { body, ...rest } = giv;
+      return GetMsgEmbed(body, rest);
     });
     MassMessageSend(this.channel, embGiveaways);
   }

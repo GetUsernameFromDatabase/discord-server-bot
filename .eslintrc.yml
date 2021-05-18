@@ -32,7 +32,6 @@ rules:
 
   # --- IMPORT ---
   # Static Analysis
-  import/no-unresolved: error
   import/no-absolute-path: error
   import/no-cycle: [error, { ignoreExternal: true }]
   import/no-self-import: error
