@@ -6,7 +6,6 @@ plugins:
 extends:
   - ../.eslintrc.yml
   - plugin:jest/style
-  - plugin:jest/style
   - plugin:jest/recommended
 
 rules:
