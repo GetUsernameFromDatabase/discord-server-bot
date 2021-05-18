@@ -1,12 +1,10 @@
 import axios from 'axios';
-import TurndownService from 'turndown';
 import { load } from 'cheerio';
+import TurndownService from 'turndown';
 import Logging from './Logging.js';
 import { ModifyCredits } from './TextManipulation.js';
 
-/**
- * @param {String} URL The url for get request
- * @returns {Promise<any>} Get request promise */
+/** @param {String} URL The url for get request */
 export function SimpleFetch(URL) {
   return axios
     .get(URL)
@@ -14,7 +12,7 @@ export function SimpleFetch(URL) {
     .catch((error) => Promise.reject(error));
 }
 
-export function HTMLIntoMD(html = '') {
+function HTMLIntoMD(html = '') {
   const $ = load(html, { decodeEntities: true }, false);
   // So that turndown would convert them properly
   const headingCSS = '.bb_h1'; // heading class I've seen used in steam
@@ -65,7 +63,17 @@ export async function GrabFreeGames(html) {
 
     const bodyCSS = 'p.article-content';
     const body = SimpleFetch(url)
-      .then((val) => load(val, { decodeEntities: true }, false)(bodyCSS).html())
+      .then((val) => {
+        const article = load(
+          val,
+          { decodeEntities: true },
+          false
+        )(bodyCSS).html();
+
+        const response =
+          article || Promise.reject(new Error("Couldn't get article content"));
+        return response;
+      })
       .then(HTMLIntoMD)
       .catch(Logging.Error);
 

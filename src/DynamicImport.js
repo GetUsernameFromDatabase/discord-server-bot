@@ -19,13 +19,13 @@ export function GetFolders(path) {
 export function GetImportsFromFolders(folders, fileType = 'js') {
   // eslint-disable-next-line no-param-reassign
   if (!Array.isArray(folders)) folders = [folders];
-  const promises = folders
-    .map((folder) => {
-      const files = readdirSync(folder).filter((file) =>
-        file.endsWith(`.${fileType}`)
-      );
-      return files.map((file) => import(`${folder}/${file}`));
-    })
-    .flat();
+  const promises = folders.flatMap((folder) => {
+    const files = readdirSync(folder).filter((file) =>
+      file.endsWith(`.${fileType}`)
+    );
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax
+    return files.map((file) => import(`${folder}/${file}`));
+  });
+
   return promises;
 }

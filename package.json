@@ -9,13 +9,13 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">= 14.0.0",
-    "npm": ">= 6.14.4"
+    "node": ">=14.16.0",
+    "npm": ">=6.14.4"
   },
   "scripts": {
     "start": "node --trace-warnings -r dotenv/config ./src/Main.js",
     "lint": "eslint .",
-    "test": "jest --forceExit --detectOpenHandles"
+    "test": "jest --forceExit --runInBand --detectOpenHandles"
   },
   "jest": {
     "displayName": "My Discord Server Bot",
@@ -38,11 +38,15 @@
     "@babel/types": "^7.14.2",
     "@jest/globals": "^26.6.2",
     "@types/jest": "^26.0.23",
-    "eslint": "^7.25.0",
+    "babel-preset-airbnb": "^5.0.0",
+    "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.2",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-unicorn": "^32.0.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1"
   }

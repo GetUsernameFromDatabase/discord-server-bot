@@ -1,5 +1,5 @@
-import { CheckArgLength } from '../Messaging.js';
 import Logging from '../Logging.js';
+import { CheckArgLength } from '../Messaging.js';
 import {
   prefix,
   commands,
@@ -8,7 +8,6 @@ import {
   PredictionsAsString,
 } from '../commands/Commands.js';
 
-// eslint-disable-next-line consistent-return
 export default {
   name: 'message',
   /** @param {import('discord.js').Message} msg */

@@ -1,5 +1,6 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
 import { MessageEmbed } from 'discord.js';
+import { GetMsgEmbed } from '../../Messaging.js';
 import {
   prefix,
   commands,
@@ -8,7 +9,6 @@ import {
   GetMostSimilarCommands,
   PredictionsAsString,
 } from '../Commands.js';
-import { GetMsgEmbed } from '../../Messaging.js';
 
 export default {
   name: 'help',
@@ -23,9 +23,9 @@ export default {
   execute(message, args) {
     const chan = message.channel;
     // If no arguments were supplied sends all usable commands
+    // eslint-disable-next-line unicorn/explicit-length-check
     if (!args.length) {
       const CmdCat = {};
-      // eslint-disable-next-line no-restricted-syntax
       for (const [key, value] of commands.entries()) {
         CmdCat[value.category] = `•${CmdCat[value.category] || ''}${key}\n`;
       }

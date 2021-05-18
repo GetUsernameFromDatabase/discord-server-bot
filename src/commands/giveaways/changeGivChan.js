@@ -1,5 +1,5 @@
 import { Permissions } from 'discord.js';
-import { handlers } from '../../Main.js';
+import { handlers } from '../../Identification.js';
 import { categories } from '../Commands.js';
 // https://discord.com/developers/docs/topics/permissions
 

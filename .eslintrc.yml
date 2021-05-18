@@ -1,18 +1,89 @@
 env:
-    node: true
-parser: '@babel/eslint-parser'
-extends: 
-  - 'airbnb-base'
-  - 'prettier'
-plugins:
-  - 'prettier'
-  - 'import'
+  es6: true
+  node: true
+parser: "@babel/eslint-parser"
+parserOptions:
+  ecmaVersion: 2021
+  sourceType: module
 
+extends:
+  - airbnb-base
+  - plugin:import/recommended
+  - plugin:node/recommended-module
+  - plugin:prettier/recommended
+  - plugin:unicorn/recommended
+plugins:
+  - prettier
+  - import
+  - node
+  - unicorn
+
+reportUnusedDisableDirectives: true
 rules:
-  prettier/prettier: ['error', 
-    {'singleQuote': true}]
   no-plusplus: 0
   func-names: 0
-  import/no-unresolved: 2
-  import/no-commonjs: 2
-  import/extensions: [2, "ignorePackages"]
+  no-continue: 0
+  prefer-destructuring: [error, { object: true, array: false }]
+  # Disables Airbnb's hate towards iterators and generators
+  no-restricted-syntax: 0
+
+  # --- Prettier ---
+  prettier/prettier: [error, { singleQuote: true }]
+
+  # --- IMPORT ---
+  # Static Analysis
+  import/no-unresolved: error
+  import/no-absolute-path: error
+  import/no-cycle: [error, { ignoreExternal: true }]
+  import/no-self-import: error
+  import/no-webpack-loader-syntax: error
+  import/no-useless-path-segments: 0
+  # Helpful Warnings
+  import/no-mutable-exports: error
+  import/no-extraneous-dependencies: error
+  # Module Systems
+  import/unambiguous: error
+  import/no-commonjs: [error, { allowConditionalRequire: false }]
+  # Style Guide
+  import/first: warn
+  import/extensions: [error, ignorePackages]
+  import/max-dependencies: warn
+  import/no-named-default: warn
+  import/no-unassigned-import: [warn, { allow: [reflect-metadata] }]
+  import/order: [warn, { newlines-between: never, alphabetize: { order: asc } }]
+  import/prefer-default-export: warn
+
+  # --- NODE ---
+  #Possible Errors
+  node/handle-callback-err: error
+  node/no-callback-literal: error
+  node/no-path-concat: error
+  node/no-process-exit: error
+  # Stylistic Issues
+  node/callback-return: error
+  node/exports-style: warn
+  node/no-sync: error
+  node/prefer-global/buffer: warn
+  node/prefer-global/console: warn
+  node/prefer-global/process: warn
+  node/prefer-global/text-decoder: warn
+  node/prefer-global/text-encoder: warn
+  node/prefer-global/url-search-params: warn
+  node/prefer-global/url: warn
+  node/prefer-promises/dns: error
+  node/prefer-promises/fs: error
+
+  # --- UNICORN ---
+  unicorn/custom-error-definition: error
+  unicorn/no-keyword-prefix: error
+  unicorn/no-unsafe-regex: error
+  unicorn/no-unused-properties: error
+  unicorn/import-index: [error, { ignoreImports: true }]
+  # Goes against recomended
+  unicorn/no-abusive-eslint-disable: off
+  unicorn/no-for-loop: off
+  unicorn/filename-case: off
+  unicorn/prevent-abbreviations: off
+  ## I really want this to be enabled but import's resolver hasn't liked node: protocol
+  ## EVEN THOUGH IT'S NODE RESOLVER BY DEFAULT
+  unicorn/prefer-node-protocol: off # :(

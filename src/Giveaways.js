@@ -1,6 +1,6 @@
 import { ID } from './Identification.js';
-import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
 import Logging, { minInMs } from './Logging.js';
+import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
 import {
   GrabFreeGames,
   GetSteamAnnouncements,
@@ -23,7 +23,6 @@ export default class Giveaways {
   };
 
   constructor() {
-    // Initiates giveaway functions
     // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
     this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
     this.GetGiveaways();
@@ -37,9 +36,9 @@ export default class Giveaways {
       // eslint-disable-next-line no-await-in-loop
       const results = await SimpleFetch(source.url)
         .then((val) => source.callback(val))
-        .catch((err) => Logging.Error(err, `${source}: FAILED`));
+        .catch((error) => Logging.Error(error, `${source}: FAILED`));
 
-      if (typeof results !== 'undefined' && results.length !== 0) {
+      if (typeof results !== 'undefined' && results.length > 0) {
         this.PostGiveaways(results);
         return true;
       }
@@ -50,7 +49,7 @@ export default class Giveaways {
 
   /** @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways */
   PostGiveaways(giveaways = []) {
-    // Reversing this to make newer (top of array) giveaways
+    // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, imageURL, ...title } = giv;

@@ -1,6 +1,6 @@
 import { Collection } from 'discord.js';
-import { Similarity } from '../TextManipulation.js';
 import { GetFolders, GetImportsFromFolders } from '../DynamicImport.js';
+import { Similarity } from '../TextManipulation.js';
 
 export const prefix = '€';
 export const categories = {
@@ -14,13 +14,13 @@ export const commands = new Collection();
 export function LoadCommands() {
   commands.clear();
   const promises = GetImportsFromFolders(GetFolders('./src/commands'));
-  return Promise.all(promises).then((impPromises) =>
-    impPromises.forEach((module) => {
+  return Promise.all(promises).then((impPromises) => {
+    for (const module of impPromises) {
       /** @type {import('../interfaces/commands').CommandObject} */
       const cmd = module.default;
       commands.set(cmd.name, cmd);
-    })
-  );
+    }
+  });
 }
 
 /** Gets the command by it's name or alias

@@ -1,6 +1,6 @@
-import { prefix } from './commands/Commands.js';
 import { client } from './Identification.js';
 import Logging, { minInMs } from './Logging.js';
+import { prefix } from './commands/Commands.js';
 
 /**
  * @param {String} name Name of the activity displayed

@@ -1,5 +1,7 @@
 /* eslint-disable max-classes-per-file */
 // https://stackoverflow.com/questions/60916450/jest-testing-discord-bot-commands
+// Currently used just to replace calls to Discord API
+// TODO: Make this into a proper mock https://jestjs.io/docs/manual-mocks#mocking-node-modules
 import * as Discord from 'discord.js';
 // a counter so that all the ids are unique
 let count = 0;
@@ -9,12 +11,9 @@ class Guild extends Discord.Guild {
     super(client, {
       // you don't need all of these but I just put them in to show you all the properties that Discord.js uses
       id: (count++).toString(),
-      name: 'MockGuild',
-      icon: null,
-      splash: null,
+      name: `MockGuild: ${count}`,
       owner_id: 'GetUsernameFromDatabase',
       region: '',
-      afk_channel_id: null,
       afk_timeout: 0,
       verification_level: 0,
       default_message_notifications: 0,
@@ -23,11 +22,8 @@ class Guild extends Discord.Guild {
       emojis: [],
       features: [],
       mfa_level: 0,
-      application_id: null,
       system_channel_flags: 0,
-      system_channel_id: null,
       widget_enabled: false,
-      widget_channel_id: null,
     });
     this.client.guilds.cache.set(this.id, this);
   }
@@ -49,7 +45,6 @@ export class Message extends Discord.Message {
         embeds: [],
         attachments: [],
         timestamp: Date.now(),
-        edited_timestamp: null,
         mentions: [],
         mention_roles: [],
         mention_everyone: false,
@@ -72,7 +67,7 @@ export class TextChannel extends Discord.TextChannel {
   constructor(guild) {
     super(guild, {
       id: (count++).toString(),
-      name: 'MockChannel',
+      name: `MockChannel: ${count}`,
       type: 0,
     });
     this.client.channels.cache.set(this.id, this);
@@ -100,7 +95,7 @@ export class TextChannel extends Discord.TextChannel {
       embeds: [],
       attachments: [],
       timestamp: Date.now(),
-      edited_timestamp: null,
+      edited_timestamp: Date.now(),
       mentions: [],
       mention_roles: [],
       mention_everyone: false,
