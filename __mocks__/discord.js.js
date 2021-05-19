@@ -1,13 +1,27 @@
 /* eslint-disable max-classes-per-file */
-// https://stackoverflow.com/questions/60916450/jest-testing-discord-bot-commands
 // Currently used just to replace calls to Discord API
-// TODO: Make this into a proper mock https://jestjs.io/docs/manual-mocks#mocking-node-modules
+// https://stackoverflow.com/questions/60916450/jest-testing-discord-bot-commands
 import { jest } from '@jest/globals';
 
-/** @type {import('discord.js')} */
+jest.disableAutomock(); // Required if enableAutomock is used anywhere else
 const Discord = jest.requireActual('discord.js');
+
 // a counter so that all the ids are unique
 let count = 0;
+// the user that executes the commands
+export const userMock = {
+  id: (count++).toString(),
+  username: 'username',
+  discriminator: '1234',
+};
+
+// the bot
+export const botMock = {
+  id: (count++).toString(),
+  username: 'BOTMOCK',
+  discriminator: '1234',
+  bot: true,
+};
 
 export class Guild extends Discord.Guild {
   constructor(client) {
@@ -33,7 +47,7 @@ export class Guild extends Discord.Guild {
 }
 
 export class Message extends Discord.Message {
-  constructor(content, channel, author) {
+  constructor(channel, content, author = userMock) {
     super(
       channel.client,
       {
@@ -86,12 +100,7 @@ export class TextChannel extends Discord.TextChannel {
       type: 0,
       channel_id: this.id,
       content,
-      author: {
-        id: 'Mock Bot',
-        username: 'MOCKAH',
-        discriminator: '1234',
-        bot: true,
-      },
+      author: botMock,
       pinned: false,
       tts: false,
       nonce: '',
@@ -111,10 +120,3 @@ export class User extends Discord.User {}
 export class Collection extends Discord.Collection {}
 export class Permissions extends Discord.Permissions {}
 export class MessageEmbed extends Discord.MessageEmbed {}
-
-// the user that executes the commands
-export const mockUser = {
-  id: count++,
-  username: 'username',
-  discriminator: '1234',
-};

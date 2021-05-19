@@ -10,25 +10,28 @@
   "type": "module",
   "engines": {
     "node": ">=16.1.0",
-    "npm": ">=7.11.2"
+    "npm": ">=7.13.0"
   },
   "scripts": {
     "start": "node --trace-warnings -r dotenv/config ./src/Main.js",
     "lint": "eslint .",
-    "test": "jest --runInBand --detectOpenHandles"
+    "test": "jest --forceExit --detectOpenHandles"
   },
   "jest": {
     "displayName": "My Discord Server Bot",
-    "testEnvironment": "node",
     "verbose": true,
     "bail": true,
     "errorOnDeprecated": true,
+    "testEnvironment": "node",
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     }
   },
   "dependencies": {
     "@babel/node": "^7.14.2",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/runtime": "^7.14.0",
+    "@babel/runtime-corejs3": "^7.14.0",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.6",
     "discord.js": "^12.5.3",
@@ -36,7 +39,9 @@
     "turndown": "^7.0.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.13.14",
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/eslint-parser": "^7.14.3",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.14.2",
     "@babel/types": "^7.14.2",
@@ -44,6 +49,7 @@
     "@types/jest": "^26.0.23",
     "babel-jest": "^26.6.3",
     "babel-preset-airbnb": "^5.0.0",
+    "core-js": "^3.12.1",
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",

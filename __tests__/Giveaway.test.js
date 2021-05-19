@@ -1,24 +1,44 @@
-/* eslint-disable jest/no-mocks-import */
 import { readFileSync } from 'fs';
 import { jest } from '@jest/globals';
-import axios from 'axios';
 import * as Discord from 'discord.js';
-import Giveaways from '../src/Giveaways.js';
-import { ID } from '../src/Identification.js';
-import * as WS from '../src/WebScraping.js';
+import { ID, handlers, client } from '../src/Identification.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
 
-const givSites = Giveaways.giveawaySites;
-const resFolder = './__tests__/res/';
-Object.assign(givSites.GrabFreeGames, {
-  file: `${resFolder}GrabFreeGames_Copy.txt`,
-  count: 13,
-});
-Object.assign(givSites.steam, {
-  file: `${resFolder}SteamAnnouncements_Copy.txt`,
-  count: 5,
-});
+/** @type {import('../src/Giveaways.js').default} */
+const Giveaways = jest.requireActual('../src/Giveaways.js').default;
+const WS = jest.requireActual('../src/WebScraping.js');
+const axios = jest.requireActual('axios').default;
+
+async function WaitTillNoMessages(chan) {
+  const wt = 150; // Wait Time in ms
+  await new Promise((r) => setTimeout(r, 75)); // Waits for spamming to start
+  while (wt < Date.now() - (chan.lastMessage?.createdTimestamp || 0)) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => setTimeout(r, wt));
+  }
+  return Promise.resolve('DONE WAITING');
+}
+/** - Adds how many giveaways are expected in the site
+ * - and the location of the file where the code for the site is located
+ * =====> To Giveaway site object */
+function GetModifiedGiveawaySites() {
+  const GiveawaySites = Giveaways.giveawaySites;
+  const resFolder = './__tests__/res/';
+  Object.assign(GiveawaySites.GrabFreeGames, {
+    file: `${resFolder}GrabFreeGames_Copy.txt`,
+    count: 13,
+  });
+  Object.assign(GiveawaySites.steam, {
+    file: `${resFolder}SteamAnnouncements_Copy.txt`,
+    count: 5,
+  });
+  return GiveawaySites;
+}
+
+const givSites = GetModifiedGiveawaySites();
+/** @type {[Discord.TextChannel, Giveaways][]]} */
+let channels = [];
 
 const mockSimpleFetch = jest.fn((URL) => {
   const givSiteValues = Object.values(givSites).map(({ url, file }) => [
@@ -30,7 +50,6 @@ const mockSimpleFetch = jest.fn((URL) => {
   const res = site ? readFileSync(site[1]) : 'Failed to read';
   return Promise.resolve(res);
 });
-
 const mockAxiosGet = jest.fn(() => {
   const response = {
     data: '<p class="article-content">This is a fake pharagraph</p>',
@@ -38,26 +57,13 @@ const mockAxiosGet = jest.fn(() => {
   return Promise.resolve(response);
 });
 
-// jest.enableAutomock();
-// jest.unmock('axios');
-jest.mock('discord.js');
-
 jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);
+/* Needed because /\ is not called inside WebScraping (parent) module
+So this is used to replace the use of SimpleFetch inside WebScraping */
 jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
 
 ID.Server = new Discord.Guild(new Discord.Client());
-
-/** @type {[Discord.TextChannel, Giveaways][]]} */
-const channels = [];
-
-async function WaitTillNoMessages(chan) {
-  const wt = 200; // Wait Time in ms
-  while (wt < Date.now() - (chan.lastMessage?.createdTimestamp || 0)) {
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise((r) => setTimeout(r, wt));
-  }
-  return Promise.resolve('DONE WAITING');
-}
+client.user = Discord.botMock;
 
 describe('giveaway fetches', () => {
   let fetchCounter = 0;
@@ -73,37 +79,48 @@ describe('giveaway fetches', () => {
     fetchCounter++;
   });
 
-  for (const source of Object.keys(givSites)) {
-    const sourceInfo = givSites[source];
-    test(`if got ${sourceInfo.count} giveaways from ${source}`, async () => {
-      expect.assertions(2);
+  test.each(
+    Object.entries(givSites).map(([source, value]) => {
+      return [value.count, source];
+    })
+  )('if got %i giveaways from %s', async (count) => {
+    expect.assertions(2);
 
-      const giv = new Giveaways();
-      /** @type {import('discord.js').TextChannel} */
-      const chan = giv.channel; // For type and eslint error
+    const giv = new Giveaways();
+    const chan = giv.channel;
+    handlers.Giveaways ??= giv; // Used in the next test
 
-      await WaitTillNoMessages(chan);
-      expect(chan.lastMessage.content).toBeDefined();
-      expect(chan.messages.cache.size).toBe(sourceInfo.count);
-    });
-  }
+    await WaitTillNoMessages(chan);
+    expect(chan.lastMessage.content).toBeDefined();
+    expect(chan.messages.cache.size).toBe(count);
+  });
+});
 
-  afterAll(() => {
-    console.warn(fetchCounter);
-    jest.autoMockOn();
-    it('should post all giveaways from the last source into the first one', async () => {
-      expect.assertions(1);
-      console.warn('I need help'); // it's okay if this test fails - I JUST WANT IT TO BE CALLED AT LEAST
-      // TODO: Get two different channels
-      const lastChannel = Discord.TextChannel;
+describe('interaction', () => {
+  const channelsCopy = channels;
+  beforeEach(() => {
+    channels = channelsCopy;
+  });
+  test.todo('test guildOnly parameter');
+  it('should send correct amount of giveaways after receiving a command', async () => {
+    expect.assertions(1);
+    const lastChannel = channels[channels.length - 1];
 
-      givCmd.execute(
-        new Discord.Message(prefix + givCmd.name, lastChannel, Discord.user)
-      );
-      await new Promise((r) => setTimeout(r, 500));
+    givCmd.execute(new Discord.Message(lastChannel, prefix + givCmd.name));
+    await WaitTillNoMessages(lastChannel);
 
-      const [[, first], [, last]] = Object.entries(givSites);
-      expect(lastChannel.messages.cache.size).toBe(first.count + last.count);
-    });
+    const [[, first], [, last]] = Object.entries(givSites);
+    expect(lastChannel.messages.cache.size).toBe(first.count + last.count + 1);
+  });
+  it.skip('should not send duplicates', async () => {
+    expect.assertions(1);
+    await new Promise((r) => setTimeout(r, 500));
+    const { channel } = handlers.Giveaways;
+    const amountBefore = channel.messages.cache.size;
+
+    handlers.Giveaways.GetGiveaways();
+    await WaitTillNoMessages(channel);
+    // Currently not working cause of the current mocked Messaging system
+    expect(amountBefore).toBe(channel.messages.cache.size);
   });
 });
