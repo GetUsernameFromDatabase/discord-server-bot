@@ -13,7 +13,7 @@ export function SimpleFetch(URL) {
 }
 
 function HTMLIntoMD(html = '') {
-  const $ = load(html, { decodeEntities: true }, false);
+  const $ = load(html, { scriptingEnabled: false }, false);
   // So that turndown would convert them properly
   const headingCSS = '.bb_h1'; // heading class I've seen used in steam
   $(headingCSS).each((_i, el) => {
@@ -33,7 +33,7 @@ function HTMLIntoMD(html = '') {
  * @returns {{title: String, url: String, body: String}[]} */
 export function GetSteamAnnouncements(html) {
   const announcements = [];
-  const $ = load(html, { decodeEntities: true });
+  const $ = load(html, { scriptingEnabled: false });
   $('div.announcement').each((_i, el) => {
     const annTitle = $(el).children().first();
     const title = annTitle.text();
@@ -56,7 +56,7 @@ export async function GrabFreeGames(html) {
   /** @type {{title: String,url:String, body:Promise<String> imageURL: String}[]} */
   const giveaways = [];
 
-  const $ = load(html, { decodeEntities: true }, false);
+  const $ = load(html, { scriptingEnabled: false }, false);
   $('div.free-image > a > img').each((_i, el) => {
     const { src: imgURL, alt: title } = el.attribs;
     const url = $(el.parent).attr('href');
@@ -66,7 +66,7 @@ export async function GrabFreeGames(html) {
       .then((val) => {
         const article = load(
           val,
-          { decodeEntities: true },
+          { scriptingEnabled: false },
           false
         )(bodyCSS).html();
 
