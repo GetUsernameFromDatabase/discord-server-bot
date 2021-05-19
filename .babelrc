@@ -9,7 +9,8 @@
         "targets": {
           "node": "current",
           "esmodules": true
-        }
+        },
+        "modules": false
       }
     ],
     ["airbnb"]

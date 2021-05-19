@@ -9,6 +9,7 @@ extends:
   - plugin:jest/recommended
 
 rules:
+  jest/no-focused-tests: warn
   jest/no-if: error
   jest/prefer-spy-on: warn
   jest/prefer-todo: error

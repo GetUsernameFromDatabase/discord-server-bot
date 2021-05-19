@@ -1,11 +1,11 @@
 /* eslint-disable jest/no-mocks-import */
-// !!! This has to be commented out in order for this test to run
-// import { jest } from '@jest/globals'; // * Useful during dev
 import { readFileSync } from 'fs';
+import { jest } from '@jest/globals';
 import axios from 'axios';
-import { guild, TextChannel, Message, user } from '../__mocks__/discord.js';
+import * as Discord from 'discord.js';
 import Giveaways from '../src/Giveaways.js';
-import { ID, handlers } from '../src/Identification.js';
+import { ID } from '../src/Identification.js';
+import * as WS from '../src/WebScraping.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
 
@@ -30,27 +30,29 @@ const mockSimpleFetch = jest.fn((URL) => {
   const res = site ? readFileSync(site[1]) : 'Failed to read';
   return Promise.resolve(res);
 });
-const mockedWS = jest.requireActual('../src/WebScraping.js');
-mockedWS.SimpleFetch = mockSimpleFetch;
-jest.setMock('../src/WebScraping.js', mockedWS);
 
-jest.mock('axios'); // Most likely won't help much
 const mockAxiosGet = jest.fn(() => {
   const response = {
     data: '<p class="article-content">This is a fake pharagraph</p>',
   };
   return Promise.resolve(response);
 });
+
+// jest.enableAutomock();
+// jest.unmock('axios');
+jest.mock('discord.js');
+
+jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);
 jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
 
-ID.Server = guild;
+ID.Server = new Discord.Guild(new Discord.Client());
 
-/** @type {[TextChannel, Giveaways][]]} */
+/** @type {[Discord.TextChannel, Giveaways][]]} */
 const channels = [];
 
 async function WaitTillNoMessages(chan) {
   const wt = 200; // Wait Time in ms
-  while (Date.now() - (chan.lastMessage?.createdTimestamp || 0) > wt) {
+  while (wt < Date.now() - (chan.lastMessage?.createdTimestamp || 0)) {
     // eslint-disable-next-line no-await-in-loop
     await new Promise((r) => setTimeout(r, wt));
   }
@@ -58,20 +60,23 @@ async function WaitTillNoMessages(chan) {
 }
 
 describe('giveaway fetches', () => {
+  let fetchCounter = 0;
   beforeEach(() => {
     // Clearing message collection before each was not robust enough
-    const channel = new TextChannel(guild);
-    channels.push([channel, Giveaways]);
+    const channel = new Discord.TextChannel(ID.Server);
+    channels.push(channel);
     Giveaways.channelID = channel.id;
+
+    // Previous source needs to fail in order for it to fallback to a different one
+    for (let j = 0; j < fetchCounter; j++)
+      mockSimpleFetch.mockRejectedValueOnce(`expect ${j} more failures`);
+    fetchCounter++;
   });
 
-  for (const [i, source] of Object.keys(givSites).entries()) {
+  for (const source of Object.keys(givSites)) {
     const sourceInfo = givSites[source];
     test(`if got ${sourceInfo.count} giveaways from ${source}`, async () => {
       expect.assertions(2);
-      // Previous source needs to fail in order for it to fallback to a different one
-      for (let j = 0; j < i; j++)
-        mockSimpleFetch.mockRejectedValueOnce(`expect ${j} more failures`);
 
       const giv = new Giveaways();
       /** @type {import('discord.js').TextChannel} */
@@ -82,20 +87,23 @@ describe('giveaway fetches', () => {
       expect(chan.messages.cache.size).toBe(sourceInfo.count);
     });
   }
-  afterAll(() => Promise.resolve());
-});
 
-afterAll(() => {
-  // ?! This test is not called - at all
-  it('should post all giveaways from the first source into the second one', async () => {
-    expect.hasAssertions();
-    console.error(channels[0][1]);
-    handlers.Giveaways = channels[0][1];
-    const scndChan = channels[1][0];
-    givCmd.execute(new Message(prefix + givCmd.name, scndChan, user));
+  afterAll(() => {
+    console.warn(fetchCounter);
+    jest.autoMockOn();
+    it('should post all giveaways from the last source into the first one', async () => {
+      expect.assertions(1);
+      console.warn('I need help'); // it's okay if this test fails - I JUST WANT IT TO BE CALLED AT LEAST
+      // TODO: Get two different channels
+      const lastChannel = Discord.TextChannel;
 
-    await WaitTillNoMessages(scndChan);
-    const [[, first], [, second]] = Object.entries(givSites);
-    expect(scndChan.messages.cache.size).toBe(first.count + second.count);
+      givCmd.execute(
+        new Discord.Message(prefix + givCmd.name, lastChannel, Discord.user)
+      );
+      await new Promise((r) => setTimeout(r, 500));
+
+      const [[, first], [, last]] = Object.entries(givSites);
+      expect(lastChannel.messages.cache.size).toBe(first.count + last.count);
+    });
   });
 });

@@ -53,6 +53,7 @@ rules:
   import/prefer-default-export: warn
 
   # --- NODE ---
+  node/no-unpublished-import: off
   #Possible Errors
   node/handle-callback-err: error
   node/no-callback-literal: error
