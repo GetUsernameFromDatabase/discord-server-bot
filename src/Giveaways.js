@@ -9,8 +9,6 @@ import {
 } from './WebScraping.js';
 
 export default class Giveaways {
-  static channelID = process.env.GiveawaysID;
-
   static giveawaySites = {
     GrabFreeGames: {
       url: 'https://grabfreegames.com/free',
@@ -23,24 +21,36 @@ export default class Giveaways {
     },
   };
 
+  static jsonLoc = './data/FetchedGiveaways.json';
+
+  #channel;
+
+  #channelChanged = false;
+
   constructor() {
-    // process.env.TestChanID --- Testing | Giveaways.channelID --- For Use
-    this.channel = ID.Server.channels.cache.get(Giveaways.channelID);
+    // process.env.TestChanID --- Testing | process.env.GiveawaysID --- For Use
+    this.#channel = ID.Server.channels.cache.get(process.env.GiveawaysID);
     this.GetGiveaways();
     setInterval(this.GetGiveaways.bind(this), 60 * minInMs);
   }
 
+  ChangeChannel(ChannelID) {
+    // TODO: Make the change be saved (maybe save the channel ID in .env)
+    if (this.#channel?.id !== ChannelID) this.#channelChanged = true;
+    this.#channel = ID.Server.channels.cache.get(ChannelID);
+  }
+
   async GetGiveaways() {
     const sources = Object.keys(Giveaways.giveawaySites);
-    for (let i = 0; i < sources.length; i++) {
-      const source = Giveaways.giveawaySites[sources[i]];
+    for (const key of sources) {
+      const source = Giveaways.giveawaySites[key];
       // eslint-disable-next-line no-await-in-loop
       const results = await SimpleFetch(source.url)
         .then((val) => source.callback(val))
         .catch((error) => Logging.Error(error, `${source}: FAILED`));
 
       if (typeof results !== 'undefined' && results.length > 0) {
-        this.PostGiveaways(results);
+        this.#PostGiveaways(results);
         return true;
       }
     }
@@ -50,10 +60,9 @@ export default class Giveaways {
 
   /** Filters out sent giveaways from fetched giveaways
    * @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
-  static FilterSentGiveaways(FetchedGiveaways) {
+  static #FilterSentGiveaways(FetchedGiveaways) {
     const encoding = 'utf8';
-    const jsonLoc = `${process.cwd()}/data/FetchedGiveaways.json`;
-    const FileJSON = readFileSync(jsonLoc, encoding) || '[]';
+    const FileJSON = readFileSync(Giveaways.jsonLoc, encoding) || '[]';
 
     /** @type {import('./interfaces/giveaways').FetchedGiveawaysJSON}  */
     const data = JSON.parse(FileJSON);
@@ -72,19 +81,28 @@ export default class Giveaways {
         updatedData.push({ title, url, created_date: now, updated_date: now });
       }
     }
-    writeFileSync(jsonLoc, JSON.stringify(data, undefined, 2), encoding);
+
+    writeFileSync(
+      Giveaways.jsonLoc,
+      JSON.stringify(data, undefined, 2),
+      encoding
+    );
     return toSend;
   }
 
   /** @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
-  PostGiveaways(FetchedGiveaways) {
-    const giveaways = Giveaways.FilterSentGiveaways(FetchedGiveaways);
+  #PostGiveaways(FetchedGiveaways) {
+    let giveaways = FetchedGiveaways;
+    if (!this.#channelChanged) {
+      this.#channelChanged = !this.#channelChanged;
+      giveaways = Giveaways.#FilterSentGiveaways(FetchedGiveaways);
+    }
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {
       const { body, ...rest } = giv;
       return GetMsgEmbed(body, rest);
     });
-    MassMessageSend(this.channel, embGiveaways);
+    MassMessageSend(this.#channel, embGiveaways);
   }
 }

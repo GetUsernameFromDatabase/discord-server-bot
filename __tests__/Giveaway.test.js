@@ -1,14 +1,53 @@
-import { readFileSync } from 'fs';
-import { jest } from '@jest/globals';
+import { readFileSync, writeFileSync } from 'fs';
+import { beforeAll, jest } from '@jest/globals';
 import * as Discord from 'discord.js';
+import Giveaways from '../src/Giveaways.js';
 import { ID, handlers, client } from '../src/Identification.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
 
-/** @type {import('../src/Giveaways.js').default} */
-const Giveaways = jest.requireActual('../src/Giveaways.js').default;
+Giveaways.jsonLoc = './__tests__/res/FetchedGiveaways.json';
+Giveaways.giveawaySites.GrabFreeGames.count = 13;
+Giveaways.giveawaySites.steam.count = 5;
+
+ID.Server = new Discord.Guild(new Discord.Client());
+client.user = Discord.botMock;
+
+const mockSimpleFetch = jest.fn((URL) => {
+  const GiveawaySites = Giveaways.giveawaySites;
+  const resFolder = './__tests__/res/';
+
+  let file;
+  switch (URL) {
+    case GiveawaySites.GrabFreeGames.url:
+      file = `${resFolder}GrabFreeGames_response.txt`;
+      break;
+    case GiveawaySites.steam.url:
+      file = `${resFolder}steam_response.txt`;
+      break;
+
+    default:
+      return Promise.reject(
+        new Error(`Couldn't find a matching file for URL:\n${URL}`)
+      );
+  }
+
+  return Promise.resolve(readFileSync(file));
+});
+const mockAxiosGet = jest.fn(() => {
+  const response = {
+    data: '<p class="article-content">This is a fake pharagraph</p>',
+  };
+  return Promise.resolve(response);
+});
+
 const WS = jest.requireActual('../src/WebScraping.js');
 const axios = jest.requireActual('axios').default;
+
+jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);
+/* Needed because /\ is not called inside WebScraping (parent) module
+So this is used to replace the use of SimpleFetch inside WebScraping */
+jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
 
 async function WaitTillNoMessages(chan) {
   const wt = 150; // Wait Time in ms
@@ -19,51 +58,13 @@ async function WaitTillNoMessages(chan) {
   }
   return Promise.resolve('DONE WAITING');
 }
-/** - Adds how many giveaways are expected in the site
- * - and the location of the file where the code for the site is located
- * =====> To Giveaway site object */
-function GetModifiedGiveawaySites() {
-  const GiveawaySites = Giveaways.giveawaySites;
-  const resFolder = './__tests__/res/';
-  Object.assign(GiveawaySites.GrabFreeGames, {
-    file: `${resFolder}GrabFreeGames_Copy.txt`,
-    count: 13,
-  });
-  Object.assign(GiveawaySites.steam, {
-    file: `${resFolder}SteamAnnouncements_Copy.txt`,
-    count: 5,
-  });
-  return GiveawaySites;
-}
 
-const givSites = GetModifiedGiveawaySites();
 /** @type {[Discord.TextChannel, Giveaways][]]} */
 let channels = [];
 
-const mockSimpleFetch = jest.fn((URL) => {
-  const givSiteValues = Object.values(givSites).map(({ url, file }) => [
-    url,
-    file,
-  ]);
-  /** @type {[String, String]} [0]-**url** ; [1]-**file location** */
-  const site = givSiteValues.find(([givURL]) => givURL === URL);
-  const res = site ? readFileSync(site[1]) : 'Failed to read';
-  return Promise.resolve(res);
+beforeAll(() => {
+  writeFileSync(Giveaways.jsonLoc, '', 'utf8');
 });
-const mockAxiosGet = jest.fn(() => {
-  const response = {
-    data: '<p class="article-content">This is a fake pharagraph</p>',
-  };
-  return Promise.resolve(response);
-});
-
-jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);
-/* Needed because /\ is not called inside WebScraping (parent) module
-So this is used to replace the use of SimpleFetch inside WebScraping */
-jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
-
-ID.Server = new Discord.Guild(new Discord.Client());
-client.user = Discord.botMock;
 
 describe('giveaway fetches', () => {
   let fetchCounter = 0;
@@ -71,7 +72,6 @@ describe('giveaway fetches', () => {
     // Clearing message collection before each was not robust enough
     const channel = new Discord.TextChannel(ID.Server);
     channels.push(channel);
-    Giveaways.channelID = channel.id;
 
     // Previous source needs to fail in order for it to fallback to a different one
     for (let j = 0; j < fetchCounter; j++)
@@ -80,15 +80,16 @@ describe('giveaway fetches', () => {
   });
 
   test.each(
-    Object.entries(givSites).map(([source, value]) => {
+    Object.entries(Giveaways.giveawaySites).map(([source, value]) => {
       return [value.count, source];
     })
   )('if got %i giveaways from %s', async (count) => {
     expect.assertions(2);
+    const chan = channels[channels.length - 1];
+    process.env.GiveawaysID = chan.id;
 
     const giv = new Giveaways();
-    const chan = giv.channel;
-    handlers.Giveaways ??= giv; // Used in the next test
+    handlers.Giveaways ??= giv; // Used in the "interaction" test
 
     await WaitTillNoMessages(chan);
     expect(chan.lastMessage.content).toBeDefined();
@@ -109,7 +110,7 @@ describe('interaction', () => {
     givCmd.execute(new Discord.Message(lastChannel, prefix + givCmd.name));
     await WaitTillNoMessages(lastChannel);
 
-    const [[, first], [, last]] = Object.entries(givSites);
+    const [[, first], [, last]] = Object.entries(Giveaways.giveawaySites);
     expect(lastChannel.messages.cache.size).toBe(first.count + last.count + 1);
   });
   it.skip('should not send duplicates', async () => {

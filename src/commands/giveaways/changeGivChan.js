@@ -14,9 +14,9 @@ export default {
    * @param {String[]} args */
   execute(message) {
     const giv = handlers.Giveaways;
-    giv.channel = message.channel; // TODO: Make the change be saved (maybe save the channel ID in .env)
-    giv.channel.send('This channel will be notified about giveaways');
+    giv.ChangeChannel(message.channel.id);
 
+    message.channel.send('This channel will be notified about giveaways');
     giv.GetGiveaways();
   },
 };
