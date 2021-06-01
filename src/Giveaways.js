@@ -96,14 +96,14 @@ export default class Giveaways {
 
   /** @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
   #PostGiveaways(FetchedGiveaways) {
-    let giveaways = FetchedGiveaways;
+    let giveaways = FetchedGiveaways.reverse();
     if (!this.#channelChanged) {
       this.#channelChanged = !this.#channelChanged;
       giveaways = Giveaways.#FilterSentGiveaways(FetchedGiveaways);
     }
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
-    const embGiveaways = giveaways.reverse().map((giv) => {
+    const embGiveaways = giveaways.map((giv) => {
       const { body, ...rest } = giv;
       return GetMsgEmbed(body, rest);
     });
