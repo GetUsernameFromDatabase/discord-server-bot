@@ -1,5 +1,7 @@
 # Copy from https://github.com/github/gitignore/blob/master/Node.gitignore
 
+__tests__\res\FetchedGiveaways.json
+
 # Logs
 logs
 *.log

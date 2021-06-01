@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ID } from './Identification.js';
 import Logging, { minInMs } from './Logging.js';
 import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
@@ -62,7 +62,9 @@ export default class Giveaways {
    * @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
   static #FilterSentGiveaways(FetchedGiveaways) {
     const encoding = 'utf8';
-    const FileJSON = readFileSync(Giveaways.jsonLoc, encoding) || '[]';
+    let FileJSON = '[]';
+    if (existsSync(Giveaways.jsonLoc))
+      FileJSON = readFileSync(Giveaways.jsonLoc, encoding) || FileJSON;
 
     /** @type {import('./interfaces/giveaways').FetchedGiveawaysJSON}  */
     const data = JSON.parse(FileJSON);
