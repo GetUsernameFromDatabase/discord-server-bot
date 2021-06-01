@@ -36,8 +36,10 @@ export default class Giveaways {
 
   ChangeChannel(ChannelID) {
     // TODO: Make the change be saved (maybe save the channel ID in .env)
-    if (this.#channel?.id !== ChannelID) this.#channelChanged = true;
-    this.#channel = ID.Server.channels.cache.get(ChannelID);
+    if (this.#channel?.id !== ChannelID) {
+      this.#channelChanged = true;
+      this.#channel = ID.Server.channels.cache.get(ChannelID);
+    }
   }
 
   async GetGiveaways() {
