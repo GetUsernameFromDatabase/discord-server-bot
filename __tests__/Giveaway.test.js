@@ -10,8 +10,8 @@ Giveaways.jsonLoc = './__tests__/res/FetchedGiveaways.json';
 Giveaways.giveawaySites.GrabFreeGames.count = 13;
 Giveaways.giveawaySites.steam.count = 5;
 
-ID.Server = new Discord.Guild(new Discord.Client());
 client.user = Discord.botMock;
+ID.Server = new Discord.Guild(client);
 
 const mockSimpleFetch = jest.fn((URL) => {
   const GiveawaySites = Giveaways.giveawaySites;
