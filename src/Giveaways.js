@@ -1,3 +1,4 @@
+import { readFileSync, writeFileSync } from 'fs';
 import { ID } from './Identification.js';
 import Logging, { minInMs } from './Logging.js';
 import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
@@ -47,8 +48,37 @@ export default class Giveaways {
     return false;
   }
 
-  /** @param {{title:String, url: String, body: String, imageURL: String|undefined}[]} giveaways */
-  PostGiveaways(giveaways = []) {
+  /** Filters out sent giveaways from fetched giveaways
+   * @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
+  static FilterSentGiveaways(FetchedGiveaways) {
+    const encoding = 'utf8';
+    const jsonLoc = `${process.cwd()}/data/FetchedGiveaways.json`;
+    const FileJSON = readFileSync(jsonLoc, encoding) || '[]';
+
+    /** @type {import('./interfaces/giveaways').FetchedGiveawaysJSON}  */
+    const data = JSON.parse(FileJSON);
+    const savedGiveaways = data.map(({ title }) => title.toLowerCase());
+
+    const toSend = [];
+    const updatedData = data;
+    for (const giv of FetchedGiveaways) {
+      const { title, url } = giv;
+      const i = savedGiveaways.indexOf(title.toLowerCase());
+      const now = Date.now();
+
+      if (i !== -1) updatedData[i].updated_date = now;
+      else {
+        toSend.push(giv);
+        updatedData.push({ title, url, created_date: now, updated_date: now });
+      }
+    }
+    writeFileSync(jsonLoc, JSON.stringify(data, undefined, 2), encoding);
+    return toSend;
+  }
+
+  /** @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
+  PostGiveaways(FetchedGiveaways) {
+    const giveaways = Giveaways.FilterSentGiveaways(FetchedGiveaways);
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
     const embGiveaways = giveaways.reverse().map((giv) => {

@@ -30,7 +30,7 @@ function HTMLIntoMD(html = '') {
 
 /** Gets giv announcements from steamcommunity.com/.../announcements/?
  * @param {String} html
- * @returns {{title: String, url: String, body: String}[]} */
+ * @returns {import('./interfaces/giveaways').GiveawayArray} */
 export function GetSteamAnnouncements(html) {
   const announcements = [];
   const $ = load(html, { scriptingEnabled: false });
@@ -51,9 +51,9 @@ export function GetSteamAnnouncements(html) {
 
 /** Gets giveaways from grabfreegames.com
  * @param {String} html
- * @returns {{title: String, url: String, body: String, imageURL: String}[]} */
+ * @returns {import('./interfaces/giveaways').GiveawayArray} */
 export async function GrabFreeGames(html) {
-  /** @type {{title: String,url:String, body:Promise<String> imageURL: String}[]} */
+  /** @type {{title: String,url:String, body:Promise<String>, imageURL: String}[]} */
   const giveaways = [];
 
   const $ = load(html, { scriptingEnabled: false }, false);
