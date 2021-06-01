@@ -25,9 +25,9 @@ export const Update = {
       .catch(Logging.Error);
   },
 
-  Server() {
+  Server({ ServerID = process.env }) {
     return client.guilds
-      .fetch(process.env.ServerID)
+      .fetch(ServerID)
       .then((srv) => {
         ID.Server = srv;
       })

@@ -21,8 +21,8 @@ function LoadEvents() {
 }
 
 client.once('ready', async () => {
-  await Update.Maintainer(); // Gets my up to date user data
   await Update.Server(); // Gets my server
+  await Update.Maintainer(); // Gets my up to date user data
   Logging.Greet(client);
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
