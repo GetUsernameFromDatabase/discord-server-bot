@@ -133,8 +133,8 @@ describe('interaction', () => {
 
   it('should not send duplicates (Depending on MassMessageSend)', async () => {
     expect.assertions(1);
-    const givChan = GetServerChannels().shift(); // Disables JSON file check
-    handlers.Giveaways.ChangeChannel(givChan.id);
+    const givChan = GetServerChannels().shift();
+    handlers.Giveaways.ChangeChannel(givChan.id); // Disables JSON file check
 
     const amountBefore = givChan.messages.cache.size;
     handlers.Giveaways.GetGiveaways();
