@@ -134,14 +134,16 @@ describe('interaction', () => {
   });
 
   it('should not send duplicates (Depending on MassMessageSend)', async () => {
-    expect.assertions(1);
+    expect.assertions(2);
     const givChan = GetServerChannels().shift();
-    handlers.Giveaways.ChangeChannel(givChan.id); // Disables JSON file check
+    // Disables JSON file check and changes the Giveaway channel to the first one
+    handlers.Giveaways.ChangeChannel(givChan.id);
 
     const amountBefore = givChan.messages.cache.size;
-    handlers.Giveaways.GetGiveaways();
+    SpyMassMessageSend.mockClear();
+    await handlers.Giveaways.GetGiveaways();
 
-    await new Promise((r) => setTimeout(r, 200));
+    expect(SpyMassMessageSend).toHaveBeenCalledTimes(1);
     expect(givChan.messages.cache.size).toBe(amountBefore);
   });
 
