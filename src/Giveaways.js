@@ -23,9 +23,9 @@ export default class Giveaways {
 
   static jsonLoc = './data/FetchedGiveaways.json';
 
-  #channel;
+  channelChanged = false;
 
-  #channelChanged = false;
+  #channel;
 
   constructor() {
     // process.env.TestChanID --- Testing | process.env.GiveawaysID --- For Use
@@ -37,7 +37,7 @@ export default class Giveaways {
   ChangeChannel(ChannelID) {
     // TODO: Make the change be saved (maybe save the channel ID in .env)
     if (this.#channel?.id !== ChannelID) {
-      this.#channelChanged = true;
+      this.channelChanged = true;
       this.#channel = ID.Server.channels.cache.get(ChannelID);
     }
   }
@@ -97,8 +97,8 @@ export default class Giveaways {
   /** @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
   #PostGiveaways(FetchedGiveaways) {
     let giveaways = FetchedGiveaways.reverse();
-    if (!this.#channelChanged) {
-      this.#channelChanged = !this.#channelChanged;
+    if (!this.channelChanged) {
+      this.channelChanged = !this.channelChanged;
       giveaways = Giveaways.#FilterSentGiveaways(FetchedGiveaways);
     }
     // Reversing this to make newer (front of array) giveaways
