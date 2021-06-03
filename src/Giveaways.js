@@ -99,7 +99,7 @@ export default class Giveaways {
     let giveaways = FetchedGiveaways.reverse();
     if (!this.channelChanged)
       giveaways = Giveaways.#FilterSentGiveaways(FetchedGiveaways);
-    else this.channelChanged = !this.channelChanged;
+    else this.channelChanged = false;
 
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
