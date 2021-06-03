@@ -3,6 +3,7 @@ import { beforeAll, jest } from '@jest/globals';
 import * as Discord from 'discord.js';
 import Giveaways from '../src/Giveaways.js';
 import { ID, handlers, client } from '../src/Identification.js';
+import * as Messaging from '../src/Messaging.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
 
@@ -48,8 +49,9 @@ jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);
 /* Needed because /\ is not called inside WebScraping (parent) module
 So this is used to replace the use of SimpleFetch inside WebScraping */
 jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
+const SpyMassMessageSend = jest.spyOn(Messaging, 'MassMessageSend');
 
-async function WaitTillNoMessages(chan) {
+async function WaitTillNoNewMessages(chan) {
   const wt = 150; // Wait Time in ms
   await new Promise((r) => setTimeout(r, 75)); // Waits for spamming to start
   while (wt < Date.now() - (chan.lastMessage?.createdTimestamp || 0)) {
@@ -96,7 +98,7 @@ describe('giveaway fetches', () => {
     const giv = new Giveaways();
     handlers.Giveaways ??= giv;
 
-    await WaitTillNoMessages(giveawayChannel);
+    await WaitTillNoNewMessages(giveawayChannel);
     expect(giveawayChannel.lastMessage.content).toBeDefined();
     expect(giveawayChannel.messages.cache.size).toBe(count);
   });
@@ -125,7 +127,7 @@ describe('interaction', () => {
     const lastChannel = GetServerChannels().pop();
 
     givCmd.execute(new Discord.Message(lastChannel, prefix + givCmd.name));
-    await WaitTillNoMessages(lastChannel);
+    await WaitTillNoNewMessages(lastChannel);
 
     const [[, first], [, last]] = Object.entries(Giveaways.giveawaySites);
     expect(lastChannel.messages.cache.size).toBe(first.count + last.count + 1);
@@ -139,7 +141,28 @@ describe('interaction', () => {
     const amountBefore = givChan.messages.cache.size;
     handlers.Giveaways.GetGiveaways();
 
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 200));
     expect(givChan.messages.cache.size).toBe(amountBefore);
+  });
+
+  it('should not send duplicates (Depending on the JSON file)', async () => {
+    expect.assertions(2);
+    let promiseResolve;
+    const promise = new Promise(function (resolve) {
+      promiseResolve = resolve;
+    });
+
+    SpyMassMessageSend.mockImplementationOnce(
+      (_channel, messages, checkDupes = true) => {
+        // This should be true when used in PostGiveaways
+        expect(checkDupes).toBe(true);
+        // No giveaways should get past JSON file check
+        expect(messages).toHaveLength(0);
+        promiseResolve();
+      }
+    );
+
+    handlers.Giveaways.GetGiveaways();
+    await promise;
   });
 });
