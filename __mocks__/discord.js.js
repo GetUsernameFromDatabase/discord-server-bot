@@ -4,6 +4,7 @@
 import { jest } from '@jest/globals';
 
 jest.disableAutomock(); // Required if enableAutomock is used anywhere else
+/** @type {import('discord.js')} */
 const Discord = jest.requireActual('discord.js');
 
 // a counter so that all the ids are unique
@@ -22,6 +23,12 @@ export const botMock = {
   discriminator: '1234',
   bot: true,
 };
+
+export class Client extends Discord.Client {}
+export class User extends Discord.User {}
+export class Collection extends Discord.Collection {}
+export class Permissions extends Discord.Permissions {}
+export class MessageEmbed extends Discord.MessageEmbed {}
 
 export class Guild extends Discord.Guild {
   constructor(client) {
@@ -95,11 +102,10 @@ export class TextChannel extends Discord.TextChannel {
 
   // you can modify this for other things like attachments and embeds if you need
   send(content) {
-    return this.client.actions.MessageCreate.handle({
+    const message = {
       id: Discord.SnowflakeUtil.generate(),
       type: 0,
       channel_id: this.id,
-      content,
       author: botMock,
       pinned: false,
       tts: false,
@@ -111,12 +117,14 @@ export class TextChannel extends Discord.TextChannel {
       mentions: [],
       mention_roles: [],
       mention_everyone: false,
-    });
+    };
+
+    message.content = typeof content === 'string' ? content : '';
+    if (typeof content === 'string') message.content = content;
+    else {
+      message.content = '';
+      message.embeds.push(content);
+    }
+    return this.client.actions.MessageCreate.handle(message);
   }
 }
-
-export class Client extends Discord.Client {}
-export class User extends Discord.User {}
-export class Collection extends Discord.Collection {}
-export class Permissions extends Discord.Permissions {}
-export class MessageEmbed extends Discord.MessageEmbed {}

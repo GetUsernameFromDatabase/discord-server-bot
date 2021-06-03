@@ -59,19 +59,27 @@ async function WaitTillNoMessages(chan) {
   return Promise.resolve('DONE WAITING');
 }
 
-/** @type {[Discord.TextChannel, Giveaways][]]} */
-let channels = [];
+function EmptyGiveawayJSON() {
+  writeFileSync(Giveaways.jsonLoc, '', 'utf8');
+}
+
+function GetServerChannels() {
+  /** @type {Discord.TextChannel[]} */
+  const channels = [...ID.Server.channels.cache.values()];
+  return channels;
+}
 
 beforeAll(() => {
-  writeFileSync(Giveaways.jsonLoc, '', 'utf8');
+  EmptyGiveawayJSON();
 });
 
 describe('giveaway fetches', () => {
   let fetchCounter = 0;
+  let giveawayChannel;
   beforeEach(() => {
     // Clearing message collection before each was not robust enough
-    const channel = new Discord.TextChannel(ID.Server);
-    channels.push(channel);
+    giveawayChannel = new Discord.TextChannel(ID.Server);
+    process.env.GiveawaysID = giveawayChannel.id;
 
     // Previous source needs to fail in order for it to fallback to a different one
     for (let j = 0; j < fetchCounter; j++)
@@ -85,27 +93,36 @@ describe('giveaway fetches', () => {
     })
   )('if got %i giveaways from %s', async (count) => {
     expect.assertions(2);
-    const chan = channels[channels.length - 1];
-    process.env.GiveawaysID = chan.id;
-
     const giv = new Giveaways();
-    handlers.Giveaways ??= giv; // Used in the "interaction" test
+    handlers.Giveaways ??= giv;
 
-    await WaitTillNoMessages(chan);
-    expect(chan.lastMessage.content).toBeDefined();
-    expect(chan.messages.cache.size).toBe(count);
+    await WaitTillNoMessages(giveawayChannel);
+    expect(giveawayChannel.lastMessage.content).toBeDefined();
+    expect(giveawayChannel.messages.cache.size).toBe(count);
   });
 });
 
 describe('interaction', () => {
-  const channelsCopy = channels;
-  beforeEach(() => {
-    channels = channelsCopy;
+  // Saves messages from all channels and then reverts back any changes made
+  /** @type {Discord.Collection<string, Discord.Message>[]} */
+  let messagesBefore;
+  beforeAll(() => {
+    messagesBefore = GetServerChannels().map((channel) =>
+      channel.messages.cache.clone()
+    );
   });
+  afterEach(() => {
+    const channels = GetServerChannels();
+    for (let i = 0; i < messagesBefore.length; i++) {
+      channels[i].messages.cache = messagesBefore[i];
+    }
+  });
+
   test.todo('test guildOnly parameter');
-  it('should send correct amount of giveaways after receiving a command', async () => {
+
+  it('should react properly to the channel command', async () => {
     expect.assertions(1);
-    const lastChannel = channels[channels.length - 1];
+    const lastChannel = GetServerChannels().pop();
 
     givCmd.execute(new Discord.Message(lastChannel, prefix + givCmd.name));
     await WaitTillNoMessages(lastChannel);
@@ -113,15 +130,16 @@ describe('interaction', () => {
     const [[, first], [, last]] = Object.entries(Giveaways.giveawaySites);
     expect(lastChannel.messages.cache.size).toBe(first.count + last.count + 1);
   });
-  it.skip('should not send duplicates', async () => {
-    expect.assertions(1);
-    await new Promise((r) => setTimeout(r, 500));
-    const { channel } = handlers.Giveaways;
-    const amountBefore = channel.messages.cache.size;
 
+  it('should not send duplicates (Depending on MassMessageSend)', async () => {
+    expect.assertions(1);
+    const givChan = GetServerChannels().shift(); // Disables JSON file check
+    handlers.Giveaways.ChangeChannel(givChan.id);
+
+    const amountBefore = givChan.messages.cache.size;
     handlers.Giveaways.GetGiveaways();
-    await WaitTillNoMessages(channel);
-    // Currently not working cause of the current mocked Messaging system
-    expect(amountBefore).toBe(channel.messages.cache.size);
+
+    await new Promise((r) => setTimeout(r, 500));
+    expect(givChan.messages.cache.size).toBe(amountBefore);
   });
 });
