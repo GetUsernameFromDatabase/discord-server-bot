@@ -66,7 +66,7 @@ export default class Giveaways {
     const encoding = 'utf8';
     let FileJSON = '[]';
     if (existsSync(Giveaways.jsonLoc))
-      FileJSON = readFileSync(Giveaways.jsonLoc, encoding) || FileJSON;
+      FileJSON = readFileSync(Giveaways.jsonLoc, encoding);
 
     /** @type {import('./interfaces/giveaways').FetchedGiveawaysJSON}  */
     const data = JSON.parse(FileJSON);
