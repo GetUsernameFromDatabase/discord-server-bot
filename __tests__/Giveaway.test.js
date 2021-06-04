@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import { beforeAll, jest } from '@jest/globals';
 // eslint-disable-next-line import/no-unassigned-import
 import 'jest-extended'; // Needed for types
@@ -64,13 +64,22 @@ async function WaitTillNoNewMessages(chan) {
 }
 
 function EmptyGiveawayJSON() {
-  writeFileSync(Giveaways.jsonLoc, '', 'utf8');
+  if (existsSync(Giveaways.jsonLoc)) unlinkSync(Giveaways.jsonLoc);
+  else writeFileSync(Giveaways.jsonLoc, '', 'utf8');
 }
 
 function GetServerChannels() {
   /** @type {Discord.TextChannel[]} */
   const channels = [...ID.Server.channels.cache.values()];
   return channels;
+}
+
+function FailSimpleFetch(count) {
+  for (let i = 0; i < count; i++)
+    mockSimpleFetch.mockRejectedValueOnce(
+      `expect ${i === 0 ? 'no' : i} more failures for giveaways`
+    );
+  return count + 1;
 }
 
 beforeAll(() => {
@@ -84,11 +93,6 @@ describe('giveaway fetches', () => {
     // Clearing message collection before each was not robust enough
     giveawayChannel = new Discord.TextChannel(ID.Server);
     process.env.GiveawaysID = giveawayChannel.id;
-
-    // Previous source needs to fail in order for it to fallback to a different one
-    for (let j = 0; j < fetchCounter; j++)
-      mockSimpleFetch.mockRejectedValueOnce(`expect ${j} more failures`);
-    fetchCounter++;
   });
 
   test.each(
@@ -97,16 +101,33 @@ describe('giveaway fetches', () => {
     })
   )('if got %i giveaways from %s', async (count) => {
     expect.assertions(2);
-    const giv = new Giveaways();
-    handlers.Giveaways ??= giv;
+    // Previous source needs to fail in order for it to fallback to a different one
+    fetchCounter = FailSimpleFetch(fetchCounter);
+    const giveawayObject = new Giveaways();
+    handlers.Giveaways ??= giveawayObject;
 
     await WaitTillNoNewMessages(giveawayChannel);
     expect(giveawayChannel.lastMessage.content).toBeDefined();
     expect(giveawayChannel.messages.cache.size).toBe(count);
   });
+
+  test('false (fail) output of GetGiveaways', async () => {
+    expect.assertions(1);
+    const giveaways = new Giveaways();
+    const lastChanKey = ID.Server.channels.cache.lastKey();
+    const lastChan = ID.Server.channels.cache.get(lastChanKey);
+
+    giveaways.ChangeChannel(lastChan.id);
+    FailSimpleFetch(fetchCounter);
+    const response = await giveaways.GetGiveaways();
+
+    // This channel is purely for this test, so it will be deleted
+    ID.Server.channels.cache.delete(lastChanKey);
+    expect(response).toBeFalsy();
+  });
 });
 
-describe('interaction', () => {
+describe('giveaway interactions', () => {
   // Saves messages from all channels and then reverts back any changes made
   /** @type {Discord.Collection<string, Discord.Message>[]} */
   let messagesBefore;
