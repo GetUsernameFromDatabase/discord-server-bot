@@ -1,5 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { beforeAll, jest } from '@jest/globals';
+// eslint-disable-next-line import/no-unassigned-import
+import 'jest-extended'; // Needed for types
 import * as Discord from 'discord.js';
 import Giveaways from '../src/Giveaways.js';
 import { ID, handlers, client } from '../src/Identification.js';
@@ -149,22 +151,12 @@ describe('interaction', () => {
 
   it('should not send duplicates (Depending on the JSON file)', async () => {
     expect.assertions(2);
-    let promiseResolve;
-    const promise = new Promise(function (resolve) {
-      promiseResolve = resolve;
-    });
+    await handlers.Giveaways.GetGiveaways();
+    const lastCall = SpyMassMessageSend.mock.calls.pop();
 
-    SpyMassMessageSend.mockImplementationOnce(
-      (_channel, messages, checkDupes = true) => {
-        // This should be true when used in PostGiveaways
-        expect(checkDupes).toBe(true);
-        // No giveaways should get past JSON file check
-        expect(messages).toHaveLength(0);
-        promiseResolve();
-      }
-    );
-
-    handlers.Giveaways.GetGiveaways();
-    await promise;
+    // Undefined will be turned into true
+    expect(lastCall[2]).toBeOneOf([undefined, true]);
+    // No giveaways should get past JSON file check
+    expect(lastCall[1]).toHaveLength(0);
   });
 });
