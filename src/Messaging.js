@@ -5,24 +5,34 @@ import { SegmentString } from './TextManipulation.js';
 
 const blank = '\u200B';
 
-/** Accounts for MD headings while making embedFields
- * @param {String[]} fields
- * @returns {Discord.EmbedField[]} */
-function MdHAsEmbedFieldTitle(fields) {
-  const { normalizeField } = Discord.MessageEmbed;
-  const embedFields = [];
-  const mdH = '#';
+function stringWithHeaderIntoEmbedField(string) {
+  const splitter = '\n';
+  const strings = string.split(splitter);
 
-  for (const field of fields) {
-    const fieldWithH = field.split(new RegExp(`(${mdH}+[^${mdH}]*)`));
-    for (let h of fieldWithH) {
-      if (h === '') continue;
-      let name;
-      if (h.startsWith(mdH)) {
-        name = h.split('\n')[0].trim();
-        h = h.replace(`${name}\n`, blank);
-      }
-      embedFields.push(normalizeField(name || blank, h.trim()));
+  const title = strings.shift().trim();
+  const restOfString = strings.join(splitter);
+  return Discord.MessageEmbed.normalizeField(
+    title || blank,
+    restOfString || blank
+  );
+}
+
+/** Accounts for MD headings while making embedFields
+ * @param {String[]} stringsToBeFields */
+function MdHAsEmbedFieldTitle(stringsToBeFields) {
+  /** @type {Discord.EmbedFieldData[]} */
+  const embedFields = [];
+  const mdH = '#'; // Markdown Header
+
+  for (const string of stringsToBeFields) {
+    // Creates a String[] where strings with headers are seperated
+    const stringsWHS = string.split(new RegExp(`((?<=\\s)${mdH}+[^${mdH}]*)`));
+    for (const strWHS of stringsWHS) {
+      if (!strWHS) continue;
+      const embedField = strWHS.startsWith(mdH)
+        ? stringWithHeaderIntoEmbedField(strWHS)
+        : Discord.MessageEmbed.normalizeField(blank, strWHS);
+      embedFields.push(embedField);
     }
   }
   return embedFields;
@@ -63,7 +73,7 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
  * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck
  * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages to check against
  * @return {Boolean} Wheter it was a duplicate or not */
-function IsDuplicateMessage(msgToCheck, messages) {
+export function IsDuplicateMessage(msgToCheck, messages) {
   const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
   const EmbedCheck = (obj) => {
     const objEmb = obj.embeds[0];
@@ -137,3 +147,5 @@ export function CheckArgLength(args, usage = '') {
   }
   return response;
 }
+
+export const testPrivate = { MdHAsEmbedFieldTitle };
