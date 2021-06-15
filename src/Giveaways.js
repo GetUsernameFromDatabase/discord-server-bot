@@ -62,7 +62,7 @@ export default class Giveaways {
 
   /** Filters out sent giveaways from fetched giveaways
    * @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
-  static #FilterSentGiveaways(FetchedGiveaways) {
+  static #FilterSentGiveaways(FetchedGiveaways, updateFile) {
     const encoding = 'utf8';
     let FileJSON = '[]';
     if (existsSync(Giveaways.jsonLoc))
@@ -85,12 +85,12 @@ export default class Giveaways {
         updatedData.push({ title, url, created_date: now, updated_date: now });
       }
     }
-
-    writeFileSync(
-      Giveaways.jsonLoc,
-      JSON.stringify(data, undefined, 2),
-      encoding
-    );
+    if (updateFile)
+      writeFileSync(
+        Giveaways.jsonLoc,
+        JSON.stringify(data, undefined, 2),
+        encoding
+      );
     return toSend;
   }
 
@@ -98,7 +98,10 @@ export default class Giveaways {
   #PostGiveaways(FetchedGiveaways) {
     let giveaways = FetchedGiveaways.reverse();
     if (!this.channelChanged)
-      giveaways = Giveaways.#FilterSentGiveaways(FetchedGiveaways);
+      giveaways = Giveaways.#FilterSentGiveaways(
+        FetchedGiveaways,
+        this.#channel.id !== process.env.TestChanID
+      );
     else this.channelChanged = false;
 
     // Reversing this to make newer (front of array) giveaways
