@@ -1,6 +1,8 @@
 # Copy from https://github.com/github/gitignore/blob/master/Node.gitignore
 
 __tests__/res/FetchedGiveaways.json
+# \/ the shortcut I use to start this program in windows
+Discord Bot Start.lnk
 
 # Logs
 logs
