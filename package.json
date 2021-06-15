@@ -17,7 +17,9 @@
     "test": "jest --forceExit --detectOpenHandles"
   },
   "jest": {
-    "setupFilesAfterEnv": ["jest-extended"],
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ],
     "displayName": "My Discord Server Bot",
     "verbose": true,
     "bail": true,
