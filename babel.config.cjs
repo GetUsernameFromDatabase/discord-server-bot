@@ -1,35 +1,5 @@
 /* eslint-disable unicorn/prefer-module */
-/* eslint-disable import/no-commonjs */
-// {
-//   "plugins": [
-//     ["@babel/plugin-proposal-class-properties"],
-//     [
-//       "@babel/plugin-transform-runtime",
-//       {
-//         "corejs": "3",
-//         "version": "^7.14"
-//       }
-//     ],
-//     ["babel-plugin-flow-to-typescript"]
-//   ],
-//   "presets": [
-//     [
-//       "@babel/preset-env",
-//       {
-//         "targets": {
-//           "node": "current",
-//           "esmodules": true
-//         },
-//         "modules": false,
-//         "useBuiltIns": "usage",
-//         "corejs": { "version": "3.12.1", "proposals": true }
-//       }
-//     ],
-//     ["airbnb", { "runtimeVersion": "^7.14" }]
-//   ]
-// }
-
-// eslint-disable-next-line import/unambiguous, no-undef
+// eslint-disable-next-line import/unambiguous
 module.exports = (api) => {
   const isTest = api.env('test');
   const baseObject = {
@@ -38,8 +8,9 @@ module.exports = (api) => {
       [
         '@babel/plugin-transform-runtime',
         {
+          absoluteRuntime: false,
           corejs: '3',
-          version: '^7.14',
+          version: '^7.14.6',
         },
       ],
     ],
@@ -48,12 +19,12 @@ module.exports = (api) => {
         '@babel/preset-env',
         {
           targets: {
-            node: 'current',
             esmodules: true,
+            node: 'current',
           },
           modules: false,
           useBuiltIns: 'usage',
-          corejs: { version: '3.12.1', proposals: true },
+          corejs: { version: '3.14', proposals: true },
         },
       ],
     ],
