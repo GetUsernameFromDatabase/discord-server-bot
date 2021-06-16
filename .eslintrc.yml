@@ -86,5 +86,4 @@ rules:
   unicorn/filename-case: off
   unicorn/prevent-abbreviations: off
   ## I really want this to be enabled but import's resolver hasn't liked node: protocol
-  ## EVEN THOUGH IT'S NODE RESOLVER BY DEFAULT
   unicorn/prefer-node-protocol: off # :(

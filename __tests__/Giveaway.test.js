@@ -93,6 +93,7 @@ describe('giveaway fetches', () => {
     // Clearing message collection before each was not robust enough
     giveawayChannel = new Discord.TextChannel(ID.Server);
     process.env.GiveawaysID = giveawayChannel.id;
+    jest.useFakeTimers();
   });
 
   test.each(
@@ -105,6 +106,7 @@ describe('giveaway fetches', () => {
     fetchCounter = FailSimpleFetch(fetchCounter);
     const giveawayObject = new Giveaways();
     handlers.Giveaways ??= giveawayObject;
+    jest.useRealTimers();
 
     await WaitTillNoNewMessages(giveawayChannel);
     expect(giveawayChannel.lastMessage.content).toBeDefined();
@@ -124,6 +126,10 @@ describe('giveaway fetches', () => {
     // This channel is purely for this test, so it will be deleted
     ID.Server.channels.cache.delete(lastChanKey);
     expect(response).toBeFalsy();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 });
 
