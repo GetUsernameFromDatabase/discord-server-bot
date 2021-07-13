@@ -66,6 +66,7 @@ export default class BotActivity {
     this.iteration += 1;
     if (this.iteration >= this.activities.length) this.iteration = 0;
 
+    // eslint-disable-next-line unicorn/prefer-prototype-methods
     setTimeout(this.ChangeActivity.bind(this), activity.duration * minInMs);
   }
 }
