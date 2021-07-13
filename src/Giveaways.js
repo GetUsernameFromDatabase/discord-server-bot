@@ -8,6 +8,11 @@ import {
   SimpleFetch,
 } from './WebScraping.js';
 
+export const givFile = {
+  location: './data/FetchedGiveaways.json',
+  encoding: 'utf-8',
+};
+
 export default class Giveaways {
   static giveawaySites = {
     GrabFreeGames: {
@@ -15,13 +20,10 @@ export default class Giveaways {
       callback: GrabFreeGames,
     },
     steam: {
-      url:
-        'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
+      url: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
       callback: GetSteamAnnouncements,
     },
   };
-
-  static jsonLoc = './data/FetchedGiveaways.json';
 
   channelChanged = false;
 
@@ -31,6 +33,7 @@ export default class Giveaways {
     // process.env.TestChanID --- Testing | process.env.GiveawaysID --- For Use
     this.#channel = ID.Server.channels.cache.get(process.env.GiveawaysID);
     this.GetGiveaways();
+    // eslint-disable-next-line unicorn/prefer-prototype-methods
     setInterval(this.GetGiveaways.bind(this), 60 * minInMs);
   }
 
@@ -62,54 +65,61 @@ export default class Giveaways {
 
   /** Filters out sent giveaways from fetched giveaways
    * @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
-  static #FilterSentGiveaways(FetchedGiveaways, updateFile) {
-    const encoding = 'utf8';
+  static FilterSentGiveaways(FetchedGiveaways) {
     let FileJSON = '[]';
-    if (existsSync(Giveaways.jsonLoc))
-      FileJSON = readFileSync(Giveaways.jsonLoc, encoding);
+    if (existsSync(givFile.location))
+      FileJSON = readFileSync(givFile.location, givFile.encoding);
 
     /** @type {import('./interfaces/giveaways').FetchedGiveawaysJSON}  */
     const data = JSON.parse(FileJSON);
     const savedGiveaways = data.map(({ title }) => title.toLowerCase());
 
-    const toSend = [];
-    const updatedData = data;
+    const FilteredGiveaways = [];
+    const jsonUpdate = data; // dataUpdate is a pointer to data
     for (const giv of FetchedGiveaways) {
       const { title, url } = giv;
       const i = savedGiveaways.indexOf(title.toLowerCase());
       const now = Date.now();
 
-      if (i !== -1) updatedData[i].updated_date = now;
+      if (i !== -1) jsonUpdate[i].updated_date = now;
       else {
-        toSend.push(giv);
-        updatedData.push({ title, url, created_date: now, updated_date: now });
+        FilteredGiveaways.push(giv);
+        jsonUpdate.push({ title, url, created_date: now, updated_date: now });
       }
     }
-    if (updateFile)
-      writeFileSync(
-        Giveaways.jsonLoc,
-        JSON.stringify(data, undefined, 2),
-        encoding
-      );
-    return toSend;
+    return { FilteredGiveaways, jsonUpdate };
+  }
+
+  static #UpdateGiveawayJSONFile(JSONObj) {
+    writeFileSync(
+      givFile.location,
+      JSON.stringify(JSONObj, undefined, 2),
+      givFile.encoding
+    );
   }
 
   /** @param {import('./interfaces/giveaways').GiveawayArray} FetchedGiveaways */
   #PostGiveaways(FetchedGiveaways) {
-    let giveaways = FetchedGiveaways.reverse();
-    if (!this.channelChanged)
-      giveaways = Giveaways.#FilterSentGiveaways(
-        FetchedGiveaways,
-        this.#channel.id !== process.env.TestChanID
-      );
-    else this.channelChanged = false;
-
+    const givFilter = Giveaways.FilterSentGiveaways;
     // Reversing this to make newer (front of array) giveaways
     // be sent last as the newest message
+    let giveaways = FetchedGiveaways.reverse();
+
+    let filterResult;
+    if (!this.channelChanged) {
+      filterResult = givFilter(FetchedGiveaways);
+      giveaways = filterResult.FilteredGiveaways;
+    } else this.channelChanged = false;
+
     const embGiveaways = giveaways.map((giv) => {
       const { body, ...rest } = giv;
       return GetMsgEmbed(body, rest);
     });
-    MassMessageSend(this.#channel, embGiveaways);
+
+    if (MassMessageSend(this.#channel, embGiveaways)) {
+      if (filterResult && this.#channel.id !== process.env.TestChanID)
+        Giveaways.#UpdateGiveawayJSONFile(filterResult.jsonUpdate);
+      Logging.Log('Giveaway fetch successful');
+    } else Logging.Error('Giveaway fetch FAILED');
   }
 }
