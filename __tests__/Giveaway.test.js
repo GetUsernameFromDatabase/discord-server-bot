@@ -3,13 +3,13 @@ import { beforeAll, jest } from '@jest/globals';
 // eslint-disable-next-line import/no-unassigned-import
 import 'jest-extended'; // Needed for types
 import * as Discord from 'discord.js';
-import Giveaways from '../src/Giveaways.js';
+import Giveaways, { givFile } from '../src/Giveaways.js';
 import { ID, handlers, client } from '../src/Identification.js';
 import * as Messaging from '../src/Messaging.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
 
-Giveaways.jsonLoc = './__tests__/res/FetchedGiveaways.json';
+givFile.location = './__tests__/res/FetchedGiveaways.json';
 Giveaways.giveawaySites.GrabFreeGames.count = 13;
 Giveaways.giveawaySites.steam.count = 5;
 
@@ -64,8 +64,8 @@ async function WaitTillNoNewMessages(chan) {
 }
 
 function EmptyGiveawayJSON() {
-  if (existsSync(Giveaways.jsonLoc)) unlinkSync(Giveaways.jsonLoc);
-  else writeFileSync(Giveaways.jsonLoc, '', 'utf8');
+  if (existsSync(givFile.location)) unlinkSync(givFile.location);
+  else writeFileSync(givFile.location, '', givFile.encoding);
 }
 
 function GetServerChannels() {
@@ -81,9 +81,15 @@ function FailSimpleFetch(count) {
     );
   return count + 1;
 }
+// MOCK END
 
 beforeAll(() => {
   EmptyGiveawayJSON();
+});
+
+afterAll(() => {
+  // Closes open handles related to Client.setInterval
+  client.destroy(); // only closes 1 for some weird reason
 });
 
 describe('giveaway fetches', () => {
