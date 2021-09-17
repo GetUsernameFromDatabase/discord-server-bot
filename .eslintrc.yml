@@ -25,7 +25,7 @@ rules:
   func-names: 0
   no-continue: 0
   prefer-destructuring: [error, { object: true, array: false }]
-  indent: ["error", 2]
+  indent: ["error", 2, { "SwitchCase": 1 }]
   # Disables Airbnb's hate towards iterators and generators
   no-restricted-syntax: 0
 
