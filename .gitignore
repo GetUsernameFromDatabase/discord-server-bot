@@ -3,6 +3,7 @@
 __tests__/res/FetchedGiveaways.json
 Start.bat
 lib
+data/FetchedGiveaways.json
 
 # Logs
 logs
