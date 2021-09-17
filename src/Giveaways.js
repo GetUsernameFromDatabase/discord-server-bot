@@ -33,7 +33,6 @@ export default class Giveaways {
     // process.env.TestChanID --- Testing | process.env.GiveawaysID --- For Use
     this.#channel = ID.Server.channels.cache.get(process.env.GiveawaysID);
     this.GetGiveaways();
-    // eslint-disable-next-line unicorn/prefer-prototype-methods
     setInterval(this.GetGiveaways.bind(this), 60 * minInMs);
   }
 

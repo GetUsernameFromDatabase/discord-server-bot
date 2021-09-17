@@ -58,14 +58,13 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
   const embedFields = fields;
 
   const MesEmb = new Discord.MessageEmbed()
-    .setColor(ID.Server.member(client.user)?.displayHexColor)
+    .setColor('#F1C40F')
     .setTitle(title.trim())
     .setURL(url.trim())
     .addFields(embedFields)
     .setImage(imageURL)
     .setFooter(`Bot by ${ID.Me.tag}`, ID.Me.avatarURL())
     .setTimestamp();
-
   return MesEmb;
 }
 
@@ -122,7 +121,10 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
   const checkedMessages = messages.filter(
     (msg) => !IsDuplicateMessage(msg, filteredChanMsgs)
   );
-  for (const msg of checkedMessages) channel.send(msg);
+  for (const msg of checkedMessages) {
+    if (typeof msg === 'string') channel.send(msg);
+    else channel.send({ embeds: [msg].flat() });
+  }
   return true;
 }
 

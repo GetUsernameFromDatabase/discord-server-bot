@@ -1,9 +1,9 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
 import { MessageEmbed } from 'discord.js';
+import { client } from '../../Identification.js';
 import { GetMsgEmbed } from '../../Messaging.js';
 import {
   prefix,
-  commands,
   categories,
   GetCommand,
   GetMostSimilarCommands,
@@ -22,7 +22,7 @@ function MakeEmbedFields(array, inline = true) {
  * Commands with the same category will shown in the same field */
 function HelpForAllCommands() {
   const CmdCat = {};
-  for (const [key, value] of commands.entries()) {
+  for (const [key, value] of client.commands.entries()) {
     if (typeof value.category === 'string')
       CmdCat[value.category] = `•${CmdCat[value.category] || ''}${key}\n`;
   }
@@ -73,7 +73,10 @@ export default {
   execute(message, args) {
     const chan = message.channel;
     // If no arguments were supplied sends all usable commands
-    if (args.length === 0) return chan.send(HelpForAllCommands(chan));
+    if (args.length === 0) {
+      const embeds = [HelpForAllCommands(chan)];
+      return chan.send({ embeds });
+    }
 
     // Gets the command that the user wants to know about
     const arg = args[0].toLowerCase();
@@ -84,6 +87,7 @@ export default {
         `did you want to know about ${PredictionsAsString(predictions)}?`
       );
     }
-    return chan.send(HelpForCommand(cmd));
+    const embeds = [HelpForCommand(cmd)];
+    return chan.send({ embeds });
   },
 };
