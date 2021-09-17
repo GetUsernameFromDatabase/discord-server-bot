@@ -2,14 +2,13 @@ import Logging from '../Logging.js';
 import { CheckArgLength } from '../Messaging.js';
 import {
   prefix,
-  commands,
   GetCommand,
   GetMostSimilarCommands,
   PredictionsAsString,
 } from '../commands/Commands.js';
 
 export default {
-  name: 'message',
+  name: 'messageCreate',
   /** @param {import('discord.js').Message} msg */
   // eslint-disable-next-line consistent-return
   execute(msg) {
@@ -44,7 +43,7 @@ export default {
 
       // Executes the command
       try {
-        commands.get(cmd.name).execute(msg, args);
+        msg.client.commands.get(cmd.name).execute(msg, args);
       } catch (error) {
         Logging.Error(error);
         msg.reply('Command could not be executed :(');

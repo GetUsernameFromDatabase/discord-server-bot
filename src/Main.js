@@ -3,7 +3,7 @@ import { Collection } from 'discord.js';
 import BotActivity from './BotActivity.js';
 import { GetImportsFromFolders } from './DynamicImport.js';
 import Giveaways from './Giveaways.js';
-import { Update, client, handlers } from './Identification.js';
+import { Update, client } from './Identification.js';
 import Logging from './Logging.js';
 import { LoadCommands } from './commands/Commands.js';
 
@@ -26,8 +26,8 @@ client.once('ready', async () => {
   Logging.Greet(client);
 
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
-  handlers.BotActivity = new BotActivity();
-  handlers.Giveaways = new Giveaways();
+  client.handlers.set('giveaways', new Giveaways());
+  client.handlers.set('botActivity', new BotActivity());
   await LoadCommands();
   await LoadEvents();
 

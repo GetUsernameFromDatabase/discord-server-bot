@@ -29,6 +29,7 @@ export class User extends Discord.User {}
 export class Collection extends Discord.Collection {}
 export class Permissions extends Discord.Permissions {}
 export class MessageEmbed extends Discord.MessageEmbed {}
+export class Intents extends Discord.Intents {}
 
 export class Guild extends Discord.Guild {
   constructor(client) {
@@ -85,6 +86,8 @@ export class MessageManager extends Discord.MessageManager {
     const chan = this.channel;
     return chan.messages.cache;
   }
+
+  cache = new Collection();
 }
 
 export class TextChannel extends Discord.TextChannel {

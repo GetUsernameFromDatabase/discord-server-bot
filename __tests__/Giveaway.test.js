@@ -4,7 +4,7 @@ import { beforeAll, jest } from '@jest/globals';
 import 'jest-extended'; // Needed for types
 import * as Discord from 'discord.js';
 import Giveaways, { givFile } from '../src/Giveaways.js';
-import { ID, handlers, client } from '../src/Identification.js';
+import { ID, client } from '../src/Identification.js';
 import * as Messaging from '../src/Messaging.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
@@ -94,6 +94,7 @@ afterAll(() => {
 
 describe('giveaway fetches', () => {
   let fetchCounter = 0;
+  /** @type {Discord.TextChannel} */
   let giveawayChannel;
   beforeEach(() => {
     // Clearing message collection before each was not robust enough
@@ -111,7 +112,8 @@ describe('giveaway fetches', () => {
     // Previous source needs to fail in order for it to fallback to a different one
     fetchCounter = FailSimpleFetch(fetchCounter);
     const giveawayObject = new Giveaways();
-    handlers.Giveaways ??= giveawayObject;
+    if (!client.handlers.has('giveaways'))
+      client.handlers.set('giveaways', giveawayObject);
     jest.useRealTimers();
 
     await WaitTillNoNewMessages(giveawayChannel);
@@ -172,11 +174,11 @@ describe('giveaway interactions', () => {
     expect.assertions(2);
     const givChan = GetServerChannels().shift();
     // Disables JSON file check and changes the Giveaway channel to the first one
-    handlers.Giveaways.ChangeChannel(givChan.id);
+    client.handlers.get('giveaways').ChangeChannel(givChan.id);
 
     const amountBefore = givChan.messages.cache.size;
     SpyMassMessageSend.mockClear();
-    await handlers.Giveaways.GetGiveaways();
+    await client.handlers.get('giveaways').GetGiveaways();
 
     expect(SpyMassMessageSend).toHaveBeenCalledTimes(1);
     expect(givChan.messages.cache.size).toBe(amountBefore);
@@ -184,7 +186,7 @@ describe('giveaway interactions', () => {
 
   it('should not send duplicates (Depending on the JSON file)', async () => {
     expect.assertions(2);
-    await handlers.Giveaways.GetGiveaways();
+    await client.handlers.get('giveaways').GetGiveaways();
     const lastCall = SpyMassMessageSend.mock.calls.pop();
 
     // Undefined will be turned into true

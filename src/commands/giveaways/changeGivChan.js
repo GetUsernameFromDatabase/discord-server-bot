@@ -1,5 +1,5 @@
 import { Permissions } from 'discord.js';
-import { handlers } from '../../Identification.js';
+import { client } from '../../Identification.js';
 import { categories } from '../Commands.js';
 // https://discord.com/developers/docs/topics/permissions
 
@@ -13,7 +13,8 @@ export default {
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
   execute(message) {
-    const giv = handlers.Giveaways;
+    /** @type {import('../../Giveaways').default} */
+    const giv = client.handlers.get('giveaways');
     giv.ChangeChannel(message.channel.id);
 
     message.channel.send('This channel will be notified about giveaways');
