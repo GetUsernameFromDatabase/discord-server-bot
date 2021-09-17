@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-module */
 // eslint-disable-next-line import/unambiguous
 module.exports = (api) => {
   const isTest = api.env('test');
