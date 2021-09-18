@@ -5,37 +5,37 @@ export default {
   name: 'skip',
   description: 'Skip a song!',
   category: categories.Music,
-  async execute(interaction, player) {
-    if (
-      !(interaction.member instanceof GuildMember) ||
-      !interaction.member.voice.channel
-    ) {
-      return interaction.reply({
+  /** @param {import('discord.js').Message} message */
+  async execute(message) {
+    const { client, member, guild, guildId } = message;
+    /** @type {import('../../Identification').DiscordBot} */
+    const { player } = client;
+
+    if (!(member instanceof GuildMember) || !member.voice.channel) {
+      return message.reply({
         content: 'You are not in a voice channel!',
         ephemeral: true,
       });
     }
 
     if (
-      interaction.guild.me.voice.channelId &&
-      interaction.member.voice.channelId !==
-        interaction.guild.me.voice.channelId
+      guild.me.voice.channelId &&
+      member.voice.channelId !== guild.me.voice.channelId
     ) {
-      return interaction.reply({
+      return message.reply({
         content: 'You are not in my voice channel!',
         ephemeral: true,
       });
     }
 
-    await interaction.deferReply();
-    const queue = player.getQueue(interaction.guildId);
+    const queue = player.getQueue(guildId);
     if (!queue || !queue.playing)
-      return interaction.followUp({
+      return message.reply({
         content: '❌ | No music is being played!',
       });
     const currentTrack = queue.current;
     const success = queue.skip();
-    return interaction.followUp({
+    return message.reply({
       content: success
         ? `✅ | Skipped **${currentTrack}**!`
         : '❌ | Something went wrong!',

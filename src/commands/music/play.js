@@ -1,70 +1,64 @@
 import { QueryType } from 'discord-player';
 import { GuildMember } from 'discord.js';
+import Logging from '../../Logging.js';
 import { categories } from '../Commands.js';
 
 export default {
   name: 'play',
   description: 'Play a song in your channel!',
   category: categories.Music,
-  options: [
-    {
-      name: 'query',
-      type: 3, // 'STRING' Type
-      description: 'The song you want to play',
-      required: true,
-    },
-  ],
+  usage: '[query]',
+  /**
+   * @param {import('discord.js').Message} message
+   * @param {String[]} args */
   // eslint-disable-next-line consistent-return
-  async execute(interaction, player) {
+  async execute(message, args) {
+    const { client, member, guild, guildId, channel } = message;
+    /** @type {import('../../Identification').DiscordBot} */
+    const { player } = client;
+
     try {
-      if (
-        !(interaction.member instanceof GuildMember) ||
-        !interaction.member.voice.channel
-      ) {
-        return interaction.reply({
+      if (!(member instanceof GuildMember) || !member.voice.channel) {
+        return message.reply({
           content: 'You are not in a voice channel!',
           ephemeral: true,
         });
       }
 
       if (
-        interaction.guild.me.voice.channelId &&
-        interaction.member.voice.channelId !==
-          interaction.guild.me.voice.channelId
+        guild.me.voice.channelId &&
+        member.voice.channelId !== guild.me.voice.channelId
       ) {
-        return interaction.reply({
+        return message.reply({
           content: 'You are not in my voice channel!',
           ephemeral: true,
         });
       }
 
-      await interaction.deferReply();
-
-      const query = interaction.options.get('query').value;
+      const query = args.join(' ');
       const searchResult = await player
         .search(query, {
-          requestedBy: interaction.user,
+          requestedBy: member.user,
           searchEngine: QueryType.AUTO,
         })
         .catch(() => {});
       if (!searchResult || searchResult.tracks.length === 0)
-        return interaction.followUp({ content: 'No results were found!' });
+        return message.reply({ content: 'No results were found!' });
 
-      const queue = await player.createQueue(interaction.guild, {
-        metadata: interaction.channel,
+      const queue = await player.createQueue(guild, {
+        metadata: channel,
       });
 
       try {
-        if (!queue.connection)
-          await queue.connect(interaction.member.voice.channel);
+        if (!queue.connection) await queue.connect(member.voice.channel);
       } catch {
-        player.deleteQueue(interaction.guildId);
-        return interaction.followUp({
+        player.deleteQueue(guildId);
+        return message.reply({
           content: 'Could not join your voice channel!',
         });
       }
 
-      await interaction.followUp({
+      await message.reply({
         content: `⏱ | Loading your ${
           searchResult.playlist ? 'playlist' : 'track'
         }...`,
@@ -75,8 +69,8 @@ export default {
 
       if (!queue.playing) await queue.play();
     } catch (error) {
-      console.log(error);
-      interaction.followUp({
+      Logging.Error(error);
+      message.reply({
         content: `There was an error trying to execute that command: ${error.message}`,
       });
     }
