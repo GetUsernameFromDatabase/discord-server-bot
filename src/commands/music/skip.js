@@ -1,8 +1,10 @@
 import { GuildMember } from 'discord.js';
+import { categories } from '../Commands.js';
 
 export default {
   name: 'skip',
   description: 'Skip a song!',
+  category: categories.Music,
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||

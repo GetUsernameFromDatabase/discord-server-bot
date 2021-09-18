@@ -6,6 +6,7 @@ export const prefix = '€';
 export const categories = {
   Utility: '🧰 Utility 🧰',
   Giveaways: '🎁 Giveaways 🎁',
+  Music: '🎵 Music 🎵',
 };
 
 // TODO: Make it possible to reload commands on runtime (so far :[ )

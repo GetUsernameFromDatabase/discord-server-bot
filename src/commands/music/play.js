@@ -1,9 +1,11 @@
 import { QueryType } from 'discord-player';
 import { GuildMember } from 'discord.js';
+import { categories } from '../Commands.js';
 
 export default {
   name: 'play',
   description: 'Play a song in your channel!',
+  category: categories.Music,
   options: [
     {
       name: 'query',
