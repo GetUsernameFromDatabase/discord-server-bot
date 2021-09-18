@@ -137,15 +137,12 @@ export function CheckArgLength(args, usage = '') {
     required: usage.match(/\[/g)?.length ?? 0,
     optional: usage.match(/\(/g)?.length ?? 0,
   };
-  const sum = argReq.optional + argReq.required;
+  // const sum = argReq.optional + argReq.required;
 
   let response;
   if (args.length < argReq) {
     response = `This command requires ${argReq.required} arguments
       ${args.length} given`;
-  } else if (args.length > sum) {
-    response = `You have given more arguments than required
-      \`given:\` **${args.length}** | \`maximum:\` **${sum}**`;
   }
   return response;
 }

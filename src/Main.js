@@ -25,14 +25,14 @@ client.once('ready', async () => {
   await Update.Maintainer(); // Gets my up to date user data
   Logging.Greet(client);
 
+  // TODO: Have cooldowns for commands
+  client.cooldowns = new Collection();
   // BOT FUNCTION INITIATIONS OR STARTING REQUIREMENTS
   client.handlers.set('giveaways', new Giveaways());
   client.handlers.set('botActivity', new BotActivity());
+
   await LoadCommands();
   await LoadEvents();
-
-  // TODO: Have cooldowns for commands
-  client.cooldowns = new Collection();
 });
 
 client.on('disconnect', () => {
