@@ -24,7 +24,8 @@ function HelpForAllCommands() {
   const CmdCat = {};
   for (const [key, value] of client.commands.entries()) {
     if (typeof value.category === 'string') {
-      CmdCat[value.category] = `${CmdCat[value.category] || ''}•${key}\n`;
+      const whatWasBefore = CmdCat[value.category];
+      CmdCat[value.category] = `${whatWasBefore || ''}•${key}\n`;
     }
   }
   const embedFields = MakeEmbedFields(Object.entries(CmdCat));
