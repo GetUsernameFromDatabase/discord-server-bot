@@ -1,8 +1,10 @@
 import { GuildMember } from 'discord.js';
+import { categories } from '../Commands.js';
 
 export default {
   name: 'nowplaying',
   description: 'Get the song that is currently playing.',
+  category: categories.Music,
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||

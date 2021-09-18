@@ -1,8 +1,10 @@
 import { GuildMember } from 'discord.js';
+import { categories } from '../Commands.js';
 
 export default {
   name: 'stop',
   description: 'Stop all songs in the queue!',
+  category: categories.Music,
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||
