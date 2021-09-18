@@ -72,7 +72,7 @@ export default {
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
-  execute(message, args) {
+  async execute(message, args) {
     const chan = message.channel;
     // If no arguments were supplied sends all usable commands
     if (args.length === 0) {
