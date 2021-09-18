@@ -12,7 +12,7 @@ export default {
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
-  execute(message) {
+  async execute(message) {
     /** @type {import('../../Giveaways').default} */
     const giv = client.handlers.get('giveaways');
     giv.ChangeChannel(message.channel.id);
