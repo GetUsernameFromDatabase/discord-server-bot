@@ -1,14 +1,16 @@
 import { GuildMember } from 'discord.js';
+import { GetMsgEmbed, blank } from '../../Messaging.js';
 import { categories } from '../Commands.js';
 
 export default {
   name: 'nowplaying',
-  description: 'Get the song that is currently playing.',
+  aliases: ['np'],
+  description: 'Get the song that is currently playing',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {
     const { client, member, guild, guildId } = message;
-    /** @type {import('../../Identification').DiscordBot} */
+    /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
     if (!(member instanceof GuildMember) || !member.voice.channel) {
@@ -36,21 +38,18 @@ export default {
     const progress = queue.createProgressBar();
     const perc = queue.getPlayerTimestamp();
 
-    return message.reply({
-      embeds: [
+    const msgEmbed = GetMsgEmbed(
+      [
         {
-          title: 'Now Playing',
-          description: `🎶 | **${queue.current.title}**! (\`${perc.progress}%\`)`,
-          fields: [
-            {
-              name: '\u200B',
-              value: progress,
-            },
-          ],
-          // eslint-disable-next-line prettier/prettier
-          color: 0xFF_FF_FF,
+          name: blank,
+          value: progress,
         },
       ],
+      { title: 'Now Playing', url: queue.current.url }
+    );
+    msgEmbed.description = `🎶 | **${queue.current.title}**! (\`${perc.progress}%\`)`;
+    return message.reply({
+      embeds: [msgEmbed],
     });
   },
 };
