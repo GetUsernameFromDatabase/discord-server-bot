@@ -2,8 +2,9 @@ import * as Discord from 'discord.js';
 import { ID, client } from './Identification.js';
 import Logging from './Logging.js';
 import { SegmentString } from './TextManipulation.js';
+import { CheckStringArray } from './TypeCheck.js';
 
-const blank = '\u200B';
+export const blank = '\u200B';
 
 function stringWithHeaderIntoEmbedField(string) {
   const splitter = '\n';
@@ -44,10 +45,7 @@ function MdHAsEmbedFieldTitle(stringsToBeFields) {
  * @returns {Discord.MessageEmbed} */
 export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
   /* eslint-disable no-param-reassign */
-  if (
-    (Array.isArray(fields) && typeof fields[0] === 'string') ||
-    typeof fields === 'string'
-  ) {
+  if (CheckStringArray()) {
     fields = Array.isArray(fields)
       ? fields.flatMap((field) => [...SegmentString(field)])
       : SegmentString(fields);
