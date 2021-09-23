@@ -31,9 +31,6 @@ export default class DiscordBot extends Client {
     this.player.on('tracksAdd', (queue, tracks) => {
       queue.metadata.send(`🎶 | ${tracks.length} tracks added to the queue!`);
     });
-    this.player.on('trackStart', (queue, track) => {
-      queue.metadata.send(`🎶 | Started playing: **${track.title}**!`);
-    });
 
     this.player.on('channelEmpty', (queue) => {
       queue.metadata.send('❌ | Nobody is in the voice channel, leaving...');
