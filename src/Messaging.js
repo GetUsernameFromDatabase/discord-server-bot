@@ -128,8 +128,7 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
 
 /**
  * @param {String[]} args
- * @param {String} usage
- * @returns {Boolean} Wether it failed or not (true if it failed) */
+ * @param {String} usage */
 export function CheckArgLength(args, usage = '') {
   const argReq = {
     required: usage.match(/\[/g)?.length ?? 0,
