@@ -135,12 +135,14 @@ export function CheckArgLength(args, usage = '') {
     required: usage.match(/\[/g)?.length ?? 0,
     optional: usage.match(/\(/g)?.length ?? 0,
   };
-  // const sum = argReq.optional + argReq.required;
+  const sum = argReq.optional + argReq.required;
 
   let response;
   if (args.length < argReq) {
     response = `This command requires ${argReq.required} arguments
       ${args.length} given`;
+  } else if (sum === 0 && args.length > 0) {
+    response = "This command doesn't take any arguments";
   }
   return response;
 }
