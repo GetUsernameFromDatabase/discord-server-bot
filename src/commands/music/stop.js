@@ -8,7 +8,7 @@ export default {
   /** @param {import('discord.js').Message} message */
   async execute(message) {
     const { client, member, guild, guildId } = message;
-    /** @type {import('../../Identification').DiscordBot} */
+    /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
     if (!(member instanceof GuildMember) || !member.voice.channel) {
