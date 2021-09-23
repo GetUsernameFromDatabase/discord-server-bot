@@ -8,7 +8,7 @@ export default class DiscordBot extends Client {
     this.commands = new Collection();
     this.handlers = new Collection();
 
-    this.player = new Player(this);
+    this.player = new Player(this, { leaveOnEmptyCooldown: 30 * 1000 });
     this.player.on('error', (queue, error) => {
       Logging.Log(
         `[${queue.guild.name}] Error emitted from the queue: ${error.message}`
