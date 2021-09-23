@@ -64,7 +64,7 @@ function HelpForCommand(command) {
 
 export default {
   name: 'help',
-  description: 'List all of my commands or info about a specific command.',
+  description: 'List all of my commands or info about a specific command',
   category: categories.Utility,
   aliases: ['commands'],
   usage: '(command name)',
