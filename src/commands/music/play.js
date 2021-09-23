@@ -5,6 +5,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'play',
+  aliases: ['p'],
   description: 'Play a song in your channel!',
   category: categories.Music,
   usage: '[query]',
@@ -14,7 +15,7 @@ export default {
   // eslint-disable-next-line consistent-return
   async execute(message, args) {
     const { client, member, guild, guildId, channel } = message;
-    /** @type {import('../../Identification').DiscordBot} */
+    /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
     try {
@@ -57,12 +58,6 @@ export default {
           content: 'Could not join your voice channel!',
         });
       }
-
-      await message.reply({
-        content: `⏱ | Loading your ${
-          searchResult.playlist ? 'playlist' : 'track'
-        }...`,
-      });
 
       if (searchResult.playlist) queue.addTracks(searchResult.tracks);
       else queue.addTrack(searchResult.tracks[0]);
