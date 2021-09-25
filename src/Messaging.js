@@ -2,7 +2,6 @@ import * as Discord from 'discord.js';
 import { ID, client } from './Identification.js';
 import Logging from './Logging.js';
 import { SegmentString } from './TextManipulation.js';
-import { CheckStringArray } from './TypeCheck.js';
 
 export const blank = '\u200B';
 
@@ -40,20 +39,26 @@ function MdHAsEmbedFieldTitle(stringsToBeFields) {
 }
 
 /**
+ * @param {String | String[]} strings */
+function stringsToEmbedField(strings) {
+  const stringArray = Array.isArray(strings)
+    ? strings.flatMap((string) => [...SegmentString(string)])
+    : SegmentString(strings);
+  return MdHAsEmbedFieldTitle(stringArray);
+}
+
+/**
  * @param {String | String[] | Discord.EmbedField | Discord.EmbedField[]} fields
  * @param options
  * @returns {Discord.MessageEmbed} */
 export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
-  /* eslint-disable no-param-reassign */
-  if (CheckStringArray()) {
-    fields = Array.isArray(fields)
-      ? fields.flatMap((field) => [...SegmentString(field)])
-      : SegmentString(fields);
-
-    fields = MdHAsEmbedFieldTitle(fields);
+  let embedFields =
+    typeof fields === 'string' ? stringsToEmbedField(fields) : fields;
+  if (Array.isArray(fields)) {
+    embedFields = fields.map((field) =>
+      typeof field === 'string' ? stringsToEmbedField(field) : field
+    );
   }
-  /* eslint-enable no-param-reassign */
-  const embedFields = fields;
 
   const MesEmb = new Discord.MessageEmbed()
     .setColor('#F1C40F')
