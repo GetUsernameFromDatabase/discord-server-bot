@@ -42,7 +42,9 @@ export default {
           requestedBy: member.user,
           searchEngine: QueryType.AUTO,
         })
-        .catch(() => {});
+        .catch((error) => {
+          Logging.Warn(error);
+        });
       if (!searchResult || searchResult.tracks.length === 0)
         return message.reply({ content: 'No results were found!' });
 
