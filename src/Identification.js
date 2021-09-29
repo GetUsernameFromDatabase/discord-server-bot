@@ -2,13 +2,13 @@ import { Client, User, Guild, Intents } from 'discord.js';
 import DiscordBot from './CustomClient.js';
 import Logging from './Logging.js';
 
-export const client = new DiscordBot({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_VOICE_STATES,
-  ],
-});
+const intents = [
+  Intents.FLAGS.GUILDS,
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILD_VOICE_STATES,
+];
+
+export const client = new DiscordBot({ intents });
 export const ID = {
   Me: new User(client, {
     username: 'MiniGamer',
@@ -16,12 +16,7 @@ export const ID = {
     id: '186439588229677056',
     avatar: '24c90ae8f89d2b9989ba3cb4ff7e6eb1',
   }),
-  Server: new Guild(
-    new Client({
-      intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
-    }),
-    { name: 'Placeholder guild' }
-  ),
+  Server: new Guild(new Client({ intents }), { name: 'Placeholder guild' }),
 };
 
 export const Update = {
