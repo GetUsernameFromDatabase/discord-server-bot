@@ -3,6 +3,14 @@ import { Client, Collection } from 'discord.js';
 import Logging from './Logging.js';
 
 /**
+ * @param {import('discord-player').Queue} queue */
+function manualLeaveOnEmpty(queue) {
+  if (queue.playing) return;
+  queue.destroy();
+  Logging.Log('Left manually on empty :(');
+}
+
+/**
  * @param {Player} player */
 function addEventsToPlayer(player) {
   player.on('error', (queue, error) => {
@@ -33,6 +41,9 @@ function addEventsToPlayer(player) {
   });
   player.on('queueEnd', (queue) => {
     queue.metadata.send('✅ | Queue finished!');
+    setTimeout(() => {
+      manualLeaveOnEmpty(queue);
+    }, queue.options.leaveOnEmptyCooldown + 1000 || 1000);
   });
 }
 
