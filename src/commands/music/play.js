@@ -50,6 +50,7 @@ export default {
 
       const queue = await player.createQueue(guild, {
         metadata: channel,
+        ...player.options,
       });
 
       try {
