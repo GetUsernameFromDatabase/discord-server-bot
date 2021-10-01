@@ -22,6 +22,11 @@ function addEventsToPlayer(player) {
     Logging.Log(
       `[${queue.guild.name}] Error emitted from the connection: ${error.message}`
     );
+    try {
+      queue.play();
+    } catch (error_) {
+      Logging.Error(error_);
+    }
   });
   player.on('botDisconnect', (queue) => {
     queue.metadata.send(
