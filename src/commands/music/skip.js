@@ -33,6 +33,7 @@ export default {
       return message.reply({
         content: '❌ | No music is being played!',
       });
+
     const currentTrack = queue.current;
     const success = queue.skip();
     return message.reply({
