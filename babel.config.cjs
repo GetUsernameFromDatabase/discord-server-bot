@@ -1,4 +1,8 @@
 // eslint-disable-next-line import/unambiguous
+const {
+  engines: { node },
+} = require('./package.json');
+
 module.exports = (api) => {
   const isTest = api.env('test');
   const baseObject = {
@@ -19,7 +23,7 @@ module.exports = (api) => {
         {
           targets: {
             esmodules: true,
-            node: 'current',
+            node: node.slice(2),
           },
           modules: false,
           useBuiltIns: 'usage',
