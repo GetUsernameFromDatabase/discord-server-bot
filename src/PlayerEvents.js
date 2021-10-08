@@ -20,8 +20,9 @@ export default function addEventsToPlayer(player) {
     Logging.Log(
       `[${queue.guild.name}] Error emitted from the connection: ${error.message}`
     );
+
+    // Sometimes when a connectionError happens, the Player stops playing completely
     setTimeout(() => {
-      Logging.Log();
       try {
         queue.play();
       } catch (error_) {
