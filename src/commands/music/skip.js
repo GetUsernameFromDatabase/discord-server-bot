@@ -1,4 +1,4 @@
-import { GuildMember } from 'discord.js';
+import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { categories } from '../Commands.js';
 
 export default {
@@ -7,31 +7,22 @@ export default {
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {
-    const { client, member, guild, guildId } = message;
+    const { client, guildId } = message;
+    if (isUserInVoiceChannel(message)) return;
+
     /** @type {import('../../CustomClient').default} */
     const { player } = client;
-
-    if (
-      !(member instanceof GuildMember) ||
-      !member.voice.channel ||
-      (guild.me.voice.channelId &&
-        member.voice.channelId !== guild.me.voice.channelId)
-    ) {
-      return message.reply({
-        content: 'You are not in a voice channel!',
-        ephemeral: true,
-      });
-    }
-
     const queue = player.getQueue(guildId);
-    if (!queue || !queue.playing)
-      return message.reply({
+    if (!queue || !queue.playing) {
+      message.reply({
         content: '❌ | No music is being played!',
       });
+      return;
+    }
 
     const currentTrack = queue.current;
     const success = queue.skip();
-    return message.reply({
+    message.reply({
       content: success
         ? `✅ | Skipped **${currentTrack}**!`
         : '❌ | Something went wrong!',

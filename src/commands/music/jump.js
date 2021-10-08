@@ -1,3 +1,4 @@
+import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { filterInt } from '../../TypeCheck.js';
 import { categories } from '../Commands.js';
 
@@ -9,20 +10,24 @@ export default {
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
-  // eslint-disable-next-line consistent-return
   async execute(message, args) {
     const { client, guild, channel } = message;
+    if (isUserInVoiceChannel(message)) return;
     /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
     const queue = await player.createQueue(guild, {
       metadata: channel,
     });
-    if (!queue || !queue.playing)
-      return message.reply({ content: '❌ | No music is being played!' });
+    if (!queue || !queue.playing) {
+      message.reply({ content: '❌ | No music is being played!' });
+      return;
+    }
 
-    if (!filterInt(args[0]))
-      return message.reply('This command only accepts integers');
+    if (!filterInt(args[0])) {
+      message.reply('This command only accepts integers');
+      return;
+    }
     const trackIndex = args[0] - 1;
     const trackName = queue.tracks[trackIndex].title;
 

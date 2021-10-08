@@ -1,3 +1,4 @@
+import { GuildMember } from 'discord.js';
 import Logging from './Logging.js';
 
 /**
@@ -52,4 +53,22 @@ export default function addEventsToPlayer(player) {
       manualLeaveOnEmpty(queue);
     }, queue.options.leaveOnEmptyCooldown + 1000 || 1000);
   });
+}
+
+/**
+ * @param {import('discord.js').Message} message */
+export function isUserInVoiceChannel(message) {
+  const { guild, member } = message;
+  if (
+    !(member instanceof GuildMember) ||
+    !member.voice.channel ||
+    (guild.me.voice.channelId &&
+      member.voice.channelId !== guild.me.voice.channelId)
+  ) {
+    return message.reply({
+      content: 'You are not in a voice channel!',
+      ephemeral: true,
+    });
+  }
+  return false;
 }
