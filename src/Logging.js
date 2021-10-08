@@ -11,14 +11,12 @@ export default {
 
   /** @param {Boolean} spacer [true] adds a spacer after logging if true */
   Error(err, description = '', spacer = true) {
-    const n = spacer ? '\n' : '';
-    console.error(description, err, n);
+    console.error(description, err, spacer ? '\n' : '');
   },
 
   /** @param {Boolean} spacer [true] adds a spacer after logging if true */
   Warn(err, description = '', spacer = true) {
-    const n = spacer ? '\n' : '';
-    console.warn(description, err, n);
+    console.warn(description, err, spacer ? '\n' : '');
   },
 
   Log(msg) {
