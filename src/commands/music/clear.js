@@ -1,3 +1,4 @@
+import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { categories } from '../Commands.js';
 
 export default {
@@ -7,17 +8,19 @@ export default {
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */
-  // eslint-disable-next-line consistent-return
   async execute(message) {
     const { client, guild, channel } = message;
+    if (isUserInVoiceChannel(message)) return;
     /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
     const queue = await player.createQueue(guild, {
       metadata: channel,
     });
-    if (!queue)
-      return message.reply({ content: '❌ | No music in the queue!' });
+    if (!queue) {
+      message.reply({ content: '❌ | No music in the queue!' });
+      return;
+    }
 
     queue.clear();
     message.reply({ content: '❌ | Queue cleared.' });
