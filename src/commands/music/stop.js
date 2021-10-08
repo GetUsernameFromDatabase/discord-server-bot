@@ -11,19 +11,14 @@ export default {
     /** @type {import('../../CustomClient').default} */
     const { player } = client;
 
-    if (!(member instanceof GuildMember) || !member.voice.channel) {
-      return message.reply({
-        content: 'You are not in a voice channel!',
-        ephemeral: true,
-      });
-    }
-
     if (
-      guild.me.voice.channelId &&
-      member.voice.channelId !== guild.me.voice.channelId
+      !(member instanceof GuildMember) ||
+      !member.voice.channel ||
+      (guild.me.voice.channelId &&
+        member.voice.channelId !== guild.me.voice.channelId)
     ) {
       return message.reply({
-        content: 'You are not in my voice channel!',
+        content: 'You are not in a voice channel!',
         ephemeral: true,
       });
     }
