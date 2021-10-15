@@ -9,7 +9,12 @@ import { prefix } from './commands/Commands.js';
  * @param {import('discord.js').ActivityType} type [PLAYING]
  * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
  */
-function MakeAct(name, duration = 1, type = 'PLAYING', repeat = false) {
+export function CreateActivity(
+  name,
+  duration = 1,
+  type = 'PLAYING',
+  repeat = false
+) {
   if (!Number.isFinite(duration) || duration < 0) {
     Logging.Error(`Wrong duration (${duration}) inserted into${this.MakeActObj}\n
       Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
@@ -30,17 +35,12 @@ function MakeAct(name, duration = 1, type = 'PLAYING', repeat = false) {
 export default class BotActivity {
   iteration = 0; // Current activity index
 
-  activities = [
-    MakeAct(`${prefix}help`, 1.5, 'WATCHING', true),
-    MakeAct('with my vodka bottle'),
-    MakeAct('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-    MakeAct('ʍıʇɥ ɹǝɐlıʇʎ'),
-  ];
-
-  constructor() {
+  constructor(
+    activities = [CreateActivity(`${prefix}help`, 1.5, 'WATCHING', true)]
+  ) {
     // Repeats activities that should
     const nonRepAct = [];
-    const repAct = this.activities.filter((x) => {
+    const repAct = activities.filter((x) => {
       if (x.several === true) return true;
       nonRepAct.push(x);
       return false;
