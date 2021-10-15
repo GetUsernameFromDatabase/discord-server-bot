@@ -1,13 +1,14 @@
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import { beforeAll, jest } from '@jest/globals';
-// eslint-disable-next-line import/no-unassigned-import
-import 'jest-extended'; // Needed for types
 import * as Discord from 'discord.js';
+import * as jestExtended from 'jest-extended'; // Needed for types
 import Giveaways, { givFile } from '../src/Giveaways.js';
 import { ID, client } from '../src/Identification.js';
 import * as Messaging from '../src/Messaging.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
+
+expect.extend(jestExtended);
 
 givFile.location = './__tests__/res/FetchedGiveaways.json';
 Giveaways.giveawaySites.GrabFreeGames.count = 13;
