@@ -27,7 +27,7 @@ const botMock = {
 export class Client extends Discord.Client {
   constructor(options) {
     super(options);
-    this.user = new Discord.User(this, { ...botMock });
+    this.user = new Discord.ClientUser(this, { ...botMock });
   }
 }
 export class User extends Discord.User {}
