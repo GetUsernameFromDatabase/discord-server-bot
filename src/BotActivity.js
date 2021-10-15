@@ -48,7 +48,7 @@ export default class BotActivity {
     this.activities = [];
 
     const raI = 3; // Interval of repetitive activities
-    for (let i = 0; i < nonRepAct.length; i++) {
+    for (let i = 0, n = nonRepAct.length; i < n; i++) {
       if (i % (raI - 1) === 0) this.activities.push(...repAct);
       this.activities.push(nonRepAct[i]);
     }

@@ -81,7 +81,7 @@ export async function GrabFreeGames(html) {
   });
 
   const resolvedGiv = [];
-  for (let i = 0; i < giveaways.length; i++) {
+  for (let i = 0, n = giveaways.length; i < n; i++) {
     const giv = giveaways[i];
     // eslint-disable-next-line no-await-in-loop
     giv.body = await giv.body;

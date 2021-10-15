@@ -152,7 +152,7 @@ describe('giveaway interactions', () => {
   });
   afterEach(() => {
     const channels = GetServerChannels();
-    for (let i = 0; i < messagesBefore.length; i++) {
+    for (let i = 0, n = messagesBefore.length; i < n; i++) {
       channels[i].messages.cache = messagesBefore[i];
     }
   });

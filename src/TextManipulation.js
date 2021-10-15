@@ -12,9 +12,9 @@ export function SegmentString(string, limit = 1024) {
  * @param {String} shorter */
 function editDistance(longer, shorter) {
   const costs = [];
-  for (let i = 0; i <= longer.length; i++) {
+  for (let i = 0, n = longer.length; i <= n; i++) {
     let lastValue = i;
-    for (let j = 0; j <= shorter.length; j++) {
+    for (let j = 0, m = shorter.length; j <= m; j++) {
       if (i === 0) {
         costs[j] = j;
       } else if (j > 0) {
