@@ -10,21 +10,26 @@ const Discord = jest.requireActual('discord.js');
 // a counter so that all the ids are unique
 let count = 0;
 // the user that executes the commands
-export const userMock = {
+const userMock = {
   id: (count++).toString(),
   username: 'username',
   discriminator: '1234',
 };
 
 // the bot
-export const botMock = {
+const botMock = {
   id: (count++).toString(),
   username: 'BOTMOCK',
   discriminator: '1234',
   bot: true,
 };
 
-export class Client extends Discord.Client {}
+export class Client extends Discord.Client {
+  constructor(options) {
+    super(options);
+    this.user = botMock;
+  }
+}
 export class User extends Discord.User {}
 export class Collection extends Discord.Collection {}
 export class Permissions extends Discord.Permissions {}
