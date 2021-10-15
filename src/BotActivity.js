@@ -31,11 +31,10 @@ export default class BotActivity {
   iteration = 0; // Current activity index
 
   activities = [
-    MakeAct(`${prefix}help`, 1.1, 'WATCHING', true),
+    MakeAct(`${prefix}help`, 1.5, 'WATCHING', true),
     MakeAct('with my vodka bottle'),
     MakeAct('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-    MakeAct(' ʍıʇɥ ɹǝɐlıʇʎ'),
-    MakeAct("Jesus Christ, that's a pretty face", 0),
+    MakeAct('ʍıʇɥ ɹǝɐlıʇʎ'),
   ];
 
   constructor() {
