@@ -1,5 +1,7 @@
 import * as Messaging from '../src/Messaging.js';
 
+jest.mock('node-fetch');
+
 test('Messaging.MdHAsEmbedFieldTitle', () => {
   expect.assertions(1);
   const testFunction = Messaging.testPrivate.MdHAsEmbedFieldTitle;
