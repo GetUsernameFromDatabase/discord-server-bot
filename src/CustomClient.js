@@ -11,6 +11,7 @@ export default class DiscordBot extends Client {
     this.player = new Player(this, {
       leaveOnEnd: false,
       leaveOnEmptyCooldown: 30_000,
+      bufferingTimeout: 4200,
       ytdlOptions: {
         requestOptions: {
           headers: {
