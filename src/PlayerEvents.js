@@ -1,13 +1,15 @@
 import { GuildMember } from 'discord.js';
 import Logging from './Logging.js';
 
+const leaveOnEndCooldown = 30_000;
+/** @type {NodeJS.Timeout} */
+let endCooldownTimeout;
 /**
  * @param {import('discord-player').Queue} queue */
-function manualLeaveOnEmpty(queue) {
+function leaveOnEnd(queue) {
   if (queue.playing) return;
   try {
     queue.destroy();
-    Logging.Log('Left manually on empty :(');
   } catch (error) {
     Logging.Error(error, '----- Failed to destroy -----');
   }
@@ -36,6 +38,7 @@ export default function addEventsToPlayer(player) {
     }, 1500);
   });
   player.on('botDisconnect', (queue) => {
+    clearTimeout(endCooldownTimeout);
     queue.metadata.send(
       '❌ | I was manually disconnected from the voice channel, clearing queue!'
     );
@@ -53,9 +56,9 @@ export default function addEventsToPlayer(player) {
   });
   player.on('queueEnd', (queue) => {
     queue.metadata.send('✅ | Queue finished!');
-    setTimeout(() => {
-      manualLeaveOnEmpty(queue);
-    }, queue.options.leaveOnEmptyCooldown + 1000 || 1000);
+    endCooldownTimeout = setTimeout(() => {
+      leaveOnEnd(queue);
+    }, leaveOnEndCooldown);
   });
 }
 

@@ -9,8 +9,8 @@ export default class DiscordBot extends Client {
     this.handlers = new Collection();
 
     this.player = new Player(this, {
-      leaveOnEnd: false,
-      leaveOnEmptyCooldown: 30_000,
+      leaveOnEnd: false, // Leaving manually on end - with cooldown
+      leaveOnEmptyCooldown: 60_000,
       bufferingTimeout: 4200,
       ytdlOptions: {
         requestOptions: {
