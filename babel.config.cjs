@@ -1,26 +1,18 @@
-// eslint-disable-next-line import/unambiguous
+/* eslint-disable import/unambiguous */
 module.exports = (api) => {
   const isTest = api.env('test');
   const baseObject = {
-    plugins: [
-      ['@babel/plugin-proposal-class-properties'],
+    plugins: [['@babel/plugin-proposal-class-properties']],
+    presets: [
       [
-        '@babel/plugin-transform-runtime',
+        '@babel/preset-env',
         {
-          absoluteRuntime: false,
-          corejs: '3',
-          version: '^7.14.6',
+          targets: {
+            node: 'current',
+          },
+          modules: false,
         },
       ],
-    ],
-    presets: [
-      '@babel/preset-env',
-      {
-        targets: {
-          node: 'current',
-        },
-        modules: false,
-      },
     ],
   };
 
