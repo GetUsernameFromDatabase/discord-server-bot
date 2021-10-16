@@ -15,10 +15,10 @@ export default class DiscordBot extends Client {
         requestOptions: {
           headers: {
             cookie: process.env.YouTubeCookie,
-            quality: 'highestaudio',
-            // eslint-disable-next-line no-bitwise
-            highWaterMark: 1 << 25,
           },
+          quality: 'highestaudio',
+          // eslint-disable-next-line no-bitwise
+          highWaterMark: 1 << 25,
         },
       },
     });
