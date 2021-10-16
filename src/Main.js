@@ -31,12 +31,12 @@ client.once('ready', async () => {
   client.handlers.set('giveaways', new Giveaways());
   client.handlers.set(
     'botActivity',
-    new BotActivity(
+    new BotActivity([
       CA(`${prefix}help`, 1.5, 'WATCHING', true),
       CA('with my vodka bottle'),
       CA('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-      CA('ʍıʇɥ ɹǝɐlıʇʎ')
-    )
+      CA('ʍıʇɥ ɹǝɐlıʇʎ'),
+    ])
   );
 
   await LoadCommands();
