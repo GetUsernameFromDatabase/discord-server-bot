@@ -4,29 +4,24 @@ module.exports = (api) => {
   const baseObject = {
     plugins: [
       ['@babel/plugin-proposal-class-properties'],
-      // [
-      //   '@babel/plugin-transform-runtime',
-      //   {
-      //     absoluteRuntime: false,
-      //     corejs: '3',
-      //     version: '^7.14.6',
-      //   },
-      // ],
+      [
+        '@babel/plugin-transform-runtime',
+        {
+          absoluteRuntime: false,
+          corejs: '3',
+          version: '^7.14.6',
+        },
+      ],
     ],
-    // presets: [
-    //   [
-    //     '@babel/preset-env',
-    //     {
-    //       targets: {
-    //         esmodules: true,
-    //         node: 'current',
-    //       },
-    //       modules: false,
-    //       useBuiltIns: 'usage',
-    //       corejs: { version: '3.14', proposals: true },
-    //     },
-    //   ],
-    // ],
+    presets: [
+      '@babel/preset-env',
+      {
+        targets: {
+          node: 'current',
+        },
+        modules: false,
+      },
+    ],
   };
 
   if (isTest)
