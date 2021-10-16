@@ -3,6 +3,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'skip',
+  aliases: ['next'],
   description: 'Skip a song!',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
