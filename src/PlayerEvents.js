@@ -5,8 +5,12 @@ import Logging from './Logging.js';
  * @param {import('discord-player').Queue} queue */
 function manualLeaveOnEmpty(queue) {
   if (queue.playing) return;
-  queue.destroy();
-  Logging.Log('Left manually on empty :(');
+  try {
+    queue.destroy();
+    Logging.Log('Left manually on empty :(');
+  } catch (error) {
+    Logging.Error(error, '----- Failed to destroy -----');
+  }
 }
 
 /**
