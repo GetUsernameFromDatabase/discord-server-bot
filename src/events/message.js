@@ -25,7 +25,7 @@ export default {
         const response =
           chance >= 0.3
             ? `I do not recognize this command
-        Did you mean to write${PredictionsAsString(predictions)}`
+        Did you mean to write ${PredictionsAsString(predictions)}`
             : `Write \`${prefix}help\` to know what commands are available`;
         return chan.send(response);
       }
