@@ -32,21 +32,39 @@ export function GetCommand(name) {
   );
 }
 
+/**
+ * @param {String} base
+ * @param {String} comparison
+ * @returns {[Number, String]} */
+function getPrediction(base, comparison) {
+  const chance = Similarity(base, comparison);
+  return [chance, comparison];
+}
+
 /** Gets a response for a wrong command
  * @param {String} msg Message to respond to
  * @return {[Number, String[]]} An array: **[0]** = *maximum chance*,
  * **[1]** = *predictions* */
 export function GetMostSimilarCommands(msg) {
   // Finds how similar the message is to all commands
-  const predictions = [...client.commands.keys()]
-    .map((cmd) => {
-      const chance = Similarity(msg, cmd);
-      /** @type {[Number, String]} */
-      const entry = [chance, cmd];
-      return entry;
-    })
-    .sort(([key1], [key2]) => key1 - key2);
-  // Gets predictions with the highest chance
+  const cmdPredictions = [...client.commands.keys()].map((cmd) =>
+    getPrediction(msg, cmd)
+  );
+  /** @type {[Number, String][]} */
+  const aliasPredictions = [];
+  for (const [, cmdName] of cmdPredictions) {
+    /** @type {import('../interfaces/commands').CommandObject} */
+    const cmd = client.commands.get(cmdName);
+    if (!cmd.aliases) continue;
+    aliasPredictions.push(
+      ...cmd.aliases.map((alias) => getPrediction(msg, alias))
+    );
+  }
+
+  const predictions = [...cmdPredictions, ...aliasPredictions].sort(
+    ([key1], [key2]) => key1 - key2
+  );
+  // Gets predictions with the highest chance - works since sorted
   const maxPred = predictions[predictions.length - 1][0];
   const maxPreds = predictions
     .filter(([key]) => key === maxPred)
