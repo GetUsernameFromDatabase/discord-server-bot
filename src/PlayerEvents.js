@@ -38,13 +38,13 @@ export default function addEventsToPlayer(player) {
     }, 1500);
   });
   player.on('botDisconnect', (queue) => {
-    clearTimeout(endCooldownTimeout);
     queue.metadata.send(
       '❌ | I was manually disconnected from the voice channel, clearing queue!'
     );
   });
 
   player.on('trackAdd', (queue, track) => {
+    clearTimeout(endCooldownTimeout);
     queue.metadata.send(`🎶 | Track **${track.title}** queued!`);
   });
   player.on('tracksAdd', (queue, tracks) => {
