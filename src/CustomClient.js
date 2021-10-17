@@ -20,6 +20,7 @@ export default class DiscordBot extends Client {
           quality: 'highestaudio',
           // eslint-disable-next-line no-bitwise
           highWaterMark: 1 << 25,
+          filter: 'audioonly',
         },
       },
     });
