@@ -21,6 +21,7 @@ export default class DiscordBot extends Client {
           // eslint-disable-next-line no-bitwise
           highWaterMark: 1 << 25,
           filter: 'audioonly',
+          maxReconnects: 2,
         },
       },
     });
