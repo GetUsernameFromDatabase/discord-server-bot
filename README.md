@@ -12,10 +12,11 @@ Setup your bot application in the [Discord developer portal](https://discord.com
 ## Setup environment variables
 For environment variables I use [dotenv](https://github.com/motdotla/dotenv)
 
-example [.env](./SAMPLE.env)
+example [.env](./.env.example)
 ```ini
 TOKEN = YOUR_TOKEN_KEY_HERE
 ServerID = YOUR_SERVER_ID_HERE
+YouTubeCookie = null
 
 TestChanID = TESTING_CHANNEL_ID
 GiveawaysID = CHANNEL_WHERE_GIVEAWAYS_WILL_BE_POSTED
