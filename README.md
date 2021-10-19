@@ -82,8 +82,29 @@ I'm currently holding this here since I'm running the server from PCs.
 Make this bot get and send memes
 
 ## Music
-### TO DO
-Make this bot have music bot functionalities
+For music bot functionality I use [discord-player](https://discord-player.js.org/) which handles the nitty gritty.  
+Developer mostly just needs to setup the interaction between the user and **discord-player**.
+
+### [Commands](./src/commands/music/)
+#### Structure
+- **command** - short description **|** &nbsp; **[required parameter]** *(optional parameter)*
+- - *alias1*
+- - *alias2*
+------
+- **clear** - *Clears the queue*
+- **jump** - *Jumps to a specific track* **|** &nbsp; **[track number]**
+- **nowplaying** - *Displays the currently playing song*
+- - *np*
+- **pause** - *Pauses the current song*
+- **play** - *Query a song to play in your voice channel* **|** &nbsp; **[query]**
+- **queue** - *Display the queue* **|** *(page)*
+- - *q*
+- **resume** - *Resume a paused song*
+- **seek** - *Seek to the given time* **|** &nbsp; **[timeInSeconds]**
+- **shuffle** - *Shuffles the queue*
+- **skip** - *Skips the current song*
+- - *next*
+- **stop** - *Stops the music bot and empties the queue*
 
 ## Misc
 ### Creation of [MessageEmbeds](https://discord.js.org/#/docs/main/stable/class/MessageEmbed)
