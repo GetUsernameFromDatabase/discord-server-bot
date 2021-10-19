@@ -6,7 +6,7 @@ import { categories } from '../Commands.js';
 export default {
   name: 'play',
   aliases: ['p'],
-  description: 'Play a song in your channel!',
+  description: 'Query a song to play in your voice channel',
   category: categories.Music,
   usage: '[query]',
   /**

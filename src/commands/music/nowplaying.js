@@ -4,7 +4,7 @@ import { categories } from '../Commands.js';
 export default {
   name: 'nowplaying',
   aliases: ['np'],
-  description: 'Get the song that is currently playing',
+  description: 'Display currently playing song',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {

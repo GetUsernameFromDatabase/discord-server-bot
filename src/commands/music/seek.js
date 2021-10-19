@@ -5,7 +5,7 @@ import { categories } from '../Commands.js';
 export default {
   name: 'seek',
   description: 'Seek to the given time',
-  usage: '[time]',
+  usage: '[timeInSeconds]',
   category: categories.Music,
   /**
    * @param {import('discord.js').Message} message

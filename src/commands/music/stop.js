@@ -3,7 +3,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'stop',
-  description: 'Stop all songs in the queue!',
+  description: 'Stops the music bot and empties the queue',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {

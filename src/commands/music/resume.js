@@ -3,7 +3,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'resume',
-  description: 'Resume current song!',
+  description: 'Resume a paused song',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {
