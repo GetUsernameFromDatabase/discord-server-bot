@@ -4,7 +4,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'jump',
-  description: 'Jump to a specific track',
+  description: 'Jumps to a specific track',
   usage: '[trackNumber]',
   category: categories.Music,
   /**

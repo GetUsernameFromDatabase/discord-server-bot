@@ -4,7 +4,7 @@ import { categories } from '../Commands.js';
 export default {
   name: 'queue',
   aliases: ['q'],
-  description: 'See the queue',
+  description: 'Display the queue',
   usage: '(page)',
   category: categories.Music,
   /**

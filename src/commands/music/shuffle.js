@@ -3,7 +3,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'shuffle',
-  description: 'Shuffle the queue',
+  description: 'Shuffles the queue',
   category: categories.Music,
   /**
    * @param {import('discord.js').Message} message

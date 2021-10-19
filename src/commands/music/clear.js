@@ -3,7 +3,7 @@ import { categories } from '../Commands.js';
 
 export default {
   name: 'clear',
-  description: 'Clear the current queue',
+  description: 'Clears the queue',
   category: categories.Music,
   /**
    * @param {import('discord.js').Message} message

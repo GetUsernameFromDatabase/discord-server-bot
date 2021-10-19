@@ -4,7 +4,7 @@ import { categories } from '../Commands.js';
 export default {
   name: 'skip',
   aliases: ['next'],
-  description: 'Skip a song!',
+  description: 'Skips the current song',
   category: categories.Music,
   /** @param {import('discord.js').Message} message */
   async execute(message) {
