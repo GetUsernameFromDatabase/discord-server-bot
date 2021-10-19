@@ -71,12 +71,11 @@ When the bot runs giveaways will be posted into the giveaway channel.
 The bot will check if a MessageEmbed with the same title can already be found in the channel.
 This check can be disabled but is on by default - used when sending messages into a channel in bulk.
 
-Before the previous check, giveaways that have been sent will be filtered out using a [json file](./data/FetchedGiveaways.json).  
+Before the previous check, giveaways that have been sent will be filtered out using a **json** file.  
 This is used since the previous check only compares against last 100 messages sent in the channel.  
 _This filtering won't happen if giveaway channel was changed_
 
-Make sure to empty or delete the [json file](./data/FetchedGiveaways.json) when using it for yourself.  
-I'm currently holding this here since I'm running the server from PCs.
+This file will be generated in the [data](./data) folder
 
 ## Memes
 ### TO DO
