@@ -83,7 +83,7 @@ Make this bot get and send memes
 
 ## Music
 For music bot functionality I use [discord-player](https://discord-player.js.org/) which handles the nitty gritty.  
-Developer mostly just needs to setup the interaction between the user and **discord-player**.
+I mostly needed to setup how to interact with **discord-player**, the rest is handled by the framework - shuffling, seeking, playing, querying.
 
 ### [Commands](./src/commands/music/)
 #### Structure
