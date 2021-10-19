@@ -55,7 +55,7 @@
     "@babel/eslint-parser": "^7.15.8",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/preset-env": "^7.15.8",
-    "@jest/globals": "^27.3.0",
+    "@jest/globals": "^27.3.1",
     "@types/jest": "^27.0.2",
     "babel-jest": "^27.3.1",
     "babel-preset-airbnb": "^5.0.0",
