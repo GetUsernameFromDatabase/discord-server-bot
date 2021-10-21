@@ -33,8 +33,8 @@ export default {
     }
 
     const queue = await player.createQueue(guild, {
-      metadata: channel,
       ...player.options,
+      metadata: channel,
     });
     try {
       if (!queue.connection) await queue.connect(member.voice.channel);
