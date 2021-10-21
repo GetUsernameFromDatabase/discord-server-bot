@@ -9,7 +9,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=14.18.0"
+    "node": ">=16.11.0"
   },
   "scripts": {
     "start": "node --trace-warnings -r dotenv/config ./src/Main.js",
