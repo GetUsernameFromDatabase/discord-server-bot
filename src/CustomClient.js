@@ -11,18 +11,17 @@ export default class DiscordBot extends Client {
     this.player = new Player(this, {
       leaveOnEnd: false, // Leaving manually on end - with cooldown
       leaveOnEmptyCooldown: 60_000,
-      bufferingTimeout: 4200,
       ytdlOptions: {
         requestOptions: {
           headers: {
             cookie: process.env.YouTubeCookie,
           },
-          quality: 'highestaudio',
-          // eslint-disable-next-line no-bitwise
-          highWaterMark: 1 << 25,
           filter: 'audioonly',
+          quality: 'highestaudio',
+          highWaterMark: 32 * 1024 * 1024,
           dlChunkSize: 0,
-          maxReconnects: 2,
+          maxReconnects: 3,
+          liveBuffer: 4000,
         },
       },
     });
