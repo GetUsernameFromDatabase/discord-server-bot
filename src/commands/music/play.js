@@ -36,6 +36,7 @@ export default {
       ...player.options,
       metadata: channel,
     });
+    queue.metadata = channel;
     try {
       if (!queue.connection) await queue.connect(member.voice.channel);
     } catch {
