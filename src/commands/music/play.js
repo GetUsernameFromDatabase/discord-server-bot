@@ -1,4 +1,5 @@
 import { QueryType } from 'discord-player';
+import playdl from 'play-dl';
 import Logging from '../../Logging.js';
 import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { categories } from '../Commands.js';
@@ -35,6 +36,15 @@ export default {
     const queue = await player.createQueue(guild, {
       ...player.options,
       metadata: channel,
+      // eslint-disable-next-line consistent-return
+      async onBeforeCreateStream(track, source) {
+        // only trap youtube source
+        if (source === 'youtube') {
+          // track here would be youtube track
+          return (await playdl.stream(track.url)).stream;
+          // we must return readable stream or void (returning void means telling discord-player to look for default extractor)
+        }
+      },
     });
     queue.metadata = channel;
     try {
