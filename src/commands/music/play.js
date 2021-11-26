@@ -39,9 +39,13 @@ export default {
       // eslint-disable-next-line consistent-return
       async onBeforeCreateStream(track, source) {
         // only trap youtube source
+        let { url: songURL } = track;
         if (source === 'youtube') {
           // track here would be youtube track
-          return (await playdl.stream(track.url)).stream;
+          if (songURL.includes('spotify')) {
+            songURL = (await playdl.search(songURL, { limit: 1 }))[0].url;
+          }
+          return (await playdl.stream(songURL)).stream;
           // we must return readable stream or void (returning void means telling discord-player to look for default extractor)
         }
       },
