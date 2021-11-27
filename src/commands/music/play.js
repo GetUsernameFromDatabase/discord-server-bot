@@ -39,11 +39,12 @@ export default {
       // eslint-disable-next-line consistent-return
       async onBeforeCreateStream(track, source) {
         // only trap youtube source
-        const { title, url } = track;
+        const { title, url, author } = track;
         let songURL = url;
         if (source === 'youtube') {
-          if (songURL.includes('spotify')) {
-            const searchResPlayDL = await playdl.search(title, {
+          const exp = /(youtu\.be|youtube\.com)/; // In order to make this hacky solution work
+          if (!exp.test(songURL)) {
+            const searchResPlayDL = await playdl.search(`${title} ${author}`, {
               fuzzy: true,
             });
             songURL = searchResPlayDL[0]?.url;
