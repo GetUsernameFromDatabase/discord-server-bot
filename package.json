@@ -58,7 +58,7 @@
     "@babel/preset-env": "^7.16.4",
     "@jest/globals": "^27.3.1",
     "@types/jest": "^27.0.3",
-    "babel-jest": "^27.3.1",
+    "babel-jest": "^27.4.2",
     "babel-preset-airbnb": "^5.0.0",
     "core-js": "^3.19.1",
     "eslint": "^8.3.0",
