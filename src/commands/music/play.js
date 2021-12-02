@@ -34,26 +34,31 @@ export default {
     }
 
     const queue = await player.createQueue(guild, {
-      ...player.options,
+      ...player.options, // leaveOnEnd is different without it
       metadata: channel,
-      // eslint-disable-next-line consistent-return
-      async onBeforeCreateStream(track, source) {
-        // only trap youtube source
+      // eslint-disable-next-line consistent-return, no-unused-vars
+      async onBeforeCreateStream(track, source, _queue) {
         const { title, url, author } = track;
+        const playDlSearchOpt = {
+          fuzzy: true,
+        };
+
         let songURL = url;
-        if (source === 'youtube') {
-          const exp = /(youtu\.be|youtube\.com)/; // In order to make this hacky solution work
-          if (!exp.test(songURL)) {
-            const searchResPlayDL = await playdl.search(`${title} ${author}`, {
-              fuzzy: true,
-            });
-            songURL = searchResPlayDL[0]?.url;
-          }
+        // since SpotifyBridge is not working for me
+        if (url.includes('spotify.')) {
+          const srchRslt = await playdl.search(
+            `${title} ${author}`,
+            playDlSearchOpt
+          );
+          songURL = srchRslt[0]?.url;
+        }
+        if (source === 'youtube' && songURL) {
           const streamer = await playdl.stream(songURL);
           return streamer.stream;
         }
       },
     });
+    // In order to change existing queue channel on command use
     queue.metadata = channel;
     try {
       if (!queue.connection) await queue.connect(member.voice.channel);
