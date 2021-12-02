@@ -21,7 +21,6 @@ export default class DiscordBot extends Client {
           highWaterMark: 32 * 1024 * 1024,
           dlChunkSize: 0,
           maxReconnects: 3,
-          liveBuffer: 4000,
         },
       },
     });

@@ -1,3 +1,4 @@
+import Logging from '../../Logging.js';
 import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { filterInt } from '../../TypeCheck.js';
 import { categories } from '../Commands.js';
@@ -31,7 +32,14 @@ export default {
     }
     const time = arg * 1000;
 
-    await queue.seek(time);
+    try {
+      await queue.seek(time);
+    } catch (error) {
+      message.reply({ content: `❌ | Seeking failed :(` });
+      Logging.Error(error);
+      return;
+    }
+
     message.reply({ content: `✅ | Seeked to ${time / 1000} seconds` });
   },
 };
