@@ -3,10 +3,10 @@ import { beforeAll, jest } from '@jest/globals';
 import * as Discord from 'discord.js';
 import * as jestExtended from 'jest-extended'; // Needed for types
 import Giveaways, { givFile } from '../src/Giveaways.js';
-import { ID, client } from '../src/Identification.js';
-import * as Messaging from '../src/Messaging.js';
+import * as Messaging from '../src/client/Messaging.js';
 import { prefix } from '../src/commands/Commands.js';
 import givCmd from '../src/commands/giveaways/changeGivChan.js';
+import { ID, client } from '../src/helpers/Identification.js';
 
 jest.mock('node-fetch');
 expect.extend(jestExtended);
@@ -45,7 +45,7 @@ const mockAxiosGet = jest.fn(() => {
   return Promise.resolve(response);
 });
 
-const WS = jest.requireActual('../src/WebScraping.js');
+const WS = jest.requireActual('../src/services/WebScraping.js');
 const axios = jest.requireActual('axios').default;
 
 jest.spyOn(WS, 'SimpleFetch').mockImplementation(mockSimpleFetch);

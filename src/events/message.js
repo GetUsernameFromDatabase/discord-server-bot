@@ -1,5 +1,5 @@
 import Logging from '../Logging.js';
-import { CheckArgLength } from '../Messaging.js';
+import { CheckArgLength } from '../client/Messaging.js';
 import {
   prefix,
   GetCommand,

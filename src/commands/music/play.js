@@ -1,7 +1,7 @@
 import { QueryType } from 'discord-player';
 import playdl from 'play-dl';
 import Logging from '../../Logging.js';
-import { isUserInVoiceChannel } from '../../PlayerEvents.js';
+import { isUserInVoiceChannel } from '../../client/PlayerEvents.js';
 import { categories } from '../Commands.js';
 
 export default {

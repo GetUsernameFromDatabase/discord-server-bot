@@ -1,11 +1,11 @@
 import { pathToFileURL, fileURLToPath } from 'url';
 import { Collection } from 'discord.js';
-import BotActivity, { CreateActivity as CA } from './BotActivity.js';
-import { GetImportsFromFolders } from './DynamicImport.js';
 import Giveaways from './Giveaways.js';
-import { Update, client } from './Identification.js';
 import Logging from './Logging.js';
+import BotActivity, { CreateActivity as CA } from './client/BotActivity.js';
 import { LoadCommands, prefix } from './commands/Commands.js';
+import { GetImportsFromFolders } from './helpers/DynamicImport.js';
+import { Update, client } from './helpers/Identification.js';
 
 function LoadEvents() {
   const promises = GetImportsFromFolders(pathToFileURL('./src/events'));

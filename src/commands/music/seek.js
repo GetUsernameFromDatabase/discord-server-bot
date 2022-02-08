@@ -1,6 +1,6 @@
 import Logging from '../../Logging.js';
-import { isUserInVoiceChannel } from '../../PlayerEvents.js';
 import { filterInt } from '../../TypeCheck.js';
+import { isUserInVoiceChannel } from '../../client/PlayerEvents.js';
 import { categories } from '../Commands.js';
 
 export default {

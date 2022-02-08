@@ -1,6 +1,6 @@
 import { Client, User, Guild, Intents } from 'discord.js';
-import DiscordBot from './CustomClient.js';
-import Logging from './Logging.js';
+import Logging from '../Logging.js';
+import DiscordBot from '../client/CustomClient.js';
 
 const intents = [
   Intents.FLAGS.GUILDS,

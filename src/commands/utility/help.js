@@ -1,7 +1,7 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
 import { MessageEmbed } from 'discord.js';
-import { client } from '../../Identification.js';
-import { GetMsgEmbed } from '../../Messaging.js';
+import { GetMsgEmbed } from '../../client/Messaging.js';
+import { client } from '../../helpers/Identification.js';
 import {
   prefix,
   categories,

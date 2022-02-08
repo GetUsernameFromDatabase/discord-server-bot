@@ -1,4 +1,4 @@
-import { isUserInVoiceChannel } from '../../PlayerEvents.js';
+import { isUserInVoiceChannel } from '../../client/PlayerEvents.js';
 import { categories } from '../Commands.js';
 
 export default {
