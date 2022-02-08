@@ -85,7 +85,7 @@ export class Message extends Discord.Message {
 }
 
 export class MessageManager extends Discord.MessageManager {
-  // eslint-disable-next-line no-underscore-dangle, no-unused-vars
+  // eslint-disable-next-line no-underscore-dangle, no-unused-vars, default-param-last
   async _fetchMany(options = {}, cache) {
     /** @type {TextChannel} */
     const chan = this.channel;
