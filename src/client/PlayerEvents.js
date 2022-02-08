@@ -1,5 +1,5 @@
 import { GuildMember } from 'discord.js';
-import Logging from './Logging.js';
+import Logging from '../Logging.js';
 
 const leaveOnEndCooldown = 30_000;
 /** @type {NodeJS.Timeout} */

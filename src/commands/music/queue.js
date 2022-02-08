@@ -1,4 +1,4 @@
-import { GetMsgEmbed } from '../../Messaging.js';
+import { GetMsgEmbed } from '../../client/Messaging.js';
 import { categories } from '../Commands.js';
 
 export default {

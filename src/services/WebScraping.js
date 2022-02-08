@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { load } from 'cheerio';
 import TurndownService from 'turndown';
-import Logging from './Logging.js';
-import { ModifyCredits } from './TextManipulation.js';
+import Logging from '../Logging.js';
+import { ModifyCredits } from '../TextManipulation.js';
 
 /** @param {String} URL The url for get request */
 export function SimpleFetch(URL) {
@@ -32,7 +32,7 @@ function HTMLIntoMD(html = '') {
 
 /** Gets giv announcements from steamcommunity.com/.../announcements/?
  * @param {String} html
- * @returns {import('./interfaces/giveaways').GiveawayArray} */
+ * @returns {import('../interfaces/giveaways').GiveawayArray} */
 export function GetSteamAnnouncements(html) {
   const announcements = [];
   const $ = load(html, { scriptingEnabled: false });
@@ -53,7 +53,7 @@ export function GetSteamAnnouncements(html) {
 
 /** Gets giveaways from grabfreegames.com
  * @param {String} html
- * @returns {import('./interfaces/giveaways').GiveawayArray} */
+ * @returns {import('../interfaces/giveaways').GiveawayArray} */
 export async function GrabFreeGames(html) {
   /** @type {{title: String,url:String, body:Promise<String>, imageURL: String}[]} */
   const giveaways = [];

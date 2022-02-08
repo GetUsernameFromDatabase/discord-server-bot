@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js';
-import { ID, client } from './Identification.js';
-import Logging from './Logging.js';
-import { SegmentString } from './TextManipulation.js';
+import Logging from '../Logging.js';
+import { SegmentString } from '../TextManipulation.js';
+import { ID, client } from '../helpers/Identification.js';
 
 export const blank = '\u200B';
 

@@ -1,6 +1,6 @@
-import { GetFolders, GetImportsFromFolders } from '../DynamicImport.js';
-import { client } from '../Identification.js';
 import { Similarity } from '../TextManipulation.js';
+import { GetFolders, GetImportsFromFolders } from '../helpers/DynamicImport.js';
+import { client } from '../helpers/Identification.js';
 
 export const prefix = '€';
 export const categories = {

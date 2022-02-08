@@ -1,4 +1,4 @@
-import * as Messaging from '../src/Messaging.js';
+import * as Messaging from '../src/client/Messaging.js';
 
 jest.mock('node-fetch');
 

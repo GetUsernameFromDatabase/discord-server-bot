@@ -1,12 +1,12 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { ID } from './Identification.js';
 import Logging, { minInMs } from './Logging.js';
-import { GetMsgEmbed, MassMessageSend } from './Messaging.js';
+import { GetMsgEmbed, MassMessageSend } from './client/Messaging.js';
+import { ID } from './helpers/Identification.js';
 import {
   GrabFreeGames,
   GetSteamAnnouncements,
   SimpleFetch,
-} from './WebScraping.js';
+} from './services/WebScraping.js';
 
 export const givFile = {
   location: './data/FetchedGiveaways.json',

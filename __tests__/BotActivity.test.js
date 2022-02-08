@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import * as Discord from 'discord.js';
-import BotActivity, { CreateActivity as CA } from '../src/BotActivity.js';
-import { ID, client } from '../src/Identification.js';
+import BotActivity, {
+  CreateActivity as CA,
+} from '../src/client/BotActivity.js';
+import { ID, client } from '../src/helpers/Identification.js';
 
 jest.mock('node-fetch');
 jest.useFakeTimers('modern');
