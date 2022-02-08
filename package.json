@@ -38,7 +38,7 @@
     "@babel/types": "^7.17.0",
     "@discord-player/extractor": "^3.0.2",
     "@discordjs/opus": "^0.7.0",
-    "@discordjs/voice": "^0.7.5",
+    "@discordjs/voice": "^0.8.0",
     "axios": "^0.25.0",
     "babel-plugin-flow-to-typescript": "^0.6.0",
     "cheerio": "^1.0.0-rc.10",
