@@ -8,8 +8,10 @@ import { ModifyCredits } from './TextManipulation.js';
 export function SimpleFetch(URL) {
   return axios
     .get(URL)
-    .then((response) => Promise.resolve(response.data))
-    .catch((error) => Promise.reject(error));
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
 }
 
 function HTMLIntoMD(html = '') {

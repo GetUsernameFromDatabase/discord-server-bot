@@ -55,13 +55,15 @@ jest.spyOn(axios, 'get').mockImplementation(mockAxiosGet);
 const SpyMassMessageSend = jest.spyOn(Messaging, 'MassMessageSend');
 
 async function WaitTillNoNewMessages(chan) {
+  /* eslint-disable no-promise-executor-return */
   const wt = 150; // Wait Time in ms
   await new Promise((r) => setTimeout(r, 75)); // Waits for spamming to start
   while (wt < Date.now() - (chan.lastMessage?.createdTimestamp || 0)) {
     // eslint-disable-next-line no-await-in-loop
     await new Promise((r) => setTimeout(r, wt));
   }
-  return Promise.resolve('DONE WAITING');
+  return 'DONE WAITING';
+  /* eslint-enable no-promise-executor-return */
 }
 
 function EmptyGiveawayJSON() {
