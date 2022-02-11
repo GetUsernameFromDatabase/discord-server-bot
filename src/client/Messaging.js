@@ -66,7 +66,7 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
     .setURL(url.trim())
     .addFields(embedFields)
     .setImage(imageURL)
-    .setFooter(`Bot by ${ID.Me.tag}`, ID.Me.avatarURL())
+    .setFooter({ text: `Bot by ${ID.Me.tag}`, iconURL: ID.Me.avatarURL() })
     .setTimestamp();
   return MesEmb;
 }
@@ -96,6 +96,16 @@ export function IsDuplicateMessage(msgToCheck, messages) {
 }
 
 /** Messages should be all the same type
+ * @param {Discord.TextChannel} channel channel from where to fetch messages
+ * @param {Number} limit Messages to send */
+export async function FetchMessages(channel, limit = 100) {
+  const maxChanMsgs = await channel.messages.fetch({ limit }).catch((error) => {
+    Logging.Error(error, undefined, false);
+  });
+  return maxChanMsgs;
+}
+
+/** Messages should be all the same type
  * @param {Discord.TextChannel} channel TextChannel where to send
  * @param {Discord.MessageEmbed[] | Discord.Message[]} messages Messages to send
  * @param {Boolean} [checkDupes] Default is true
@@ -106,11 +116,7 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
     return true;
   }
 
-  const maxChanMsgs = await channel.messages
-    .fetch({ limit: 100 })
-    .catch((error) => {
-      Logging.Error(error, undefined, false);
-    });
+  const maxChanMsgs = await FetchMessages(channel);
   if (typeof maxChanMsgs === 'undefined') {
     Logging.Error(`Couldn't fetch ${channel.name} messages`);
     return false;
