@@ -1,5 +1,4 @@
 import { QueryType } from 'discord-player';
-import playdl from 'play-dl';
 import Logging from '../../Logging.js';
 import { isUserInVoiceChannel } from '../../client/PlayerEvents.js';
 import { categories } from '../Commands.js';
@@ -36,27 +35,6 @@ export default {
     const queue = await player.createQueue(guild, {
       ...player.options, // leaveOnEnd is different without it
       metadata: channel,
-      // eslint-disable-next-line consistent-return, no-unused-vars
-      async onBeforeCreateStream(track, source, _queue) {
-        const { title, url, author } = track;
-        const playDlSearchOpt = {
-          fuzzy: true,
-        };
-
-        let songURL = url;
-        // since SpotifyBridge is not working for me
-        if (url.includes('spotify.')) {
-          const srchRslt = await playdl.search(
-            `${title} ${author}`,
-            playDlSearchOpt
-          );
-          songURL = srchRslt[0]?.url;
-        }
-        if (source === 'youtube' && songURL) {
-          const streamer = await playdl.stream(songURL);
-          return streamer.stream;
-        }
-      },
     });
     // In order to change existing queue channel on command use
     queue.metadata = channel;
