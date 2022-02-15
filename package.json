@@ -50,7 +50,7 @@
     "turndown": "^7.1.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.17.0",
+    "@babel/cli": "^7.17.3",
     "@babel/core": "^7.17.2",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
