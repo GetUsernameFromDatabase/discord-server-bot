@@ -1,11 +1,11 @@
-import { Client, User, Guild, Intents } from 'discord.js';
+import { Client, User, Guild, GatewayIntentBits } from 'discord.js';
 import Logging from '../Logging.js';
 import DiscordBot from '../client/CustomClient.js';
 
 const intents = [
-  Intents.FLAGS.GUILDS,
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.GUILD_VOICE_STATES,
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.GuildVoiceStates
 ];
 
 export const client = new DiscordBot({ intents });

@@ -5,20 +5,25 @@ import { ID, client } from '../helpers/Identification.js';
 
 export const blank = '\u200B';
 
+/**
+ * @returns {Discord.EmbedField}
+ */
 function stringWithHeaderIntoEmbedField(string) {
   const splitter = '\n';
   const strings = string.split(splitter);
 
   const title = strings.shift().trim();
   const restOfString = strings.join(splitter);
-  return Discord.MessageEmbed.normalizeField(
-    title || blank,
-    restOfString || blank
-  );
+  return {
+    name: title || blank,
+    value: restOfString || blank,
+  };
 }
 
 /** Accounts for MD headings while making embedFields
- * @param {String[]} stringsToBeFields */
+ * @param {String[]} stringsToBeFields
+ * @returns {Discord.EmbedField}
+ */
 function MdHAsEmbedFieldTitle(stringsToBeFields) {
   /** @type {Discord.EmbedFieldData[]} */
   const embedFields = [];
@@ -31,7 +36,7 @@ function MdHAsEmbedFieldTitle(stringsToBeFields) {
       if (!strWHS) continue;
       const embedField = strWHS.startsWith(mdH)
         ? stringWithHeaderIntoEmbedField(strWHS)
-        : Discord.MessageEmbed.normalizeField(blank, strWHS);
+        : { name: blank, value: strWHS };
       embedFields.push(embedField);
     }
   }
@@ -50,17 +55,17 @@ function stringsToEmbedField(strings) {
 /**
  * @param {String | String[] | Discord.EmbedField | Discord.EmbedField[]} fields
  * @param options
- * @returns {Discord.MessageEmbed} */
+ * @returns {Discord.EmbedBuilder} */
 export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
   let embedFields =
     typeof fields === 'string' ? stringsToEmbedField(fields) : fields;
   if (Array.isArray(fields)) {
     embedFields = fields.map((field) =>
-      typeof field === 'string' ? stringsToEmbedField(field) : field
+      typeof field === 'string' ? stringsToEmbedField(field) : field,
     );
   }
 
-  const MesEmb = new Discord.MessageEmbed()
+  const MesEmb = new Discord.EmbedBuilder()
     .setColor('#F1C40F')
     .setTitle(title.trim())
     .setURL(url.trim())
@@ -72,24 +77,21 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
 }
 
 /**
- * @param {String | Discord.MessageEmbed |Discord.Message} msgToCheck
- * @param {{content: string;embeds: Discord.MessageEmbed[]}[]} messages to check against
+ * @param {String | Discord.EmbedBuilder | Discord.Message} msgToCheck
+ * @param {Discord.Message[]} messages to check against
  * @return {Boolean} Wheter it was a duplicate or not */
 export function IsDuplicateMessage(msgToCheck, messages) {
-  const msgEmbedTypes = ['rich', 'image', 'video', 'gifv', 'article', 'link'];
+  const checkTitle = msgToCheck.data?.title
+  /** @param {Discord.Message} obj */
   const EmbedCheck = (obj) => {
     const objEmb = obj.embeds[0];
-    const titles = {
-      obj: objEmb?.title?.toLowerCase(),
-      msg: msgToCheck.title.toLowerCase(),
-    };
-    const cond1 = titles.obj === titles.msg;
-    return cond1;
+    return checkTitle === objEmb?.data?.title;
   };
+  /** @param {Discord.Message} obj */
   const contentCheck = (obj) =>
     obj.content === (msgToCheck.content ?? msgToCheck);
 
-  const callback = msgEmbedTypes.includes(msgToCheck.type)
+  const callback = checkTitle
     ? EmbedCheck
     : contentCheck;
   return messages.some((element) => callback(element));
@@ -107,7 +109,7 @@ export async function FetchMessages(channel, limit = 100) {
 
 /** Messages should be all the same type
  * @param {Discord.TextChannel} channel TextChannel where to send
- * @param {Discord.MessageEmbed[] | Discord.Message[]} messages Messages to send
+ * @param {Discord.EmbedBuilder[] | Discord.Message[]} messages Messages to send
  * @param {Boolean} [checkDupes] Default is true
  * @returns {Boolean} Wether it was successful or not */
 export async function MassMessageSend(channel, messages, checkDupes = true) {
@@ -126,9 +128,9 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
     .filter((msg) => msg.author.id === client.user.id)
     .map((msg) => ({ content: msg.content, embeds: msg.embeds }));
 
-  /** @type {{Discord.MessageEmbed[] | Discord.Message[]}} */
+  /** @type {{Discord.EmbedBuilder[] | Discord.Message[]}} */
   const checkedMessages = messages.filter(
-    (msg) => !IsDuplicateMessage(msg, filteredChanMsgs)
+    (msg) => !IsDuplicateMessage(msg, filteredChanMsgs),
   );
   for (const msg of checkedMessages) {
     if (typeof msg === 'string') channel.send(msg);
