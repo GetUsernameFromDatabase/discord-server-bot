@@ -10,7 +10,7 @@ import {
 
 export const givFile = {
   location: './data/FetchedGiveaways.json',
-  encoding: 'utf-8',
+  encoding: 'utf8',
 };
 
 export default class Giveaways {

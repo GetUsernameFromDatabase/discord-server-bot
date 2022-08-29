@@ -15,6 +15,7 @@
     "start": "node --trace-warnings -r dotenv/config ./src/index.js",
     "build": "babel src/ -d lib/",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "jest --forceExit --detectOpenHandles"
   },
   "jest": {
@@ -46,6 +47,7 @@
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.1",
     "ffmpeg-static": "^5.1.0",
+    "node-fetch": "^3.2.10",
     "npm": "^8.18.0",
     "turndown": "^7.1.1"
   },
