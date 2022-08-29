@@ -61,18 +61,19 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
     typeof fields === 'string' ? stringsToEmbedField(fields) : fields;
   if (Array.isArray(fields)) {
     embedFields = fields.map((field) =>
-      typeof field === 'string' ? stringsToEmbedField(field) : field,
+      typeof field === 'string' ? stringsToEmbedField(field) : field
     );
   }
 
   const MesEmb = new Discord.EmbedBuilder()
     .setColor('#F1C40F')
     .setTitle(title.trim())
-    .setURL(url.trim())
     .addFields(embedFields)
-    .setImage(imageURL)
     .setFooter({ text: `Bot by ${ID.Me.tag}`, iconURL: ID.Me.avatarURL() })
     .setTimestamp();
+  if (url) MesEmb.setURL(url.trim());
+  if (imageURL) MesEmb.setImage(imageURL);
+
   return MesEmb;
 }
 
@@ -81,7 +82,7 @@ export function GetMsgEmbed(fields, { title = '', url = '', imageURL = '' }) {
  * @param {Discord.Message[]} messages to check against
  * @return {Boolean} Wheter it was a duplicate or not */
 export function IsDuplicateMessage(msgToCheck, messages) {
-  const checkTitle = msgToCheck.data?.title
+  const checkTitle = msgToCheck.data?.title;
   /** @param {Discord.Message} obj */
   const EmbedCheck = (obj) => {
     const objEmb = obj.embeds[0];
@@ -91,9 +92,7 @@ export function IsDuplicateMessage(msgToCheck, messages) {
   const contentCheck = (obj) =>
     obj.content === (msgToCheck.content ?? msgToCheck);
 
-  const callback = checkTitle
-    ? EmbedCheck
-    : contentCheck;
+  const callback = checkTitle ? EmbedCheck : contentCheck;
   return messages.some((element) => callback(element));
 }
 
@@ -130,7 +129,7 @@ export async function MassMessageSend(channel, messages, checkDupes = true) {
 
   /** @type {{Discord.EmbedBuilder[] | Discord.Message[]}} */
   const checkedMessages = messages.filter(
-    (msg) => !IsDuplicateMessage(msg, filteredChanMsgs),
+    (msg) => !IsDuplicateMessage(msg, filteredChanMsgs)
   );
   for (const msg of checkedMessages) {
     if (typeof msg === 'string') channel.send(msg);

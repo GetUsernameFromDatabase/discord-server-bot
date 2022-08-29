@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable jest/no-commented-out-tests */
 import RedditFetch from '../src/services/Reddit.js';
 
 test('hot', async () => {

@@ -5,7 +5,8 @@ import DiscordBot from '../client/CustomClient.js';
 const intents = [
   GatewayIntentBits.Guilds,
   GatewayIntentBits.GuildMessages,
-  GatewayIntentBits.GuildVoiceStates
+  GatewayIntentBits.GuildVoiceStates,
+  GatewayIntentBits.MessageContent,
 ];
 
 export const client = new DiscordBot({ intents });
@@ -16,7 +17,9 @@ export const ID = {
     id: '186439588229677056',
     avatar: '24c90ae8f89d2b9989ba3cb4ff7e6eb1',
   }),
-  Server: new Guild(new Client({ intents }), { name: 'Placeholder guild' }),
+  Server: new Guild(new Client({ intents }), {
+    name: 'Placeholder guild',
+  }),
 };
 
 export const Update = {

@@ -66,11 +66,11 @@ export default function addEventsToPlayer(player) {
  * @param {import('discord.js').Message} message */
 export function isUserInVoiceChannel(message) {
   const { guild, member } = message;
+  const { me } = guild.members;
   if (
     !(member instanceof GuildMember) ||
     !member.voice.channel ||
-    (guild.me.voice.channelId &&
-      member.voice.channelId !== guild.me.voice.channelId)
+    (me.voice.channelId && member.voice.channelId !== me.voice.channelId)
   ) {
     return message.reply({
       content: 'You are not in a voice channel!',

@@ -160,7 +160,7 @@ describe('giveaway interactions', () => {
     }
   });
 
-  test.todo('test guildOnly parameter');
+  test.todo('guildOnly parameter');
 
   it('should react properly to the channel command', async () => {
     expect.assertions(1);
