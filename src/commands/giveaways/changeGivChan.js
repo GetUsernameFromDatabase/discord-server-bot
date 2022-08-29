@@ -1,4 +1,4 @@
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import { client } from '../../helpers/Identification.js';
 import { categories } from '../Commands.js';
 // https://discord.com/developers/docs/topics/permissions
@@ -8,7 +8,7 @@ export default {
   description: 'Sends giveaways to this channel',
   category: categories.Giveaways,
   guildOnly: true,
-  permissions: Permissions.FLAGS.MANAGE_CHANNELS,
+  permissions: PermissionsBitField.Flags.ManageChannels,
   /**
    * @param {import('discord.js').Message} message
    * @param {String[]} args */

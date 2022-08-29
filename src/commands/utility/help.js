@@ -1,5 +1,4 @@
 // https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
-import { MessageEmbed } from 'discord.js';
 import { GetMsgEmbed } from '../../client/Messaging.js';
 import { client } from '../../helpers/Identification.js';
 import {
@@ -15,10 +14,14 @@ import {
  * @param {Boolean} inline =[true], if inline EmbedField or not
  */
 function MakeEmbedFields(array, inline = true) {
-  return array.map(([k, v]) => MessageEmbed.normalizeField(k, v, inline));
+  return array.map(([k, v]) => {
+    /** @type {import('discord.js').EmbedField} */
+    const embedField = { name: k, value: v, inline: inline };
+    return embedField;
+  });
 }
 
-/** Gets a MessageEmbed of all commands with a category\
+/** Gets a EmbedBuilder of all commands with a category\
  * Commands with the same category will shown in the same field */
 function HelpForAllCommands() {
   const CmdCat = {};
@@ -32,7 +35,7 @@ function HelpForAllCommands() {
   return GetMsgEmbed(embedFields, { title: 'All of my commands' });
 }
 
-/** Gets a MessageEmbed of a command with descriptions\
+/** Gets a EmbedBuilder of a command with descriptions\
  * @param {import('../../interfaces/commands').CommandObject} command
  * parameters that will be shown:
  * - aliases
@@ -43,7 +46,7 @@ function HelpForAllCommands() {
 function HelpForCommand(command) {
   const wantedParameters = ['aliases', 'description', 'usage', 'cooldown'];
   const filteredParameters = Object.entries(command).filter(([key]) =>
-    wantedParameters.includes(key)
+    wantedParameters.includes(key),
   );
   const proccesedEntries = filteredParameters.map(([key, val]) => {
     // Deals with different parameters
@@ -86,7 +89,7 @@ export default {
     if (!cmd) {
       const [, predictions] = GetMostSimilarCommands(arg);
       return message.reply(
-        `did you want to know about ${PredictionsAsString(predictions)}?`
+        `did you want to know about ${PredictionsAsString(predictions)}?`,
       );
     }
     const embeds = [HelpForCommand(cmd)];
