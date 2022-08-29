@@ -15,7 +15,7 @@ export default {
   async execute(message, args) {
     const { client, member, guild, guildId, channel } = message;
     if (isUserInVoiceChannel(message)) return;
-    /** @type {import('../../CustomClient').default} */
+    /** @type {import('../../client/CustomClient').default} */
     const { player } = client;
 
     const query = args.join(' ');
