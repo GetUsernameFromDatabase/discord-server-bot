@@ -30,7 +30,7 @@ rules:
   no-restricted-syntax: 0
 
   # --- Prettier ---
-  prettier/prettier: ["error", {singleQuote: true, endOfLine: auto}]
+  prettier/prettier: ["error", {singleQuote: true, endOfLine: auto, trailingComma: es5 }]
 
   # --- IMPORT ---
   # Static Analysis
