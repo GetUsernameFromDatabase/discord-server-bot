@@ -1,3 +1,4 @@
+import { ActivityType } from 'discord.js';
 import Logging, { minInMs } from '../Logging.js';
 import { prefix } from '../commands/Commands.js';
 import { client } from '../helpers/Identification.js';
@@ -6,13 +7,13 @@ import { client } from '../helpers/Identification.js';
  * @param {String} name Name of the activity displayed
  * @param {Number} duration How long activity is displayed in min\
  * if it's 0, then the duration will be calculated based on str.length
- * @param {import('discord.js').ActivityType} type [PLAYING]
+ * @param {ActivityType} type
  * @param {Boolean} repeat If the Activity is supposed to be after a certain interval
  */
 export function CreateActivity(
   name,
   duration = 1,
-  type = 'PLAYING',
+  type = ActivityType.Playing,
   repeat = false
 ) {
   if (!Number.isFinite(duration) || duration < 0) {
@@ -24,19 +25,16 @@ export function CreateActivity(
     // eslint-disable-next-line no-param-reassign
     duration = name.length / 60;
   }
-  return {
-    name,
-    duration,
-    type: type.toUpperCase(),
-    several: repeat,
-  };
+  return { name, duration, type, several: repeat };
 }
 
 export default class BotActivity {
   iteration = 0; // Current activity index
 
   constructor(
-    activities = [CreateActivity(`${prefix}help`, 1.5, 'WATCHING', true)]
+    activities = [
+      CreateActivity(`${prefix}help`, 1.5, ActivityType.Watching, true),
+    ]
   ) {
     // Repeats activities that should
     const nonRepAct = [];
@@ -45,6 +43,7 @@ export default class BotActivity {
       nonRepAct.push(x);
       return false;
     });
+    /** @type {{ name: string; duration: number; type: ActivityType; several: boolean }[]} */
     this.activities = [];
 
     const raI = 3; // Interval of repetitive activities
