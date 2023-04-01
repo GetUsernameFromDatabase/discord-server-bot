@@ -1,85 +1,139 @@
-# Goal
+# Discord Server Bot <!-- omit in toc -->
 
-To make a discord bot for my own personal server  
+This is a discord server bot made for personal use  
 _This is not meant to be used for multiple discord servers_
 
-# Usage
+This bot:
 
-The [guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
-I found useful  
+- fetches giveaways
+- plays music
+
+## Table Of Contents
+
+- [Table Of Contents](#table-of-contents)
+- [Usage](#usage)
+  - [Continous Run](#continous-run)
+  - [Setup environment variables](#setup-environment-variables)
+  - [Tests](#tests)
+- [Commands](#commands)
+- [Giveaways](#giveaways)
+  - [Fetching](#fetching)
+  - [Conversion](#conversion)
+  - [Conversion Result](#conversion-result)
+  - [Posting Giveaways](#posting-giveaways)
+- [Memes](#memes)
+- [Music](#music)
+- [Useful Links](#useful-links)
+
+## Usage
+
+[Table Of Contents](#table-of-contents)
+
+You can follow a [guide](https://discordjs.guide/#before-you-begin) to get started
+
 Setup your bot application in the [Discord developer portal](https://discord.com/developers/applications)
 
-## Setup environment variables
+Install yarn -- [guide](https://classic.yarnpkg.com/lang/en/docs/install/)
+
+```bash
+npm install --global yarn
+```
+
+Run the script with
+
+```bash
+yarn start
+```
+
+### Continous Run
+
+If you want to have it running continously I reccomend [pm2](https://github.com/Unitech/pm2)
+
+```bash
+npm install --global pm2
+```
+
+Install [pm2-logrotate](https://github.com/keymetrics/pm2-logrotate) to keep the log files limited size
+
+```bash
+pm2 install pm2-logrotate
+```
+
+This project has setup [pm2 config file](./pm2.config.js) so you can easily get started using the following command
+> NB: this only works on linux systems
+
+```bash
+pm2 start pm2.config.cjs
+```
+
+### Setup environment variables
 
 For environment variables I use [dotenv](https://github.com/motdotla/dotenv)
 
 example [.env](./.env.example)
 
 ```ini
-TOKEN = YOUR_TOKEN_KEY_HERE
-ServerID = YOUR_SERVER_ID_HERE
-YouTubeCookie = null
+DISCORD_CLIENT_ID=XXX
+DISCORD_CLIENT_TOKEN="XXX"
+DISCORD_CLIENT_PUBKEY="XXX"
 
-TestChanID = TESTING_CHANNEL_ID
-GiveawaysID = CHANNEL_WHERE_GIVEAWAYS_WILL_BE_POSTED
+DISCORD_GUILD_ID=XXX
+TEST_CHANNEL_ID=XXX
+GIVEAWAYS_CHANNEL_ID=XXX
+DEV=FALSE
 ```
 
-Channel IDs will be used to find the channel associated with the ID:
+The following environment variables are required to run the application:
 
-- GiveawaysID - the channel where giveaways will be posted when the bot is run.  
-  This channel can be changed during runtime with a command (€giveaways).  
-  Currently the change won't be saved after program is closed
+- `DISCORD_CLIENT_ID`: The client ID of your Discord bot.
+- `DISCORD_CLIENT_TOKEN`: The token of your Discord bot.
+- `DISCORD_CLIENT_PUBKEY`: The public key of your Discord bot.
 
-## To run
+- `DISCORD_GUILD_ID`: The ID of the Discord server (guild) that the bot will operate in.
+- `TEST_CHANNEL_ID`: The ID of the channel in the Discord server used for testing.
+- `GIVEAWAYS_CHANNEL_ID`: The ID of the channel in the Discord server where giveaways will be held.
 
-install node packages using `npm install`  
-start the bot with `npm start`
+- `DEV`: Set to `TRUE` if running the bot in a development environment, otherwise set to `FALSE`.
+  - Can be set via command line.
+
+Make sure to replace the placeholder values (`XXX`) with your actual values before running the application.
+
+### Tests
+
+> TODO: Fix problems that have occured since switching to typescript and upgrading packages
 
 For testing I use [Jest](https://jestjs.io/) testing framework  
-Tests can be run with `npm test`
-
-For linting I use [ESLint](https://eslint.org/)  
-Linter can be run with `npm run lint`
-
-# About the bot itself
+Tests can be run with `yarn test`
 
 ## Commands
 
-Command handler is pretty much the same as in the Discord.js [guide](https://discordjs.guide/command-handling/adding-features.html)
-
-Currently available commands are:
-
-- help [arg] - creates a MessageEmbed of all available commands
-  if argument is used then information about the specified command is given
-- giveaways - changes the channel where giveaways are posted and then posts the giveaways
+Commands are made using [slash-create](https://slash-create.js.org/#/) -- makes it easy to handle and create discord slash commands
 
 ## Giveaways
 
-### Fetching Giveaways
+[Giveaway Commands](./src/commands/giveaways/)
 
-HTTP requests are made using [axios](https://github.com/axios/axios)
+### Fetching
 
-#### Fetch Section
-
-This bot mainly tries to get giveaways from https://grabfreegames.com/  
+This bot mainly tries to get giveaways from <https://grabfreegames.com/>  
 Should that fail it will then try to get them from
 [GrabFreeGames steam group page](https://steamcommunity.com/groups/GrabFreeGames/announcements/listing)
 
-#### Conversion
+### Conversion
 
 Fetched html will be turned into a usable format using [Cheerio](https://cheerio.js.org/) and
 [Turndown](https://github.com/domchristie/turndown) - used to convert HTML into MD.  
 Resulting string will be turned into a MessageEmbed.
 
-#### Conversion Result
+### Conversion Result
 
 - URL used during fetch will become the title url to link the source
 - Border colour of MessageEmbed is the same colour that the bot has in the Server's member list
 - Image is only displayed if the source has it
 
-![](./.github/examples/GrabFreeGames_EmbedExample.png)
+![GrabFreeGames_EmbedExample](./.github/examples/GrabFreeGames_EmbedExample.png)
 
-#### Posting Giveaways
+### Posting Giveaways
 
 When the bot runs giveaways will be posted into the giveaway channel.  
 The bot will check if a MessageEmbed with the same title can already be found in the channel.
@@ -93,58 +147,26 @@ This file will be generated in the [data](./data) folder
 
 ## Memes
 
-### TO DO
+[Meme Commands](./src/commands/memes/)
 
-Make this bot get and send memes
+> TODO: Plan is to have this bot send memes taken from reddit
 
 ## Music
 
+[Music Commands](./src/commands/music/)
+
 For music bot functionality I use [discord-player](https://discord-player.js.org/) which handles the nitty gritty.  
-I mostly needed to setup how to interact with **discord-player**, the rest is handled by the framework - shuffling, seeking, playing, querying.
 
-### [Commands](./src/commands/music/)
+## Useful Links
 
-#### Structure
+[Regex101](https://regex101.com/) -- extremely helpful in the making of regular expressions.
 
-- **command** - short description **|** &nbsp; **[required parameter]** _(optional parameter)_
-- - _alias1_
-- - _alias2_
+[Discord.js guide](https://discordjs.guide/) -- starting the project from the ground up
 
----
+[Discord.js documentation](https://discord.js.org/#/docs/discord.js/main/general/welcome)
 
-- **clear** - _Clears the queue_
-- **jump** - _Jumps to a specific track_ **|** &nbsp; **[track number]**
-- **nowplaying** - _Displays the currently playing song_
-- - _np_
-- **pause** - _Pauses the current song_
-- **play** - _Query a song to play in your voice channel_ **|** &nbsp; **[query]**
-- **queue** - _Display the queue_ **|** _(page)_
-- - _q_
-- **resume** - _Resume a paused song_
-- **seek** - _Seek to the given time_ **|** &nbsp; **[timeInSeconds]**
-- **shuffle** - _Shuffles the queue_
-- **skip** - _Skips the current song_
-- - _next_
-- **stop** - _Stops the music bot and empties the queue_
+[PM2 documentation](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/)
 
-## Misc
+[slash-create documentation](https://slash-create.js.org/#/docs/main/latest/general/welcome)
 
-### Creation of [MessageEmbeds](https://discord.js.org/#/docs/main/stable/class/MessageEmbed)
-
-The bot creates MessageEmbeds using strings, [EmbedField](https://discord.js.org/#/docs/main/stable/typedef/EmbedField)
-or their array variants as fields argument.
-
-#### Using Strings
-
-Strings are segmented into <1024 length parts since EmbedField value cannot be bigger than that.
-It is converted using a regular expression which splits the string till the last newline which doesn't exceed the limit.  
-The regular expression used for this is `[\s\S]{1,1024}(?<=\n|$)`.
-
-_A side note: [Regex101](https://regex101.com/) has been extremely helpful in the making of regular expressions._
-
-Markdown headings are also taken into account when making EmbedFields, making everything under MD heading a seperate EmbedField.  
-This happens only when string(s) supplied as `fields` into `GetMsgEmbed` function.
-
-#### Using EmbedFields
-
-EmbedFields are blindly accepted during construction of MessageEmbed.
+[Go to the table of contents](#table-of-contents)

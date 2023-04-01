@@ -1,3 +1,4 @@
 node_modules
-lib
-src/interfaces
+dist
+pm2.config.cjs
+**WIP*
