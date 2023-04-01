@@ -1,5 +1,7 @@
 # Discord Server Bot <!-- omit in toc -->
 
+**USNTABLE**: Due to conversion to typescript and dependencies major version changes 
+
 This is a discord server bot made for personal use  
 _This is not meant to be used for multiple discord servers_
 
