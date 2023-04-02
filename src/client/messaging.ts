@@ -83,20 +83,42 @@ export function GetMessageEmbed(
 export function IsDuplicateMessage(
   toCheck: TextBasedChannelSendOptionsWithoutPayload,
   messages: Discord.Message[]
-) {
-  // TODO: fix giveaways not being filtered
-  // eslint-disable-next-line unicorn/prefer-ternary
-  if (toCheck instanceof Discord.Embed) {
+): boolean {
+  if (typeof toCheck === 'string' || toCheck.content) {
+    console.log('CHECKING CONTENT');
+    const checkAgainst =
+      typeof toCheck === 'string' ? toCheck : toCheck.content;
+    return messages.some((message) => message.content === checkAgainst);
+  } else if (toCheck.embeds?.length) {
+    const toCheckEmbeds = toCheck.embeds as Discord.APIEmbed[];
     return messages.some((message) => {
-      const firstEmbed = message.embeds[0];
-      return toCheck.data.title === firstEmbed?.data?.title;
+      if (
+        message.embeds.length === 0 ||
+        message.embeds.length !== toCheckEmbeds.length
+      ) {
+        return false;
+      }
+      const sameEmbeds = message.embeds.every((embed, embedIndex) => {
+        const toCheckEmbed = toCheckEmbeds[embedIndex];
+        if (embed.title?.trim() !== toCheckEmbed.title?.trim()) return false;
+        if (
+          !toCheckEmbed.fields ||
+          embed.fields.length !== toCheckEmbed.fields.length
+        ) {
+          return false;
+        }
+        const sameFields = embed.fields.every((field, fieldIndex) => {
+          const toCheckField = toCheckEmbed.fields?.at(fieldIndex);
+          const sameName = field.name.trim() === toCheckField?.name.trim();
+          const sameValue = field.value.trim() === toCheckField?.value.trim();
+          return sameName && sameValue;
+        });
+        return sameFields;
+      });
+      return sameEmbeds;
     });
   } else {
-    const checkContent =
-      typeof toCheck === 'string' ? toCheck : toCheck.content;
-    return messages.some((message) => {
-      return checkContent ?? toCheck === message.content;
-    });
+    throw new Error('Check not implemented');
   }
 }
 
@@ -113,10 +135,10 @@ export async function FetchMessages(channel: Discord.TextChannel, limit = 100) {
   return maxChanMsgs;
 }
 
-export function ConvertEmbedToMessage(
-  toConvert: Discord.EmbedBuilder
-): TextBasedChannelSendOptionsWithoutPayload {
-  return { embeds: [toConvert] };
+export function BuildMessageableEmbeds(
+  toConvert: Discord.EmbedBuilder[]
+): Discord.MessageCreateOptions {
+  return { embeds: toConvert.map((x) => x.toJSON()) };
 }
 
 /**

@@ -33,7 +33,6 @@ export default class extends SlashCommand {
 
     void giv.ChangeChannel(context.channelID);
     const force = (context.options.force as boolean | undefined) ?? false;
-    console.log('FORCE_OPTION:', force);
 
     void context.sendFollowUp('This channel will be notified about giveaways');
     const result = await giv.GetGiveaways(force);

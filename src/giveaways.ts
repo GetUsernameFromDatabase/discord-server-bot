@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import Logging, { minInMs } from './logging.js';
 import {
-  ConvertEmbedToMessage,
+  BuildMessageableEmbeds,
   GetMessageEmbed,
   MassMessageSend,
 } from './client/messaging.js';
@@ -57,20 +57,28 @@ export default class Giveaways {
   channelChanged = false;
 
   constructor() {
-    const channelID = process.env.DEV
-      ? process.env.TEST_CHANNEL_ID
-      : process.env.GIVEAWAYS_CHANNEL_ID;
-    void this.ChangeChannel(channelID).then(() => this.GetGiveaways());
+    void this.initiate();
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(this.GetGiveaways.bind(this), 60 * minInMs);
   }
 
+  /**
+   * Since I can't use await in the constructor
+   */
+  async initiate() {
+    const channelID = process.env.DEV
+      ? process.env.TEST_CHANNEL_ID
+      : process.env.GIVEAWAYS_CHANNEL_ID;
+    this.channel = (await ID.Server.channels.fetch(channelID)) as TextChannel;
+    void this.GetGiveaways();
+  }
+
+  /**
+   * Used to change channel and notify if giveaways should be filtered by json
+   */
   async ChangeChannel(ChannelID: string) {
-    // TODO: Make the change be saved (maybe save the channel ID in .env)
-    if (this.channel && this.channel.id !== ChannelID) {
-      this.channelChanged = true;
-      this.channel = (await ID.Server.channels.fetch(ChannelID)) as TextChannel;
-    } else if (!this.channel) {
+    this.channelChanged = this.channel.id !== ChannelID;
+    if (this.channelChanged) {
       this.channel = (await ID.Server.channels.fetch(ChannelID)) as TextChannel;
     }
     return this.channelChanged;
@@ -153,7 +161,8 @@ export default class Giveaways {
 
     const giveawayMessages = giveawaysToSend.map((giv) => {
       const { body, ...rest } = giv;
-      return ConvertEmbedToMessage(GetMessageEmbed(body, rest));
+      const embedBuilder = GetMessageEmbed(body, rest);
+      return BuildMessageableEmbeds([embedBuilder]);
     });
 
     Logging.Log(`Sending ${giveawayMessages.length} ${type} giveaways `);

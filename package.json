@@ -13,8 +13,8 @@
   },
   "main": "src/index.ts",
   "scripts": {
-    "start": "yarn make:index && ts-node src/index.ts",
-    "start:continous": "yarn make:index && tsc -b --clean && tsc && node dist/index.js",
+    "start": "yarn make:index && tsc -b --clean && tsc && node dist/index.js",
+    "dev": "yarn make:index && ts-node src/index.ts",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
     "lint:fix:notests": "yarn lint:fix --ignore-pattern __tests__ --ignore-pattern __mocks__",
