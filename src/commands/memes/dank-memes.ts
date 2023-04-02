@@ -38,7 +38,7 @@ export default class extends SlashCommand {
         return;
       })
       .catch((error: Error) => {
-        void context.sendFollowUp(error.message);
+        void context.send(error.message);
       });
   }
 }

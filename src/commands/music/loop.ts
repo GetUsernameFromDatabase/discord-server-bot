@@ -1,11 +1,10 @@
-import { QueueRepeatMode } from 'discord-player';
+import { QueueRepeatMode, useQueue } from 'discord-player';
 import {
   SlashCommand,
   SlashCreator,
   CommandContext,
   CommandOptionType,
 } from 'slash-create';
-import { client } from '../../helpers/identification.js';
 
 export default class extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -47,9 +46,9 @@ export default class extends SlashCommand {
 
   async run(context: CommandContext) {
     await context.defer();
-    const queue = client.player.nodes.get(context.guildID ?? '');
+    const queue = useQueue(context.guildID ?? '');
     if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
+      return void context.send({
         content: '❌ | No music is being played!',
       });
 
@@ -61,7 +60,7 @@ export default class extends SlashCommand {
         : loopMode === QueueRepeatMode.QUEUE
         ? '🔁'
         : '▶';
-    return void context.sendFollowUp({
+    return void context.send({
       content: `${mode} | Updated loop mode!`,
     });
   }

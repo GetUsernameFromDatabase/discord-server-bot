@@ -1,10 +1,11 @@
+import { useQueue } from 'discord-player';
 import {
   SlashCommand,
   SlashCreator,
   CommandContext,
   CommandOptionType,
 } from 'slash-create';
-import { client } from '../../helpers/identification.js';
+import { GetMessageEmbed } from '../../client/messaging.js';
 
 export default class extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -28,9 +29,9 @@ export default class extends SlashCommand {
 
   async run(context: CommandContext) {
     await context.defer();
-    const queue = client.player.nodes.get(context.guildID ?? '');
+    const queue = useQueue(context.guildID ?? '');
     if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
+      return void context.send({
         content: '❌ | No music is being played!',
       });
 
@@ -42,31 +43,29 @@ export default class extends SlashCommand {
     const tracks = queue.tracks
       .toArray()
       .slice(pageStart, pageEnd)
-      .map((m, index) => {
-        return `${index + pageStart + 1}. **${m.title}** ([link](${m.url}))`;
-      });
-    const nowPlayingInfo = currentTrack
-      ? `🎶 | **${currentTrack.title}** ([link](${currentTrack.url}))`
-      : 'Nothing';
-
-    return void context.sendFollowUp({
-      embeds: [
+      .map(
+        (m, index) =>
+          `${index + pageStart + 1}. **${m.title}** ([link](${m.url}))`
+      );
+    const messageEmbed = GetMessageEmbed(
+      [
         {
-          title: 'Server Queue',
-          description: `${tracks.join('\n')}${
-            tracks.length > pageEnd
-              ? `\n...${tracks.length - pageEnd} more track(s)`
-              : ''
-          }`,
-          color: 0xff_00_00,
-          fields: [
-            {
-              name: 'Now Playing',
-              value: nowPlayingInfo,
-            },
-          ],
+          name: 'Now Playing',
+          value: currentTrack
+            ? `🎶 | **${currentTrack.title}** ([link](${currentTrack.url}))`
+            : 'Nothing',
         },
       ],
+      { title: 'Server Queue' }
+    ).toJSON();
+    messageEmbed.description = `${tracks.join('\n')}${
+      tracks.length > pageEnd
+        ? `\n...${tracks.length - pageEnd} more track(s)`
+        : ''
+    }`;
+
+    return void context.send({
+      embeds: [messageEmbed],
     });
   }
 }
