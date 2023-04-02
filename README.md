@@ -1,9 +1,10 @@
 # Discord Server Bot <!-- omit in toc -->
 
-**USNTABLE**: Due to conversion to typescript and dependencies major version changes 
+**UNSTABLE**: Due to conversion to typescript and dependencies major version changes
+I also haven't had the time to work on this much of late
 
 This is a discord server bot made for personal use  
-_This is not meant to be used for multiple discord servers_
+_aka usage for multiple servers is not prioritized during development and testing_
 
 This bot:
 
@@ -13,7 +14,7 @@ This bot:
 ## Table Of Contents
 
 - [Table Of Contents](#table-of-contents)
-- [Usage](#usage)
+- [Setup](#setup)
   - [Continous Run](#continous-run)
   - [Setup environment variables](#setup-environment-variables)
   - [Tests](#tests)
@@ -27,25 +28,23 @@ This bot:
 - [Music](#music)
 - [Useful Links](#useful-links)
 
-## Usage
+## TODO
 
-[Table Of Contents](#table-of-contents)
+- rework my sql builder with https://github.com/kysely-org/kysely (or something like that) for a more suistanable solution
+  - also switch to https://github.com/WiseLibs/better-sqlite3
+- refocus to work with multiple servers, current focus is on just my own personal server
+- docker containerization
+- update music bot
+- see if it is possible to have customizable rights
+  - should be able to have minimum rights needed and give more if wanted by developer, just some checks are required before initiating action
+
+## Setup
 
 You can follow a [guide](https://discordjs.guide/#before-you-begin) to get started
 
 Setup your bot application in the [Discord developer portal](https://discord.com/developers/applications)
 
-Install yarn -- [guide](https://classic.yarnpkg.com/lang/en/docs/install/)
-
-```bash
-npm install --global yarn
-```
-
-Run the script with
-
-```bash
-yarn start
-```
+Install yarn -- [guide](https://yarnpkg.com/getting-started/install)
 
 ### Continous Run
 

@@ -1,0 +1,13 @@
+{
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "sqltools.useNodeRuntime": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "Giveaways",
+      "group": "Discord Bot",
+      "database": "${workspaceFolder:discord-server-bot}/data/GiveawaysDB"
+    }
+  ]
+}

@@ -1,22 +1,18 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "@sapphire/ts-config",
   "compilerOptions": {
-    "module": "ES2020",
-    "moduleResolution": "nodenext",
-    "allowJs": true,
-    "checkJs": false,
-    "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true,
     "outDir": "dist",
-    "sourceMap": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "isolatedModules": true,
     "paths": {
-      "@/*": ["./@types/*"],
-    }
+      "#lib/*": ["./src/helpers/*"],
+      "@/*": ["./@types/*"]
+    },
+    "noImplicitReturns": false,
+    "skipLibCheck": true,
+    "ignoreDeprecations": "5.0"
   },
-  "ts-node": {
-    "esm": true,
-    "files": true,
-  },
-  "include": ["src", "@types"],
-  "exclude": ["node_modules", "dist", "pm2.config.cjs"]
+  "ts-node": { "files": true },
+  "include": ["src", "development", "@types"],
+  "exclude": ["node_modules"]
 }

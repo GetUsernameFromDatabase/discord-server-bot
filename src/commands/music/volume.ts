@@ -1,54 +1,62 @@
-import {
-  SlashCommand,
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-} from 'slash-create';
-import { client } from '../../helpers/identification.js';
+import { Command } from '@sapphire/framework';
+import { useQueue, useTimeline } from 'discord-player';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'volume',
-      description: 'Set music volume',
-      options: [
-        {
-          name: 'amount',
-          type: CommandOptionType.INTEGER,
-          description: 'The volume amount to set (0-100)',
-          required: false,
-        },
-      ],
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class VolumeCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Changes the volume of the track and entire queue',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-    const queue = client.player.nodes.get(context.guildID ?? '');
-    if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
-        content: '❌ | No music is being played!',
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description)
+        .addIntegerOption((option) =>
+          option
+            .setName('amount')
+            .setDescription('The amount of volume you want to change to')
+            .setMinValue(0)
+            .setMaxValue(100)
+        );
+    });
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const timeline = useTimeline(interaction.guild!.id)!;
+    const permissions = voice(interaction);
+    const volume = interaction.options.getInteger('amount');
+
+    if (!queue)
+      return interaction.reply({
+        content: `${emojis.error} | I am not in a voice channel`,
+        ephemeral: true,
+      });
+    if (!queue.currentTrack)
+      return interaction.reply({
+        content: `${emojis.error} | There is no track **currently** playing`,
+        ephemeral: true,
       });
 
-    const vol = Number.parseInt(context.options.amount as string);
-    if (!vol)
-      return void context.sendFollowUp({
-        content: `🎧 | Current volume is **${queue.node.volume}**%!`,
+    if (!volume)
+      return interaction.reply({
+        content: `🔊 | **Current** volume is **${timeline.volume}%**`,
       });
-    if (vol < 0 || vol > 100)
-      return void context.sendFollowUp({
-        content: '❌ | Volume range must be 0-100',
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
       });
 
-    const success = queue.node.setVolume(vol);
-    return void context.sendFollowUp({
-      content: success
-        ? `✅ | Volume set to **${vol}%**!`
-        : '❌ | Something went wrong!',
+    timeline.setVolume(volume);
+    return interaction.reply({
+      content: `${emojis.success} | I **changed** the volume to: **${timeline.volume}%**`,
     });
   }
 }

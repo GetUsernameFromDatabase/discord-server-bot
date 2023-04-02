@@ -1,9 +1,11 @@
-import { GiveawayObject } from '@/giveaways.js';
+import type { GiveawayObject } from '@/giveaways.js';
 import axios from 'axios';
 import { Element, load } from 'cheerio';
 import TurndownService from 'turndown';
-import Logging from '../logging.js';
-import { ModifyCredits } from './text-manipulation.js';
+import { ModifyCredits } from './text-manipulation';
+
+// TODO: Convert to undici https://www.npmjs.com/package/undici
+// TODO: caching would be great
 
 export function SimpleFetch<T>(URL: string) {
   return axios
@@ -74,7 +76,7 @@ export function GrabFreeGames(html: string) {
         return response;
       })
       .then(HTMLIntoMD)
-      .catch(Logging.Error);
+      .catch(console.error);
     const giveaway: GiveawayObject = {
       title,
       url,

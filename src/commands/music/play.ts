@@ -1,85 +1,107 @@
-import {
-  SlashCommand,
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-} from 'slash-create';
-import { client } from '../../helpers/identification.js';
-import { QueryType } from 'discord-player';
-import { User } from 'discord.js';
+import { Command } from '@sapphire/framework';
+import { useMasterPlayer } from 'discord-player';
+import type { GuildMember } from 'discord.js';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'play',
-      description: 'Play the requested song/playlist',
-      options: [
-        {
-          name: 'query',
-          type: CommandOptionType.STRING,
-          description: 'The song you want to play',
-          required: true,
-        },
-      ],
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class PlayCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Plays and enqueues track(s) of the query provided',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-
-    const guildID = context.guildID ?? '';
-    const guild = client.guilds.cache.get(guildID);
-    if (!guild) {
-      throw new Error(`Guild not found: ${guildID}`);
-    }
-    const channel = guild.channels.cache.get(context.channelID);
-    const query = context.options.query as string;
-    const searchResult = await client.player
-      .search(query, {
-        requestedBy: context.user as unknown as User,
-        searchEngine: QueryType.AUTO,
-      })
-      .catch(() => {
-        console.log('he');
-      });
-    if (!searchResult || searchResult.tracks.length === 0)
-      return void context.sendFollowUp({ content: 'No results were found!' });
-
-    const queue = client.player.nodes.create(guild, {
-      metadata: channel,
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description)
+        .addStringOption((option) => {
+          return option
+            .setName('query')
+            .setDescription('A query of your choice')
+            .setRequired(true)
+            .setAutocomplete(true);
+        });
     });
+  }
 
-    const member =
-      guild.members.cache.get(context.user.id) ??
-      (await guild.members.fetch(context.user.id));
-    if (!member.voice.channel) {
-      return void context.sendFollowUp({
-        content: 'You are not in a voice channel',
-      });
+  public override async autocompleteRun(
+    interaction: Command.AutocompleteInteraction
+  ) {
+    const player = useMasterPlayer()!;
+    const query = interaction.options.getString('query');
+    const results = await player.search(query!);
+
+    let tracks;
+    tracks = results.tracks
+      .map((t) => ({
+        name: t.title,
+        value: t.url,
+      }))
+      .slice(0, 5);
+
+    if (results.playlist) {
+      tracks = results.tracks
+        .map(() => ({
+          name: `${results.playlist!.title} [playlist]`,
+          value: results.playlist!.url,
+        }))
+        .slice(0, 1);
     }
+
+    return interaction.respond(tracks);
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice, options } = this.container.client.utils;
+    const player = useMasterPlayer()!;
+    const permissions = voice(interaction);
+    const query = interaction.options.getString('query')!;
+    const member = interaction.member as GuildMember;
+
+    if (permissions.member)
+      return interaction.reply({
+        content: permissions.member,
+        ephemeral: true,
+      });
+    if (permissions.client)
+      return interaction.reply({
+        content: permissions.client,
+        ephemeral: true,
+      });
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
+      });
+
+    const results = await player.search(query);
+    if (!results.hasTracks())
+      return interaction.reply({
+        content: `${emojis.error} | **No** tracks were found for your query`,
+        ephemeral: true,
+      });
+
+    await interaction.deferReply();
+
     try {
-      if (!queue.connection) await queue.connect(member.voice.channel);
-    } catch {
-      client.player.nodes.delete(guildID);
-      return void context.sendFollowUp({
-        content: 'Could not join your voice channel!',
+      const response = await player.play(member.voice.channel!.id, results, {
+        nodeOptions: options(interaction),
       });
+      return interaction.editReply({
+        content: `${emojis.success} | Successfully enqueued${
+          response.track.playlist
+            ? ` **track(s)** from: **${response.track.playlist.title}**`
+            : `: **${response.track.title}**`
+        }`,
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: `${emojis.error} | An **error** has occurred`,
+      });
+      return globalThis.logger.error(error);
     }
-
-    await context.sendFollowUp({
-      content: `⏱ | Loading your ${
-        searchResult.playlist ? 'playlist' : 'track'
-      }...`,
-    });
-
-    searchResult.playlist
-      ? queue.addTrack(searchResult.tracks)
-      : queue.addTrack(searchResult.tracks[0]);
-
-    if (!queue.node.isPlaying()) await queue.node.play();
   }
 }

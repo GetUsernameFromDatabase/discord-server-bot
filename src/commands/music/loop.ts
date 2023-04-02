@@ -1,68 +1,75 @@
-import { QueueRepeatMode } from 'discord-player';
-import {
-  SlashCommand,
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-} from 'slash-create';
-import { client } from '../../helpers/identification.js';
+import { Command } from '@sapphire/framework';
+import { QueueRepeatMode, useQueue } from 'discord-player';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'loop',
-      description: 'Set loop mode',
-      options: [
-        {
-          name: 'mode',
-          type: CommandOptionType.INTEGER,
-          description: 'Loop type',
-          required: true,
-          choices: [
-            {
-              name: 'Off',
-              value: QueueRepeatMode.OFF,
-            },
-            {
-              name: 'Track',
-              value: QueueRepeatMode.TRACK,
-            },
-            {
-              name: 'Queue',
-              value: QueueRepeatMode.QUEUE,
-            },
-            {
-              name: 'Autoplay',
-              value: QueueRepeatMode.AUTOPLAY,
-            },
-          ],
-        },
-      ],
+const repeatModes = [
+  { name: 'Off', value: QueueRepeatMode.OFF },
+  { name: 'Track', value: QueueRepeatMode.TRACK },
+  { name: 'Queue', value: QueueRepeatMode.QUEUE },
+  { name: 'Autoplay', value: QueueRepeatMode.AUTOPLAY },
+];
 
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class LoopCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Loops the current playing track or the entire queue',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-    const queue = client.player.nodes.get(context.guildID ?? '');
-    if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
-        content: '❌ | No music is being played!',
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description)
+        .addNumberOption((option) =>
+          option
+            .setName('mode')
+            .setDescription('Choose a loop mode')
+            .setRequired(true)
+            .addChoices(...repeatModes)
+        );
+    });
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const permissions = voice(interaction);
+
+    if (!queue)
+      return interaction.reply({
+        content: `${emojis.error} | I am **not** in a voice channel`,
+        ephemeral: true,
+      });
+    if (!queue.currentTrack)
+      return interaction.reply({
+        content: `${emojis.error} | There is no track **currently** playing`,
+        ephemeral: true,
+      });
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
       });
 
-    const loopMode = context.options.mode as QueueRepeatMode;
-    queue.setRepeatMode(loopMode);
-    const mode =
-      loopMode === QueueRepeatMode.TRACK
-        ? '🔂'
-        : loopMode === QueueRepeatMode.QUEUE
-        ? '🔁'
-        : '▶';
-    return void context.sendFollowUp({
-      content: `${mode} | Updated loop mode!`,
+    const mode = interaction.options.getNumber('mode', true) as QueueRepeatMode;
+    const name =
+      mode === QueueRepeatMode.OFF
+        ? 'Looping'
+        : repeatModes.find((m) => m.value === mode)?.name;
+    if (!name)
+      return interaction.reply(
+        `${emojis.error} | Error occured -- loop mode not found`
+      );
+
+    queue.setRepeatMode(mode);
+
+    return interaction.reply({
+      content: `${emojis.success} | **${name}** has been **${
+        mode === queue.repeatMode ? 'enabled' : 'disabled'
+      }**`,
     });
   }
 }
