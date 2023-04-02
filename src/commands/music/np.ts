@@ -1,5 +1,5 @@
+import { useQueue } from 'discord-player';
 import { SlashCommand, SlashCreator, CommandContext } from 'slash-create';
-import { client } from '../../helpers/identification.js';
 
 export default class extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -16,9 +16,9 @@ export default class extends SlashCommand {
   async run(context: CommandContext) {
     await context.defer();
 
-    const queue = client.player.nodes.get(context.guildID ?? '');
+    const queue = useQueue(context.guildID ?? '');
     if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
+      return void context.send({
         content: '❌ | No music is being played!',
       });
     const progress = queue.node.createProgressBar();
@@ -30,7 +30,7 @@ export default class extends SlashCommand {
       : 'Live';
     const trackTitle = queue.currentTrack?.title ?? 'NOT_FOUND';
 
-    return void context.sendFollowUp({
+    return void context.send({
       embeds: [
         {
           title: 'Now Playing',

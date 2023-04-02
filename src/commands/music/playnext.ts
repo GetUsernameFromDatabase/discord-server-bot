@@ -5,7 +5,7 @@ import {
   CommandOptionType,
 } from 'slash-create';
 import { client } from '../../helpers/identification.js';
-import { QueryType } from 'discord-player';
+import { QueryType, useQueue } from 'discord-player';
 import { User } from 'discord.js';
 
 export default class extends SlashCommand {
@@ -31,9 +31,9 @@ export default class extends SlashCommand {
   async run(context: CommandContext) {
     await context.defer();
 
-    const queue = client.player.nodes.get(context.guildID ?? '');
+    const queue = useQueue(context.guildID ?? '');
     if (!queue || !queue.node.isPlaying())
-      return void context.sendFollowUp({
+      return void context.send({
         content: '❌ | No music is being played!',
       });
 
@@ -48,8 +48,8 @@ export default class extends SlashCommand {
       });
 
     if (!searchResult || searchResult.tracks.length === 0)
-      return void context.sendFollowUp({ content: 'No results were found!' });
+      return void context.send({ content: 'No results were found!' });
     queue.node.insert(searchResult.tracks[0]);
-    await context.sendFollowUp({ content: '⏱ | Loading your track...' });
+    await context.send({ content: '⏱ | Loading your track...' });
   }
 }

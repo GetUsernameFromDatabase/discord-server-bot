@@ -8,6 +8,14 @@
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "yarn",
       "runtimeArgs": ["dev"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Compiled",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["start"]
     }
   ]
 }

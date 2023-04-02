@@ -34,9 +34,8 @@ export default class extends SlashCommand {
     void giv.ChangeChannel(context.channelID);
     const force = (context.options.force as boolean | undefined) ?? false;
 
-    void context.sendFollowUp('This channel will be notified about giveaways');
+    void context.send('This channel will be notified about giveaways');
     const result = await giv.GetGiveaways(force);
-    if (result !== 'SUCCESS')
-      void context.sendFollowUp(GiveawayFetchMessages[result]);
+    if (result !== 'SUCCESS') void context.send(GiveawayFetchMessages[result]);
   }
 }

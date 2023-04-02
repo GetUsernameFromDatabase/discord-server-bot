@@ -25,8 +25,7 @@ export default class DiscordBot extends Client {
   constructor(options: ClientOptions) {
     super(options);
     this.handlers = new Collection();
-    // TODO: fix discord-player
-    this.player = new Player(this);
+    this.player = Player.singleton(this);
     registerPlayerEvents(this.player);
   }
   initiate() {
