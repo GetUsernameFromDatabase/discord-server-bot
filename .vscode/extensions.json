@@ -11,14 +11,13 @@
     "esbenp.prettier-vscode",
     "firsttris.vscode-jest-runner",
     "yzhang.markdown-all-in-one",
-    "vscodevim.vim",
     "mikestead.dotenv",
     "xabikos.javascriptsnippets",
     "ghmcadams.lintlens",
-    "extr0py.vscode-relative-line-numbers",
     "mariusalchimavicius.json-to-ts",
-    "davidanson.vscode-markdownlint"
+    "davidanson.vscode-markdownlint",
+    "gruntfuggly.todo-tree"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
-  "unwantedRecommendations": []
+  "unwantedRecommendations": ["abdulyahya.js-index", "joostlubach.js-index"]
 }

@@ -16,7 +16,7 @@ export default {
   },
 
   /** @param {boolean} spacer [true] adds a spacer after logging if true */
-  Warn: (error: Error, description = '', spacer: boolean = true) => {
+  Warn: (error: Error | string, description = '', spacer: boolean = true) => {
     console.warn(description, error, spacer ? '\n' : '');
   },
 
