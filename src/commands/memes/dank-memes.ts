@@ -28,11 +28,11 @@ export default class extends SlashCommand {
   async run(context: CommandContext) {
     await context.defer();
     const subreddit = 'Memes_Of_The_Dank';
+    const type: RedditSortType | undefined = context.options
+      .type as RedditSortType;
+    console.log(type);
 
-    const type: RedditSortType | null = context.options
-      .sortingType as RedditSortType;
-
-    void redditFetch({ subreddit, sort: type })
+    void redditFetch({ subreddit, ...(type ? { sort: type } : {}) })
       .then((posts) => {
         console.log(posts);
         return;
