@@ -76,8 +76,6 @@ export default class extends SlashCommand {
       }...`,
     });
 
-    console.log(searchResult.tracks);
-    console.log(queue.node.isPlaying());
     searchResult.playlist
       ? queue.addTrack(searchResult.tracks)
       : queue.addTrack(searchResult.tracks[0]);
