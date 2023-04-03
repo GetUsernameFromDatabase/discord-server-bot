@@ -1,6 +1,5 @@
-import { Guild, User } from 'discord.js';
+import { User } from 'discord.js';
 
-export interface PersonalUse {
+export interface Identification {
   Maintainer: User;
-  Server: Guild;
 }

@@ -1,31 +1,49 @@
+import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
-import { SlashCommand, SlashCreator, CommandContext } from 'slash-create';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'skip',
-      description: 'Skip to the current song',
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class SkipCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Skips the current track and automatically plays the next',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-    const queue = useQueue(context.guildID ?? '');
-    if (!queue || !queue.node.isPlaying())
-      return void context.send({
-        content: '❌ | No music is being played!',
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description);
+    });
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const permissions = voice(interaction);
+
+    if (!queue)
+      return interaction.reply({
+        content: `${emojis.error} | I am **not** in a voice channel`,
+        ephemeral: true,
       });
-    const currentTrack = queue.currentTrack?.toString() ?? 'NOT_FOUND';
-    const success = queue.node.skip();
-    return void context.send({
-      content: success
-        ? `✅ | Skipped **${currentTrack}**!`
-        : '❌ | Something went wrong!',
+    if (!queue.currentTrack)
+      return interaction.reply({
+        content: `${emojis.error} | There is no track **currently** playing`,
+        ephemeral: true,
+      });
+
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
+      });
+
+    queue.node.skip();
+    return interaction.reply({
+      content: `⏩ | I have **skipped** to the next track`,
     });
   }
 }

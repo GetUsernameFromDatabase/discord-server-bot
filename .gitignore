@@ -1,6 +1,5 @@
 # Copy from https://github.com/github/gitignore/blob/master/Node.gitignore
 
-__tests__/res/FetchedGiveaways.json
 Start.bat
 lib
 data/FetchedGiveaways.json

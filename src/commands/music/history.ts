@@ -1,74 +1,74 @@
-import { useQueue } from 'discord-player';
-import {
-  SlashCommand,
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-} from 'slash-create';
+import { PaginatedMessage } from '@sapphire/discord.js-utilities';
+import { Command } from '@sapphire/framework';
+import { useHistory, useQueue } from 'discord-player';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'history',
-      description: 'Display the queue history',
-      options: [
-        {
-          name: 'page',
-          type: CommandOptionType.INTEGER,
-          description: 'Specific page number in queue history',
-          required: false,
-        },
-      ],
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class HistoryCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Displays the queue history in an embed',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-    const queue = useQueue(context.guildID ?? '');
-
-    if (!queue || !queue.node.isPlaying())
-      return void context.send({
-        content: '❌ | No music is being played!',
-      });
-
-    if (!context.options.page) context.options.page = 1;
-    const pageEnd = -10 * (context.options.page - 1) - 1;
-    const pageStart = pageEnd - 10;
-
-    const currentTrack = queue.currentTrack;
-    const tracks = queue.history.tracks
-      .toArray()
-      .slice(pageStart, pageEnd)
-      .reverse()
-      .map((m, index) => {
-        return `${index + pageEnd * -1}. **${m.title}** ([link](${m.url}))`;
-      });
-    if (!tracks) return context.send('Server Queue History is empty');
-
-    return void context.send({
-      embeds: [
-        {
-          title: 'Server Queue History',
-          description: `${tracks.join('\n')}${
-            tracks.length > pageStart * -1
-              ? `\n...${tracks.length + pageStart} more track(s)`
-              : ''
-          }`,
-          color: 0xff_00_00,
-          fields: [
-            {
-              name: 'Now Playing',
-              value: currentTrack
-                ? `🎶 | **${currentTrack.title}** ([link](${currentTrack.url}))`
-                : 'nothing',
-            },
-          ],
-        },
-      ],
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description);
     });
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const history = useHistory(interaction.guild!.id);
+
+    if (!queue)
+      return interaction.reply({
+        content: `${emojis.error} | I am **not** in a voice channel`,
+        ephemeral: true,
+      });
+    if (!history?.tracks)
+      return interaction.reply({
+        content: `${emojis.error} | There is **no** queue history to **display**`,
+        ephemeral: true,
+      });
+
+    let pagesNumber = Math.ceil(queue.tracks.size / 5);
+
+    if (pagesNumber <= 0) {
+      pagesNumber = 1;
+    }
+
+    const tracks = history.tracks.map(
+      (track, index) => `**${++index})** [${track.title}](${track.url})`
+    );
+
+    const paginatedMessage = new PaginatedMessage();
+
+    // handle error if pages exceed 25 pages
+    if (pagesNumber > 25) pagesNumber = 25;
+
+    for (let index = 0; index < pagesNumber; index++) {
+      const list = tracks.slice(index * 5, index * 5 + 5).join('\n');
+
+      paginatedMessage.addPageEmbed((embed) =>
+        embed
+          .setColor('Red')
+          .setDescription(
+            `**Queue history** for **session** in **${
+              queue.channel?.name ?? 'NO_CHANNEL'
+            }:**\n${list === '' ? '\n*• No more queued tracks*' : `\n${list}`}
+						\n`
+          )
+          .setFooter({
+            text: `${queue.tracks.size} track(s) in queue`,
+          })
+      );
+    }
+
+    return paginatedMessage.run(interaction);
   }
 }

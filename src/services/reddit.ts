@@ -1,11 +1,9 @@
-import {
+import type {
   ChildrenEntity,
   RedditFetchOptions,
   RedditFetchResponse,
   RedditSortType,
 } from '@/reddit.js';
-import fetch from 'node-fetch';
-import { ApplicationCommandOptionChoice } from 'slash-create';
 
 export const RedditSortTypes: RedditSortType[] = [
   'hot',
@@ -14,10 +12,7 @@ export const RedditSortTypes: RedditSortType[] = [
   'rising',
 ];
 
-export const RedditSortTypeChoices: ApplicationCommandOptionChoice[] =
-  RedditSortTypes.map((x) => {
-    return { name: x, value: x };
-  });
+// TODO: Convert to undici https://www.npmjs.com/package/undici
 
 /**
  * Makes a HTTP GET request to retrieve JSON data from a post
