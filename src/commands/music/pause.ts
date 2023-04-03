@@ -1,28 +1,52 @@
-import { useQueue } from 'discord-player';
-import { SlashCommand, SlashCreator, CommandContext } from 'slash-create';
+import { Command } from '@sapphire/framework';
+import { useQueue, useTimeline } from 'discord-player';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'pause',
-      description: 'Pause the current song',
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class PauseCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Pauses or resumes the current track',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
-    const queue = useQueue(context.guildID ?? '');
-    if (!queue || !queue.node.isPlaying())
-      return void context.send({
-        content: '❌ | No music is being played!',
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description);
+    });
+  }
+
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const timeline = useTimeline(interaction.guild!.id)!;
+    const permissions = voice(interaction);
+
+    if (!queue)
+      return interaction.reply({
+        content: `${emojis.error} | I am **not** in a voice channel`,
+        ephemeral: true,
       });
-    const paused = queue.node.setPaused(true);
-    return void context.send({
-      content: paused ? '⏸ | Paused!' : '❌ | Something went wrong!',
+    if (!queue.currentTrack)
+      return interaction.reply({
+        content: `${emojis.error} | There is no track **currently** playing`,
+        ephemeral: true,
+      });
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
+      });
+
+    timeline.paused ? timeline.resume() : timeline.pause();
+    const state = timeline.paused;
+    return interaction.reply({
+      content: `${emojis.success} | **Playback** has been **${
+        state ? 'paused' : 'resumed'
+      }**`,
     });
   }
 }

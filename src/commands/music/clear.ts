@@ -1,29 +1,53 @@
+import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
-import { SlashCommand, SlashCreator, CommandContext } from 'slash-create';
 
-export default class extends SlashCommand {
-  constructor(creator: SlashCreator) {
-    super(creator, {
-      name: 'clear',
-      description: 'Clear the current queue.',
-
-      guildIDs: process.env.DISCORD_GUILD_ID
-        ? [process.env.DISCORD_GUILD_ID]
-        : undefined,
+export class ClearCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      description: 'Clears the current queue and removes all enqueued tracks',
     });
   }
 
-  async run(context: CommandContext) {
-    await context.defer();
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => {
+      builder //
+        .setName(this.name)
+        .setDescription(this.description)
+        .addBooleanOption((option) =>
+          option.setName('history').setDescription('Clear the queue history')
+        );
+    });
+  }
 
-    const queue = useQueue(context.guildID ?? '');
+  public override async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction
+  ) {
+    const { emojis, voice } = this.container.client.utils;
+    const queue = useQueue(interaction.guild!.id);
+    const permissions = voice(interaction);
+    const history = interaction.options.getBoolean('history');
+
     if (!queue)
-      return void context.send({
-        content: '❌ | No music in the queue!',
+      return interaction.reply({
+        content: `${emojis.error} | I am **not** in a voice channel`,
+        ephemeral: true,
+      });
+    if (!queue.tracks)
+      return interaction.reply({
+        content: `${emojis.error} | There is **nothing** to clear`,
+        ephemeral: true,
+      });
+    if (permissions.clientToMember)
+      return interaction.reply({
+        content: permissions.clientToMember,
+        ephemeral: true,
       });
 
-    queue.clear();
-
-    return context.send({ content: '❌ | Queue cleared.' });
+    queue.tracks.clear();
+    if (history) queue.history.clear();
+    return interaction.reply({
+      content: `${emojis.success} | I have **cleared** the queue`,
+    });
   }
 }

@@ -4,7 +4,7 @@ const apps = [
   {
     name: name,
     script: 'yarn',
-    args: 'start',
+    args: 'start:continous',
     output: './log.log',
     error: './error.log',
     watch: 'src',

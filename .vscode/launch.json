@@ -7,15 +7,15 @@
       "name": "Debug",
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": ["dev"]
+      "runtimeArgs": ["start"]
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Compiled",
+      "name": "Debug With Watch",
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": ["start"]
+      "runtimeArgs": ["start:watch"]
     }
   ]
 }
