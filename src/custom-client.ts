@@ -1,5 +1,10 @@
 import type { Handlers } from '@/custom-client';
-import { BucketScope, LogLevel, SapphireClient } from '@sapphire/framework';
+import {
+  BucketScope,
+  ILogger,
+  LogLevel,
+  SapphireClient,
+} from '@sapphire/framework';
 import { envParseArray } from '@skyra/env-utilities';
 import BotActivity, { CreateActivity as CA } from './bot-activity';
 import { Player } from 'discord-player';
@@ -22,9 +27,11 @@ export class CustomClient extends SapphireClient {
         limit: 2,
       },
       logger: {
-        level: LogLevel.Info,
+        level: LogLevel.Trace,
       },
     });
+
+    globalThis.logger = this.logger;
     this.utils = Utils;
     this.player = Player.singleton(this);
   }
@@ -47,4 +54,9 @@ declare module 'discord.js' {
     readonly utils: typeof Utils;
     readonly handlers: Handlers;
   }
+}
+
+/* eslint-disable no-var */
+declare global {
+  var logger: ILogger;
 }

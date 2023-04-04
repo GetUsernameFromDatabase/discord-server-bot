@@ -20,7 +20,7 @@ export function CreateActivity(
     const error =
       new Error(`Wrong duration (${duration}) inserted into Activity Creator\n
       Name associated with the wrong input: "${name}"\nDuration replaced with the default`);
-    console.error(error);
+    globalThis.logger.warn(error);
     // eslint-disable-next-line no-param-reassign
     duration = 1;
   } else if (duration === 0) {

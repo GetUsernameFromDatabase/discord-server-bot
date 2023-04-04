@@ -9,12 +9,16 @@ export function deleteAllRestCommands(clientid: string) {
     .put(Routes.applicationGuildCommands(clientid, '571418297938214913'), {
       body: [],
     })
-    .then(() => console.log('Successfully deleted all guild commands.'))
+    .then(() =>
+      globalThis.logger.info('Successfully deleted all guild commands.')
+    )
     .catch(console.error);
 
   // for global commands
   rest
     .put(Routes.applicationCommands(clientid), { body: [] })
-    .then(() => console.log('Successfully deleted all application commands.'))
+    .then(() =>
+      globalThis.logger.info('Successfully deleted all application commands.')
+    )
     .catch(console.error);
 }

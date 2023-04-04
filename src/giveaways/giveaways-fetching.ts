@@ -35,9 +35,9 @@ export const GiveawayFetchMessages = {
 function logFetchResult(result: keyof typeof GiveawayFetchMessages) {
   const logMessage = GiveawayFetchMessages[result];
   if (result === 'FAILED_TO_SEND' || result === 'NONE_FOUND') {
-    console.error(new Error(logMessage));
+    globalThis.logger.error(new Error(logMessage));
   } else {
-    console.log(logMessage);
+    globalThis.logger.info(logMessage);
   }
   return result;
 }
@@ -106,10 +106,12 @@ export default class Giveaways {
       // eslint-disable-next-line no-await-in-loop
       const results = await SimpleFetch<string>(source.url)
         .then((value) => source.callback(value))
-        .catch((error) => console.error(error as Error, `${key}: FAILED`));
+        .catch((error) =>
+          globalThis.logger.error(error as Error, `${key}: FAILED`)
+        );
 
       if (results && results.length > 0) {
-        console.log(`Fetched ${results.length} giveaways`);
+        globalThis.logger.info(`Fetched ${results.length} giveaways`);
         return this.PostGiveaways(results, forceSend);
       }
     }
@@ -169,7 +171,7 @@ export default class Giveaways {
     if (giveawaysToSend.length === 0) {
       return logFetchResult('NO_NEW');
     } else if (type === 'JSON_FILTERED') {
-      console.log(`${giveawaysToSend.length} new giveaways to send`);
+      globalThis.logger.info(`${giveawaysToSend.length} new giveaways to send`);
     }
 
     const giveawayMessages = giveawaysToSend.map((giv) => {
@@ -178,7 +180,9 @@ export default class Giveaways {
       return BuildMessageableEmbeds([embedBuilder]);
     });
 
-    console.log(`Sending ${giveawayMessages.length} ${type} giveaways `);
+    globalThis.logger.info(
+      `Sending ${giveawayMessages.length} ${type} giveaways`
+    );
     const sendSuccess = await MassMessageSend(
       this.channel,
       giveawayMessages,
