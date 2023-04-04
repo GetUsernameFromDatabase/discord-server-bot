@@ -84,7 +84,6 @@ export function IsDuplicateMessage(
   messages: Discord.Message[]
 ): boolean {
   if (typeof toCheck === 'string' || toCheck.content) {
-    console.log('CHECKING CONTENT');
     const checkAgainst =
       typeof toCheck === 'string' ? toCheck : toCheck.content;
     return messages.some((message) => message.content === checkAgainst);

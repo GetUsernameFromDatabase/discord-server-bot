@@ -101,7 +101,7 @@ export class PlayCommand extends Command {
       await interaction.editReply({
         content: `${emojis.error} | An **error** has occurred`,
       });
-      return console.log(error);
+      return globalThis.logger.error(error);
     }
   }
 }
