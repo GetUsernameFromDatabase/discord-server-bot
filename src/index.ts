@@ -1,3 +1,4 @@
+import type { ILogger } from '@sapphire/framework';
 import { CustomClient } from './custom-client';
 import './helpers/setup';
 
@@ -15,3 +16,8 @@ const main = async () => {
 };
 
 void main();
+
+/* eslint-disable no-var */
+declare global {
+  var logger: ILogger;
+}

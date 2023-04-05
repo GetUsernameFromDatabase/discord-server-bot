@@ -1,5 +1,8 @@
 const name = 'discord_server_bot'
-/** @type {import('pm2').StartOptions[]} */
+
+// Beats having pm2 in dependencies
+// ! make sure to update using https://github.com/Unitech/pm2/blob/master/types/index.d.ts
+/** @type {import('./@types/pm2').StartOptions[]} */
 const apps = [
   {
     name: name,
@@ -8,6 +11,8 @@ const apps = [
     output: './log.log',
     error: './error.log',
     watch: 'src',
+    // these folders should be taken care of by [sapphire HMR plugin](https://www.npmjs.com/package/@sapphire/plugin-hmr)
+    ignore_watch: ['src/commands', 'src/listeners', 'src/preconditions'],
     source_map_support: true,
     min_uptime: 30_000
   },

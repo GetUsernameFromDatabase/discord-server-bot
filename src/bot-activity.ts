@@ -3,6 +3,8 @@ import type { CustomBotActivity } from '@/bot-activity.js';
 import type { CustomClient } from './custom-client';
 import { Time } from '@sapphire/duration';
 
+// TODO: make this HMR compatible
+
 /**
  * @param {string} name Name of the activity displayed
  * @param {number} duration How long activity is displayed in min\

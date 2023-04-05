@@ -2,7 +2,7 @@
 
 Start.bat
 lib
-data/FetchedGiveaways.json
+data/*
 
 # Logs
 logs

@@ -126,10 +126,13 @@ export function IsDuplicateMessage(
  * @param channel channel from where to fetch messages
  * @param limit Messages to send
  */
-export async function FetchMessages(channel: Discord.TextChannel, limit = 100) {
-  const maxChanMsgs = await channel.messages.fetch({ limit }).catch((error) => {
-    console.error(error as Error, undefined, false);
-  });
+export async function FetchMessages(
+  channel: Discord.TextBasedChannel,
+  limit = 50
+): Promise<void | Discord.Collection<string, Discord.Message<boolean>>> {
+  const maxChanMsgs = await channel.messages
+    .fetch({ limit })
+    .catch((error) => globalThis.logger.error(error));
   return maxChanMsgs;
 }
 
@@ -148,7 +151,7 @@ export function BuildMessageableEmbeds(
  * @returns Wether it was successful or not
  */
 export async function MassMessageSend(
-  channel: Discord.TextChannel,
+  channel: Discord.TextBasedChannel,
   messages: TextBasedChannelSendOptionsWithoutPayload[],
   checkDupes = true
 ) {
@@ -161,7 +164,7 @@ export async function MassMessageSend(
 
   const fetchedMessages = await FetchMessages(channel);
   if (fetchedMessages === undefined) {
-    console.error(new Error(`Couldn't fetch ${channel.name} messages`));
+    globalThis.logger.error(`Couldn't fetch channel (${channel.id} messages)`);
     return false;
   }
 
