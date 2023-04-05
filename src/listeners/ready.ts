@@ -1,4 +1,3 @@
-import { Update } from '../helpers/identification';
 import { Listener } from '@sapphire/framework';
 import type { CustomClient } from '../custom-client';
 
@@ -12,8 +11,7 @@ export class UserEvent extends Listener {
 
   public async run() {
     const client = this.container.client as CustomClient;
-    await Update.Maintainer(client);
-    client.initiate();
+    await client.onReady();
 
     client.logger.info(
       `Successfully logged in as: ${

@@ -1,22 +1,25 @@
-import type { Handlers } from '@/custom-client';
-import {
-  BucketScope,
-  ILogger,
-  LogLevel,
-  SapphireClient,
-} from '@sapphire/framework';
+import { BucketScope, LogLevel, SapphireClient } from '@sapphire/framework';
 import { envParseArray } from '@skyra/env-utilities';
 import BotActivity, { CreateActivity as CA } from './bot-activity';
 import { Player } from 'discord-player';
-import { GatewayIntentBits } from 'discord.js';
-import Giveaways from './giveaways/giveaways-fetching';
+import { Collection, GatewayIntentBits } from 'discord.js';
 import * as Utils from './helpers/utils';
+import { GiveawayChannelStore } from './giveaways/giveaway-store';
+import { Update } from '#lib/identification';
 
-export class CustomClient extends SapphireClient {
+interface CustomProperties {
+  readonly player: Player;
+  readonly utils: typeof Utils;
+  readonly giveawayChannels: Collection<string, string>;
+  readonly botActivity: BotActivity;
+}
+export class CustomClient extends SapphireClient implements CustomProperties {
   public player: Player;
-  public handlers!: Handlers;
   public utils: typeof Utils;
-  public constructor() {
+  public giveawayChannels: Collection<string, string>;
+  public botActivity!: BotActivity;
+
+  constructor() {
     super({
       disableMentionPrefix: true,
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
@@ -27,36 +30,31 @@ export class CustomClient extends SapphireClient {
         limit: 2,
       },
       logger: {
-        level: LogLevel.Trace,
+        level: LogLevel.Info,
       },
     });
-
     globalThis.logger = this.logger;
+
     this.utils = Utils;
     this.player = Player.singleton(this);
+
+    const savedGiveawayStore = new GiveawayChannelStore();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    this.giveawayChannels = new Collection(savedGiveawayStore.read());
   }
 
-  public initiate() {
-    this.handlers = {
-      giveaway: new Giveaways(this),
-      botActivity: new BotActivity(this, [
-        CA('with my vodka bottle'),
-        CA('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
-        CA('ʍıʇɥ ɹǝɐlıʇʎ'),
-      ]),
-    };
+  public async onReady() {
+    await Update.Maintainer(this);
+    this.botActivity = new BotActivity(this, [
+      CA('with my vodka bottle'),
+      CA('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
+      CA('ʍıʇɥ ɹǝɐlıʇʎ'),
+    ]);
+    return;
   }
 }
 
 declare module 'discord.js' {
-  interface Client {
-    readonly player: Player;
-    readonly utils: typeof Utils;
-    readonly handlers: Handlers;
-  }
-}
-
-/* eslint-disable no-var */
-declare global {
-  var logger: ILogger;
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface Client extends CustomProperties {}
 }

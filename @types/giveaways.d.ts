@@ -22,13 +22,3 @@ export interface GiveawaySite {
 export interface GiveawaySites {
   [x: string]: GiveawaySite;
 }
-
-export interface GiveawayFileDescriptor {
-  location: string;
-  encoding: BufferEncoding;
-}
-
-export interface TGiveawayFetchResult {
-  location: string;
-  encoding: BufferEncoding;
-}

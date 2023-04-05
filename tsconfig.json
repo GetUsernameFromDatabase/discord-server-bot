@@ -11,5 +11,6 @@
 		},
 		"noImplicitReturns": false
 	},
+	"ts-node": {"files": true,},
 	"include": ["src", "@types"]
 }
