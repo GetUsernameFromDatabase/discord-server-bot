@@ -1,11 +1,13 @@
+import { getTextBasedChannel } from '#lib/discord-fetch';
 import { Command } from '@sapphire/framework';
-import { PermissionsBitField, TextBasedChannel } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import {
   GetGiveaways,
   GiveawayFetchMessages,
 } from '../../giveaways/giveaway-fetching';
-import { GiveawayChannelStore } from '../../giveaways/giveaway-store';
+import { GiveawayChannelStore } from '../../store/giveaway-store';
 
+//TODO: either an option to stop giveaways from being sent here or in a different command
 export class GiveawayChannelChangeCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
@@ -35,15 +37,10 @@ export class GiveawayChannelChangeCommand extends Command {
     await interaction.deferReply();
 
     const { client, user, channelId } = interaction;
-    let { channel } = interaction;
+    const channel =
+      interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
-      const fetchedChannel = await client.channels.fetch(channelId);
-      if (!fetchedChannel) {
-        const errorMessage = `Could not fetch channel: ${channelId}`;
-        client.logger.error(errorMessage);
-        return interaction.editReply(errorMessage);
-      }
-      channel = fetchedChannel as TextBasedChannel;
+      return interaction.editReply('Error: Channel not found');
     }
 
     let key: string;

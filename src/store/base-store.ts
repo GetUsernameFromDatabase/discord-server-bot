@@ -1,8 +1,7 @@
-import type { GiveawayObjectJSON } from '@/giveaways';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-abstract class BaseStore<T> {
+export abstract class BaseStore<T> {
   readonly location: string;
   readonly encoding: BufferEncoding;
   /**
@@ -22,7 +21,7 @@ abstract class BaseStore<T> {
       JSON.stringify(data, undefined, 2),
       this.encoding
     );
-    globalThis.logger.info(`Updated ${this.location}`);
+    globalThis.logger.debug(`Updated ${this.location}`);
   }
 
   read() {
@@ -32,19 +31,5 @@ abstract class BaseStore<T> {
     }
     const fileContent = readFileSync(this.location, this.encoding);
     return JSON.parse(fileContent) as T;
-  }
-}
-
-// TODO: convert this to use sql?
-export class FetchedGiveawayStore extends BaseStore<GiveawayObjectJSON[]> {
-  constructor() {
-    super('./data/FetchedGiveaways.json');
-  }
-}
-
-export class GiveawayChannelStore extends BaseStore<[string, string][]> {
-  // TODO: maybe should use a different type here?
-  constructor() {
-    super('./data/GiveawayChannels.json');
   }
 }

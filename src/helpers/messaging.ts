@@ -2,6 +2,7 @@ import * as Discord from 'discord.js';
 import type { TextBasedChannelSendOptionsWithoutPayload } from '@/messaging.js';
 import { SegmentString } from './text-manipulation.js';
 import { ID } from './identification.js';
+import { FetchMessages } from './discord-fetch.js';
 
 export const blank = '\u200B';
 
@@ -118,22 +119,6 @@ export function IsDuplicateMessage(
   } else {
     throw new Error('Check not implemented');
   }
-}
-
-/**
- * Messages should be all the same type
- *
- * @param channel channel from where to fetch messages
- * @param limit Messages to send
- */
-export async function FetchMessages(
-  channel: Discord.TextBasedChannel,
-  limit = 50
-): Promise<void | Discord.Collection<string, Discord.Message<boolean>>> {
-  const maxChanMsgs = await channel.messages
-    .fetch({ limit })
-    .catch((error) => globalThis.logger.error(error));
-  return maxChanMsgs;
 }
 
 export function BuildMessageableEmbeds(
