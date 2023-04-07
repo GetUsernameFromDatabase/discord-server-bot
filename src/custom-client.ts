@@ -4,8 +4,9 @@ import BotActivity, { CreateActivity as CA } from './bot-activity';
 import { Player } from 'discord-player';
 import { Collection, GatewayIntentBits } from 'discord.js';
 import * as Utils from './helpers/utils';
-import { GiveawayChannelStore } from './giveaways/giveaway-store';
+import { GiveawayChannelStore } from './store/giveaway-store';
 import { Update } from '#lib/identification';
+import { GiveawayNotifier } from './jobs/giveaways';
 
 interface CustomProperties {
   readonly player: Player;
@@ -30,7 +31,7 @@ export class CustomClient extends SapphireClient implements CustomProperties {
         limit: 2,
       },
       logger: {
-        level: LogLevel.Info,
+        level: LogLevel.Debug,
       },
     });
     globalThis.logger = this.logger;
@@ -50,7 +51,13 @@ export class CustomClient extends SapphireClient implements CustomProperties {
       CA('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
       CA('ʍıʇɥ ɹǝɐlıʇʎ'),
     ]);
+
+    this.startJobs();
     return;
+  }
+
+  private startJobs() {
+    new GiveawayNotifier();
   }
 }
 

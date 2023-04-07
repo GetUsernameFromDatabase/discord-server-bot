@@ -5,6 +5,7 @@ import TurndownService from 'turndown';
 import { ModifyCredits } from './text-manipulation';
 
 // TODO: Convert to undici https://www.npmjs.com/package/undici
+// TODO: caching would be great
 
 export function SimpleFetch<T>(URL: string) {
   return axios

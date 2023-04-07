@@ -10,16 +10,16 @@ import {
 } from '../helpers/web-scraping.js';
 import type { TextBasedChannel } from 'discord.js';
 import type { GiveawayObject, GiveawaySites } from '@/giveaways.js';
-import { FetchedGiveawayStore } from './giveaway-store.js';
-//: GiveawaySites
+import { FetchedGiveawayStore } from '../store/giveaway-store.js';
+
 const SiteFetchers: GiveawaySites = {
   GrabFreeGames: {
     url: 'https://grabfreegames.com/free',
-    callback: GrabFreeGames,
+    parse: GrabFreeGames,
   },
   steam: {
     url: 'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?',
-    callback: GetSteamAnnouncements,
+    parse: GetSteamAnnouncements,
   },
 };
 
@@ -29,6 +29,28 @@ export const GiveawayFetchMessages = {
   NO_NEW: 'No new giveaways',
   FAILED_TO_SEND: 'Failed to send giveaways',
 };
+
+export async function GetGiveaways(
+  channel: TextBasedChannel,
+  forceSend = false
+): Promise<keyof typeof GiveawayFetchMessages> {
+  const sources = Object.keys(SiteFetchers);
+  for (const key of sources) {
+    const source = SiteFetchers[key];
+    // eslint-disable-next-line no-await-in-loop
+    const results = await SimpleFetch<string>(source.url)
+      .then((value) => source.parse(value))
+      .catch((error) =>
+        globalThis.logger.error(error as Error, `${key}: FAILED`)
+      );
+
+    if (results && results.length > 0) {
+      globalThis.logger.info(`Fetched ${results.length} giveaways`);
+      return PostGiveaways(channel, results, forceSend);
+    }
+  }
+  return logFetchResult('NONE_FOUND');
+}
 
 function logFetchResult(result: keyof typeof GiveawayFetchMessages) {
   const logMessage = GiveawayFetchMessages[result];
@@ -79,9 +101,6 @@ async function PostGiveaways(
 
   let giveawaysToSend = filteredGiveaways;
   let type: 'JSON_FILTERED' | 'UNFILTERED' = 'JSON_FILTERED';
-  // TODO: account for channel being changed
-  // Maybe remember what the previous giveaway channel is
-  // Discord.Collection usage?
   if (forceSend) {
     giveawaysToSend = giveaways;
     type = 'UNFILTERED';
@@ -108,41 +127,3 @@ async function PostGiveaways(
   }
   return logFetchResult('FAILED_TO_SEND');
 }
-
-export async function GetGiveaways(
-  channel: TextBasedChannel,
-  forceSend = false
-): Promise<keyof typeof GiveawayFetchMessages> {
-  const sources = Object.keys(SiteFetchers);
-  for (const key of sources) {
-    const source = SiteFetchers[key];
-    // eslint-disable-next-line no-await-in-loop
-    const results = await SimpleFetch<string>(source.url)
-      .then((value) => source.callback(value))
-      .catch((error) =>
-        globalThis.logger.error(error as Error, `${key}: FAILED`)
-      );
-
-    if (results && results.length > 0) {
-      globalThis.logger.info(`Fetched ${results.length} giveaways`);
-      return PostGiveaways(channel, results, forceSend);
-    }
-  }
-  return logFetchResult('NONE_FOUND');
-}
-
-export default {
-  GetGiveaways,
-};
-
-// setInterval(this.GetGiveaways.bind(this), 60 * Time.Minute);
-// /**
-//  * Since I can't use await in the constructor
-//  */
-// async function initiate() {
-//   const channelID = envParseBoolean('DEV')
-//     ? envParseString('TEST_CHANNEL_ID')
-//     : envParseString('GIVEAWAYS_CHANNEL_ID');
-//   this.channel = await this.getChannelFromMainGuild(channelID);
-//   void this.GetGiveaways();
-// }

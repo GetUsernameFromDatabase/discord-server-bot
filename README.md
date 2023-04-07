@@ -5,8 +5,6 @@
 This is a discord server bot made for personal use  
 _This is not meant to be used for multiple discord servers_
 
-//TODO: `"watch": "swc src -d dist -w"` does not seem to work the way I want it to
-
 This bot:
 
 - fetches giveaways

@@ -16,7 +16,7 @@ interface GiveawayObjectJSON {
 
 export interface GiveawaySite {
   url: string;
-  callback: (html: string) => GiveawayObject[] | Promise<GiveawayObject[]>;
+  parse: (html: string) => GiveawayObject[] | Promise<GiveawayObject[]>;
 }
 
 export interface GiveawaySites {
