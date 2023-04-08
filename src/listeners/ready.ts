@@ -11,12 +11,12 @@ export class UserEvent extends Listener {
 
   public async run() {
     const client = this.container.client as CustomClient;
-    await client.onReady();
-
     client.logger.info(
       `Successfully logged in as: ${
         this.container.client.user?.username ?? 'NO_ONE'
       }`
     );
+
+    await client.onReady();
   }
 }

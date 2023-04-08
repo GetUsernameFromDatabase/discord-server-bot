@@ -160,7 +160,7 @@ export async function MassMessageSend(
   const checkedMessages = messages.filter(
     (message) => !IsDuplicateMessage(message, messagesSentByBot)
   );
-  for (const message of checkedMessages) void channel.send(message);
+  for (const message of checkedMessages) await channel.send(message);
   return true;
 }
 export const testPrivate = { MdHAsEmbedFieldTitle };

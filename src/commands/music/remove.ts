@@ -1,7 +1,7 @@
 import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
 
-export class removeCommand extends Command {
+export class RemoveCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
