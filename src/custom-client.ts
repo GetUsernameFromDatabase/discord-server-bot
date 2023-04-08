@@ -15,10 +15,10 @@ interface CustomProperties {
   readonly botActivity: BotActivity;
 }
 export class CustomClient extends SapphireClient implements CustomProperties {
-  public player: Player;
-  public utils: typeof Utils;
-  public giveawayChannels: Collection<string, string>;
-  public botActivity!: BotActivity;
+  player;
+  utils;
+  giveawayChannels;
+  botActivity!: BotActivity;
 
   constructor() {
     super({
@@ -57,7 +57,7 @@ export class CustomClient extends SapphireClient implements CustomProperties {
   }
 
   private startJobs() {
-    new GiveawayNotifier();
+    new GiveawayNotifier().start();
   }
 }
 

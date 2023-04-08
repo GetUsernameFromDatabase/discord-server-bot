@@ -54,6 +54,10 @@ export function voice(
 
   const memberVoice = (interaction.member as GuildMember).voice;
   return {
+    get member() {
+      if (!memberVoice.channel)
+        return `${emojis.error} | You **need** to be in a voice channel.`;
+    },
     get client() {
       const resolved = new PermissionsBitField([
         PermissionsBitField.Flags.Connect,
@@ -70,10 +74,6 @@ export function voice(
         } | I am **missing** the required voice channel permissions: \`${missingPerms.join(
           ', '
         )}\``;
-    },
-    get member() {
-      if (!memberVoice.channel)
-        return `${emojis.error} | You **need** to be in a voice channel.`;
     },
     get clientToMember() {
       if (
@@ -172,5 +172,14 @@ export const emojis = {
   },
   get error() {
     return ':x:';
+  },
+};
+
+export const date = {
+  toUnixTimecode(this: void, date: Date) {
+    return date.getTime() / 1000;
+  },
+  discordTime(this: void, unixTime: number) {
+    return `<t:${unixTime}>`;
   },
 };

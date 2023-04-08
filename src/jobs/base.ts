@@ -1,20 +1,17 @@
-import type { Cron } from '@sapphire/time-utilities';
+import { Cron } from '@sapphire/time-utilities';
 
 export abstract class BaseCronJob {
-  cron: Cron;
-  constructor(cron: Cron) {
-    this.cron = cron;
-    this.churner();
-  }
+  static cron: Cron = new Cron('0 * * * *');
+  timeout?: NodeJS.Timeout;
 
   protected job() {
     return;
   }
 
-  protected churner() {
-    const next = this.cron.next();
+  protected churn() {
+    const self = this.constructor as typeof BaseCronJob;
+    const next = self.cron.next();
     const now = new Date();
-    const delta = next.getTime() - now.getTime();
 
     globalThis.logger.debug(
       `Next ${this.constructor.name} job will run at ${next
@@ -22,9 +19,19 @@ export abstract class BaseCronJob {
         .slice(0, 33)}`
     );
 
-    setTimeout(() => {
+    const delta = next.getTime() - now.getTime();
+    return setTimeout(() => {
       this.job();
-      this.churner();
+      this.churn();
     }, delta);
+  }
+
+  start() {
+    this.timeout = this.churn();
+  }
+
+  stop() {
+    if (!this.timeout) return;
+    clearTimeout(this.timeout);
   }
 }

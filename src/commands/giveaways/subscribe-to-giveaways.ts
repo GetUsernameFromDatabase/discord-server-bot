@@ -1,39 +1,31 @@
 import { getTextBasedChannel } from '#lib/discord-fetch';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
-import {
-  GetGiveaways,
-  GiveawayFetchMessages,
-} from '../../giveaways/giveaway-fetching';
 import { GiveawayChannelStore } from '../../store/giveaway-store';
+import cronstrue from 'cronstrue';
+import { GiveawayNotifier } from '../../jobs/giveaways';
 
-//TODO: either an option to stop giveaways from being sent here or in a different command
-export class GiveawayChannelChangeCommand extends Command {
+export class SubscribeToGiveawaysCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      description: 'Send giveaways to this channel',
+      description: `Start sending giveaways here ${cronstrue.toString(
+        GiveawayNotifier.cron.cron,
+        { use24HourTimeFormat: true }
+      )}`,
       requiredUserPermissions: PermissionsBitField.Flags.ManageChannels,
     });
   }
 
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand((builder) => {
-      builder //
-        .setName(this.name)
-        .setDescription(this.description)
-        .addBooleanOption((option) =>
-          option
-            .setName('force')
-            .setDescription("force send even if there aren't any new giveaways")
-        );
+      builder.setName(this.name).setDescription(this.description);
     });
   }
 
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
-    let force = interaction.options.getBoolean('force') ?? false;
     await interaction.deferReply();
 
     const { client, user, channelId } = interaction;
@@ -43,25 +35,23 @@ export class GiveawayChannelChangeCommand extends Command {
       return interaction.editReply('Error: Channel not found');
     }
 
-    let key: string;
-    if (channel.isDMBased()) {
-      force = true;
-      key = `DM_${user.id}`;
-    } else {
-      key = `GUILD_${channel.guildId}`;
-    }
-
+    const key = GiveawayChannelStore.generateKey(channel, user);
     const oldChannelID = client.giveawayChannels.get(key);
+
     if (oldChannelID !== channelId) {
-      force = true;
       client.giveawayChannels.set(key, channelId);
       const store = new GiveawayChannelStore();
       store.update([...client.giveawayChannels]);
     }
 
-    await interaction.editReply('I will notify giveaways here');
-    const result = await GetGiveaways(channel, force);
-    if (result !== 'SUCCESS')
-      void interaction.editReply(GiveawayFetchMessages[result]);
+    const { discordTime, toUnixTimecode } = client.utils.date;
+    const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
+    await interaction.editReply(
+      `${
+        oldChannelID
+          ? 'This channel already is subscribed'
+          : 'This channel is now subscribed to giveaways'
+      }\nNext fetch will happen at: ${discordTime(nextUnixTimecode)}`
+    );
   }
 }

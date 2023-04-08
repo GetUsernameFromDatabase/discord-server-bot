@@ -22,3 +22,11 @@ export interface GiveawaySite {
 export interface GiveawaySites {
   [x: string]: GiveawaySite;
 }
+
+export interface PostGiveawayOptions {
+  /**
+   * Whether to filter giveaways using local DB\
+   * Default: `false`
+   */
+  noFilter: boolean;
+}

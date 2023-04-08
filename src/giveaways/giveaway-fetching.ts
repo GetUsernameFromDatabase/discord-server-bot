@@ -9,7 +9,11 @@ import {
   SimpleFetch,
 } from '../helpers/web-scraping.js';
 import type { TextBasedChannel } from 'discord.js';
-import type { GiveawayObject, GiveawaySites } from '@/giveaways.js';
+import type {
+  GiveawayObject,
+  GiveawaySites,
+  PostGiveawayOptions,
+} from '@/giveaways.js';
 import { FetchedGiveawayStore } from '../store/giveaway-store.js';
 
 const SiteFetchers: GiveawaySites = {
@@ -32,7 +36,7 @@ export const GiveawayFetchMessages = {
 
 export async function GetGiveaways(
   channel: TextBasedChannel,
-  forceSend = false
+  options?: Partial<PostGiveawayOptions>
 ): Promise<keyof typeof GiveawayFetchMessages> {
   const sources = Object.keys(SiteFetchers);
   for (const key of sources) {
@@ -46,7 +50,7 @@ export async function GetGiveaways(
 
     if (results && results.length > 0) {
       globalThis.logger.info(`Fetched ${results.length} giveaways`);
-      return PostGiveaways(channel, results, forceSend);
+      return PostGiveaways(channel, results, options);
     }
   }
   return logFetchResult('NONE_FOUND');
@@ -64,6 +68,8 @@ function logFetchResult(result: keyof typeof GiveawayFetchMessages) {
 
 /** Filters out sent giveaways from fetched giveaways */
 function FilterSentGiveaways(FetchedGiveaways: GiveawayObject[]) {
+  // TODO: figure out a better system to filter out ancient giveaways
+  // that will be sent since channel reaches channel.fetch maximum message amount
   const giveawayStore = new FetchedGiveawayStore();
   const storedData = giveawayStore.read() ?? [];
 
@@ -91,35 +97,30 @@ function FilterSentGiveaways(FetchedGiveaways: GiveawayObject[]) {
 async function PostGiveaways(
   channel: TextBasedChannel,
   fetchedGiveaways: GiveawayObject[],
-  forceSend = false
+  inputOptions?: Partial<PostGiveawayOptions>
 ): Promise<keyof typeof GiveawayFetchMessages> {
   if (fetchedGiveaways.length === 0) return logFetchResult('NONE_FOUND');
+  const defaultOptions: PostGiveawayOptions = {
+    noFilter: false,
+  };
+  const options: PostGiveawayOptions = { ...defaultOptions, ...inputOptions };
+
   // Reversing this to make newer giveaways be sent last as the newest message
   const giveaways = fetchedGiveaways.reverse();
   const { filteredGiveaways, updateStore } =
     FilterSentGiveaways(fetchedGiveaways);
+  const giveawaysToSend = options.noFilter ? giveaways : filteredGiveaways;
 
-  let giveawaysToSend = filteredGiveaways;
-  let type: 'JSON_FILTERED' | 'UNFILTERED' = 'JSON_FILTERED';
-  if (forceSend) {
-    giveawaysToSend = giveaways;
-    type = 'UNFILTERED';
-  }
   if (giveawaysToSend.length === 0) {
     return logFetchResult('NO_NEW');
-  } else if (type === 'JSON_FILTERED') {
-    globalThis.logger.info(`${giveawaysToSend.length} new giveaways to send`);
   }
+  globalThis.logger.info(`Sendable giveaway amount: ${giveawaysToSend.length}`);
 
   const giveawayMessages = giveawaysToSend.map((giv) => {
     const { body, ...rest } = giv;
     const embedBuilder = GetMessageEmbed(body, rest);
     return BuildMessageableEmbeds([embedBuilder]);
   });
-
-  globalThis.logger.info(
-    `Sending ${giveawayMessages.length} ${type} giveaways`
-  );
   const sendSuccess = await MassMessageSend(channel, giveawayMessages, true);
   if (sendSuccess) {
     updateStore();
