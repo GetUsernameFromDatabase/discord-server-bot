@@ -13,7 +13,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
-    "clean": "npx rimraf dist",
+    "clean": "yarn dlx rimraf dist",
     "build": "yarn clean && swc src -d dist -s",
     "watch": "swc src -d dist -w",
     "start": "node dist/index.js",
