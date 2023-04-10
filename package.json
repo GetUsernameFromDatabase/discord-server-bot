@@ -8,7 +8,7 @@
     "node": ">=18.15.0"
   },
   "private": true,
-  "packageManager": "yarn@1.22.19",
+  "packageManager": "yarn@3.5.0",
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint .",
