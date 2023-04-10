@@ -6,7 +6,7 @@ import type {
   MessageCommandSuccessPayload,
 } from '@sapphire/framework';
 import { container } from '@sapphire/framework';
-import { GuildQueue, Track, TrackResolvable } from 'discord-player';
+import { cyan } from 'colorette';
 import {
   Guild,
   GuildMember,
@@ -15,12 +15,6 @@ import {
   PermissionsBitField,
   User,
 } from 'discord.js';
-import {
-  getAuthorInfo,
-  getCommandInfo,
-  getGuildInfo,
-  getShardInfo,
-} from './getter';
 
 function isGuildTextBasedChannel(
   interaction: Command.ChatInputCommandInteraction | GuildTextBasedChannel
@@ -85,36 +79,6 @@ export function voice(
   };
 }
 
-export function tracks(queue: GuildQueue, trackResolvable: TrackResolvable) {
-  const functions = {
-    get possible() {
-      const result =
-        typeof trackResolvable === 'string'
-          ? this.string
-          : typeof trackResolvable === 'number'
-          ? this.number
-          : trackResolvable instanceof Track
-          ? this.track
-          : false;
-      return result;
-    },
-    get string() {
-      const track = trackResolvable as string;
-      const number = queue.node.getTrackPosition(track);
-      return queue.tracks.at(number);
-    },
-    get number() {
-      return queue.tracks.at(trackResolvable as number);
-    },
-    get track() {
-      const track = trackResolvable as Track;
-      const number = queue.node.getTrackPosition(track);
-      return queue.tracks.at(number);
-    },
-  };
-  return functions;
-}
-
 export function options(interaction: Interaction) {
   return {
     metadata: {
@@ -153,16 +117,15 @@ export function logSuccessCommand(
   );
 }
 
-export function getSuccessLoggerData(
+function getSuccessLoggerData(
   guild: Guild | null,
   user: User,
   command: Command
 ) {
-  const shard = getShardInfo(guild?.shardId ?? 0);
-  const commandName = getCommandInfo(command);
-  const author = getAuthorInfo(user);
-  const sentAt = getGuildInfo(guild);
-
+  const shard = `[${cyan(guild?.shardId ?? 0).toString()}]`;
+  const commandName = cyan(command.name);
+  const author = `${user.username}[${cyan(user.id)}]`;
+  const sentAt = guild ? `${guild.name}[${cyan(guild.id)}]` : 'Direct Messages';
   return { shard, commandName, author, sentAt };
 }
 
