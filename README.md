@@ -35,17 +35,7 @@ You can follow a [guide](https://discordjs.guide/#before-you-begin) to get start
 
 Setup your bot application in the [Discord developer portal](https://discord.com/developers/applications)
 
-Install yarn -- [guide](https://classic.yarnpkg.com/lang/en/docs/install/)
-
-```bash
-npm install --global yarn
-```
-
-Run the script with
-
-```bash
-yarn start
-```
+Install yarn -- [guide](https://yarnpkg.com/getting-started)
 
 ### Continous Run
 
