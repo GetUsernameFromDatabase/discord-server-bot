@@ -14,6 +14,7 @@ const apps = [
     // these folders should be taken care of by [sapphire HMR plugin](https://www.npmjs.com/package/@sapphire/plugin-hmr)
     ignore_watch: ['src/commands', 'src/listeners', 'src/preconditions'],
     source_map_support: true,
+    restart_delay: 30_000,
     min_uptime: 30_000
   },
   {
