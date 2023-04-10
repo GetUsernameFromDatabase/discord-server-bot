@@ -7,7 +7,7 @@ const apps = [
   {
     name: name,
     script: 'yarn',
-    args: 'start:watch',
+    args: 'start:pm2',
     output: './log.log',
     error: './error.log',
     watch: 'src',
