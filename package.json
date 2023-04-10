@@ -18,7 +18,7 @@
     "watch": "swc src -d dist -w",
     "start": "node dist/index.js",
     "start:watch": "run-p watch start",
-    "start:pm2": "yarn build && yarn watch:start"
+    "start:pm2": "yarn build && yarn start:watch"
   },
   "dependencies": {
     "@discord-player/equalizer": "^0.2.1",
