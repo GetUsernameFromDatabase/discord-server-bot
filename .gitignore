@@ -1,6 +1,5 @@
 # Copy from https://github.com/github/gitignore/blob/master/Node.gitignore
 
-Start.bat
 lib
 data/*
 

@@ -14,11 +14,13 @@
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
     "clean": "yarn dlx rimraf dist",
-    "build": "yarn clean && swc src -d dist -s",
+    "build:index": " yarn vscode-generate-index-standalone src",
+    "build": "yarn clean && yarn build:index && swc src -d dist -s",
     "watch": "swc src -d dist -w",
     "start": "node dist/index.js",
     "start:watch": "run-p watch start",
-    "start:pm2": "yarn build && yarn start:watch"
+    "start:pm2": "yarn build && yarn start:watch",
+    "dev:piece": "yarn dlx ts-node development/index.ts --project tsconfig.json"
   },
   "dependencies": {
     "@discord-player/equalizer": "^0.2.1",
@@ -42,7 +44,9 @@
     "discord.js": "^14.9.0",
     "ffmpeg-static": "^5.1.0",
     "play-dl": "^1.9.6",
-    "turndown": "^7.1.2"
+    "sqlite3": "^5.1.6",
+    "turndown": "^7.1.2",
+    "vscode-generate-index-standalone": "^1.7.1"
   },
   "devDependencies": {
     "@sapphire/ts-config": "^3.3.4",
@@ -64,6 +68,6 @@
     "eslint-plugin-unicorn": "^46.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.7",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.4"
   }
 }

@@ -1,23 +1,24 @@
+import './helpers/setup';
 import { BucketScope, LogLevel, SapphireClient } from '@sapphire/framework';
 import { envParseArray } from '@skyra/env-utilities';
 import BotActivity, { CreateActivity as CA } from './bot-activity';
 import { Player } from 'discord-player';
-import { Collection, GatewayIntentBits } from 'discord.js';
-import * as Utils from './helpers/utils';
-import { GiveawayChannelStore } from './store/giveaway-store';
+import { GatewayIntentBits } from 'discord.js';
+import * as Utils from './helpers/discord-utils';
 import { Update } from '#lib/identification';
-import { GiveawayNotifier } from './jobs/giveaways';
+import { initializeStores, stores } from './store';
+import { StartJobs } from './jobs';
 
 interface CustomProperties {
   readonly player: Player;
   readonly utils: typeof Utils;
-  readonly giveawayChannels: Collection<string, string>;
   readonly botActivity: BotActivity;
+  readonly sqlStores: typeof stores;
 }
 export class CustomClient extends SapphireClient implements CustomProperties {
   player;
   utils;
-  giveawayChannels;
+  sqlStores;
   botActivity!: BotActivity;
 
   constructor() {
@@ -38,26 +39,20 @@ export class CustomClient extends SapphireClient implements CustomProperties {
 
     this.utils = Utils;
     this.player = Player.singleton(this);
-
-    const savedGiveawayStore = new GiveawayChannelStore();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.giveawayChannels = new Collection(savedGiveawayStore.read());
+    this.sqlStores = stores;
   }
 
   public async onReady() {
     await Update.Maintainer(this);
+    await initializeStores();
     this.botActivity = new BotActivity(this, [
       CA('with my vodka bottle'),
       CA('𝔀𝓲𝓽𝓱 𝓯𝓵𝓸𝔀𝓮𝓻𝓼'),
       CA('ʍıʇɥ ɹǝɐlıʇʎ'),
     ]);
 
-    this.startJobs();
+    StartJobs();
     return;
-  }
-
-  private startJobs() {
-    new GiveawayNotifier().start();
   }
 }
 
