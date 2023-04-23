@@ -20,7 +20,7 @@ const apps = [
   {
     name: name + '_updater',
     script: 'updater.sh',
-    cron: "00 * * * *",
+    cron: "30 */6 * * *",
     autorestart: false,
   }
 ];

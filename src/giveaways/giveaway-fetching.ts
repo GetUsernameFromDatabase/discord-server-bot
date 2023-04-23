@@ -15,6 +15,7 @@ import type {
   PostGiveawayOptions,
 } from '@/giveaways.js';
 import { FetchedGiveawayStore } from '../store/giveaway-store.js';
+import { stores } from '../store/index.js';
 
 const SiteFetchers: GiveawaySites = {
   GrabFreeGames: {
@@ -68,30 +69,31 @@ function logFetchResult(result: keyof typeof GiveawayFetchMessages) {
 
 /** Filters out sent giveaways from fetched giveaways */
 function FilterSentGiveaways(FetchedGiveaways: GiveawayObject[]) {
-  // TODO: figure out a better system to filter out ancient giveaways
+  const store = stores.FetchedGiveaways;
+  // TODO: FINISH THIS
   // that will be sent since channel reaches channel.fetch maximum message amount
-  const giveawayStore = new FetchedGiveawayStore();
-  const storedData = giveawayStore.read() ?? [];
+  // const giveawayStore = new FetchedGiveawayStore();
+  // const storedData = giveawayStore.read() ?? [];
 
-  const savedGiveaways = storedData.map(({ title }) => title.toLowerCase());
-  const filteredGiveaways = [];
-  for (const giv of FetchedGiveaways) {
-    const { title, url } = giv;
-    const index = savedGiveaways.indexOf(title.toLowerCase());
-    const now = new Date().toISOString();
+  // const savedGiveaways = storedData.map(({ title }) => title.toLowerCase());
+  // const filteredGiveaways = [];
+  // for (const giv of FetchedGiveaways) {
+  //   const { title, url } = giv;
+  //   const index = savedGiveaways.indexOf(title.toLowerCase());
+  //   const now = new Date().toISOString();
 
-    if (index === -1) {
-      filteredGiveaways.push(giv);
-      storedData.push({ title, url, created_date: now, updated_date: now });
-    } else {
-      storedData[index].updated_date = now;
-    }
-  }
-  return {
-    filteredGiveaways,
-    // Update store so latter can be run when sending giveaways was successful
-    updateStore: () => giveawayStore.update(storedData),
-  };
+  //   if (index === -1) {
+  //     filteredGiveaways.push(giv);
+  //     storedData.push({ title, url, created_date: now, updated_date: now });
+  //   } else {
+  //     storedData[index].updated_date = now;
+  //   }
+  // }
+  // return {
+  //   filteredGiveaways,
+  //   // Update store so latter can be run when sending giveaways was successful
+  //   updateStore: () => giveawayStore.update(storedData),
+  // };
 }
 
 async function PostGiveaways(
@@ -107,9 +109,9 @@ async function PostGiveaways(
 
   // Reversing this to make newer giveaways be sent last as the newest message
   const giveaways = fetchedGiveaways.reverse();
-  const { filteredGiveaways, updateStore } =
-    FilterSentGiveaways(fetchedGiveaways);
-  const giveawaysToSend = options.noFilter ? giveaways : filteredGiveaways;
+  // const { filteredGiveaways, updateStore } =
+  //   FilterSentGiveaways(fetchedGiveaways);
+  const giveawaysToSend = giveaways; //options.noFilter ? giveaways : filteredGiveaways;
 
   if (giveawaysToSend.length === 0) {
     return logFetchResult('NO_NEW');
@@ -123,7 +125,7 @@ async function PostGiveaways(
   });
   const sendSuccess = await MassMessageSend(channel, giveawayMessages, true);
   if (sendSuccess) {
-    updateStore();
+    // updateStore();
     return logFetchResult('SUCCESS');
   }
   return logFetchResult('FAILED_TO_SEND');

@@ -14,7 +14,7 @@ export abstract class BaseCronJob {
     const now = new Date();
 
     globalThis.logger.debug(
-      `Next ${this.constructor.name} job will run at ${next
+      `CronJob[${this.constructor.name}]: next job will run at ${next
         .toString()
         .slice(0, 33)}`
     );

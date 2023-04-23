@@ -4,7 +4,7 @@ import {
   LogLevel,
 } from '@sapphire/framework';
 import type { Logger } from '@sapphire/plugin-logger';
-import { logSuccessCommand } from '../../../helpers/utils';
+import { logSuccessCommand } from '../../../helpers/discord-utils';
 
 export class UserListener extends Listener {
   public run(payload: ChatInputCommandSuccessPayload) {

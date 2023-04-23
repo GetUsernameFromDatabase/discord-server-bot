@@ -1,10 +1,9 @@
 import type { ILogger } from '@sapphire/framework';
 import { CustomClient } from './custom-client';
-import './helpers/setup';
 
-const client = new CustomClient();
+async function main() {
+  const client = new CustomClient();
 
-const main = async () => {
   try {
     client.logger.info('Logging in...');
     return client.login();
@@ -13,7 +12,7 @@ const main = async () => {
     client.destroy();
     throw error;
   }
-};
+}
 
 void main();
 

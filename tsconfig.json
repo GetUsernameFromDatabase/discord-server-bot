@@ -1,19 +1,18 @@
 {
-	"extends": "@sapphire/ts-config",
-	"compilerOptions": {
-		"rootDir": "src",
-		"outDir": "dist",
-		"tsBuildInfoFile": "dist/.tsbuildinfo",
-		"isolatedModules": true,
-		"paths": {
-			"#lib/*": ["./src/helpers/*"],
-			 "@/*": ["./@types/*"],
-		},
-		"noImplicitReturns": false,
-		"skipLibCheck": true,
-		"ignoreDeprecations": "5.0"
-	},
-	"ts-node": {"files": true,},
-	"include": ["src", "@types"],
-	"exclude": ["node_modules"]
+  "extends": "@sapphire/ts-config",
+  "compilerOptions": {
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "isolatedModules": true,
+    "paths": {
+      "#lib/*": ["./src/helpers/*"],
+      "@/*": ["./@types/*"]
+    },
+    "noImplicitReturns": false,
+    "skipLibCheck": true,
+    "ignoreDeprecations": "5.0"
+  },
+  "ts-node": { "files": true },
+  "include": ["src", "development", "@types"],
+  "exclude": ["node_modules"]
 }

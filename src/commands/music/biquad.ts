@@ -4,6 +4,7 @@ import type { APIApplicationCommandOptionChoice } from 'discord.js';
 
 type SupportedBiquadFilters = keyof typeof BiquadFilterType | 'Off';
 
+// TODO: add run `runIn: 'GUILD_TEXT'` to all music commands
 export class BiquadCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {

@@ -1,7 +1,6 @@
 import { getTextBasedChannel } from '#lib/discord-fetch';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
-import { GiveawayChannelStore } from '../../store/giveaway-store';
 import cronstrue from 'cronstrue';
 import { GiveawayNotifier } from '../../jobs/giveaways';
 
@@ -35,23 +34,16 @@ export class SubscribeToGiveawaysCommand extends Command {
       return interaction.editReply('Error: Channel not found');
     }
 
-    const key = GiveawayChannelStore.generateKey(channel, user);
-    const oldChannelID = client.giveawayChannels.get(key);
-
-    if (oldChannelID !== channelId) {
-      client.giveawayChannels.set(key, channelId);
-      const store = new GiveawayChannelStore();
-      store.update([...client.giveawayChannels]);
-    }
+    const store = client.sqlStores.GiveawayChannel;
+    await store.saveChannel(channel, user);
 
     const { discordTime, toUnixTimecode } = client.utils.date;
     const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
+
     await interaction.editReply(
-      `${
-        oldChannelID
-          ? 'This channel already is subscribed'
-          : 'This channel is now subscribed to giveaways'
-      }\nNext fetch will happen at: ${discordTime(nextUnixTimecode)}`
+      `${'This channel is subscribed to giveaways'}\nNext fetch will happen at: ${discordTime(
+        nextUnixTimecode
+      )}`
     );
   }
 }
