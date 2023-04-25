@@ -1,4 +1,4 @@
-import type { Identification } from '@/indentification';
+import type { Identification } from '@/discord/indentification';
 import { envParseArray } from '@skyra/env-utilities';
 import type { CustomClient } from '../custom-client';
 

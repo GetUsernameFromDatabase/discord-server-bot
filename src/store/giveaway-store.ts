@@ -23,7 +23,7 @@ export class GiveawayChannelStore extends BaseStoreSQL<TGiveawayChannelRecordsSQ
         type: { type: 'TEXT', notNull: true },
         channel: { type: 'TEXT', notNull: true },
       },
-      { tableStatement: { constraints: { unique: ['id', 'type'] } } }
+      { tableStatement: { constraints: { unique: ['parent_id', 'type'] } } }
     );
   }
 
@@ -31,7 +31,7 @@ export class GiveawayChannelStore extends BaseStoreSQL<TGiveawayChannelRecordsSQ
     const { parentID, type } = this.getParent(channel, user);
     return this.insert(
       { parent_id: parentID, type, channel: channel.id },
-      { or: 'REPLACE' }
+      { onConflictUpdate: true }
     );
   }
 
@@ -120,6 +120,7 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
     return this.createUpdateOnTrigger('updated_date');
   }
 
+  /** MODIFED */
   insert(
     values: Omit<TGiveawayRecordSQL, 'created_date' | 'updated_date'>,
     options?: TInsertOptions
@@ -132,17 +133,27 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
     values: Omit<TGiveawayRecordSQL, 'created_date' | 'updated_date'>,
     options?: TInsertOptions
   ) {
-    const channelStore = this.getCoupledTables().GiveawayChannelStore;
-    const regularChannel = await channelStore.get({ channel: channel.id });
-    if (!regularChannel) throw new Error('Channel not subscribed');
+    const notifyChannel = await this.getNotifyChannel(channel);
+    if (!notifyChannel) throw new Error('Channel not subscribed');
     return this.insert(
-      { ...values, channel_parent_id: regularChannel.id },
+      { ...values, channel_parent_id: notifyChannel.id },
       options || { onConflictUpdate: true }
     );
   }
 
-  // TODO: finish this
-  getNotifyChannel(channel: TextBasedChannel) {}
+  async selectWithChannel<K extends keyof TGiveawayRecordSQL>(
+    channel: TextBasedChannel,
+    pickedValues?: K[]
+  ) {
+    const notifyChannel = await this.getNotifyChannel(channel);
+    if (!notifyChannel) return;
+    return this.select({ channel_parent_id: notifyChannel.id }, pickedValues);
+  }
+
+  async getNotifyChannel(channel: TextBasedChannel) {
+    const channelStore = this.getCoupledTables().GiveawayChannelStore;
+    return channelStore.get({ channel: channel.id });
+  }
 
   protected getCoupledTables() {
     return { GiveawayChannelStore: new GiveawayChannelStore() };

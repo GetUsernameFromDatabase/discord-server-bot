@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import type { TextBasedChannelSendOptionsWithoutPayload } from '@/messaging.js';
+import type { TextBasedChannelSendOptionsWithoutPayload } from '@/discord/messaging.js';
 import { SegmentString } from './text-manipulation.js';
 import { ID } from './identification.js';
 import { FetchMessages } from './discord-fetch.js';
