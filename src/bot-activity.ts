@@ -1,5 +1,5 @@
 import { ActivityType, ActivityOptions } from 'discord.js';
-import type { CustomBotActivity } from '@/bot-activity.js';
+import type { CustomBotActivity } from '@/discord/bot-activity.js';
 import type { CustomClient } from './custom-client';
 import { Time } from '@sapphire/duration';
 

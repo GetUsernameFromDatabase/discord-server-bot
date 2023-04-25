@@ -68,8 +68,13 @@ function logFetchResult(result: keyof typeof GiveawayFetchMessages) {
 }
 
 /** Filters out sent giveaways from fetched giveaways */
-function FilterSentGiveaways(FetchedGiveaways: GiveawayObject[]) {
+async function FilterSentGiveaways(
+  channel: TextBasedChannel,
+  FetchedGiveaways: GiveawayObject[]
+) {
   const store = stores.FetchedGiveaways;
+  const fetchHistory = await store.selectWithChannel(channel, ['title', 'url']);
+  if (!fetchHistory) return;
   // TODO: FINISH THIS
   // that will be sent since channel reaches channel.fetch maximum message amount
   // const giveawayStore = new FetchedGiveawayStore();
@@ -102,10 +107,7 @@ async function PostGiveaways(
   inputOptions?: Partial<PostGiveawayOptions>
 ): Promise<keyof typeof GiveawayFetchMessages> {
   if (fetchedGiveaways.length === 0) return logFetchResult('NONE_FOUND');
-  const defaultOptions: PostGiveawayOptions = {
-    noFilter: false,
-  };
-  const options: PostGiveawayOptions = { ...defaultOptions, ...inputOptions };
+  const options: PostGiveawayOptions = { noFilter: false, ...inputOptions };
 
   // Reversing this to make newer giveaways be sent last as the newest message
   const giveaways = fetchedGiveaways.reverse();

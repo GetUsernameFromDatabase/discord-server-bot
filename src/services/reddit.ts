@@ -3,7 +3,7 @@ import type {
   RedditFetchOptions,
   RedditFetchResponse,
   RedditSortType,
-} from '@/reddit.js';
+} from '@/services/reddit.js';
 
 export const RedditSortTypes: RedditSortType[] = [
   'hot',

@@ -3,7 +3,7 @@
 **USNTABLE**: Due to conversion to typescript and dependencies major version changes
 
 This is a discord server bot made for personal use  
-_This is not meant to be used for multiple discord servers_
+_aka usage for multiple servers is not prioritized during development and testing_
 
 This bot:
 
@@ -13,7 +13,7 @@ This bot:
 ## Table Of Contents
 
 - [Table Of Contents](#table-of-contents)
-- [Usage](#usage)
+- [Setup](#setup)
   - [Continous Run](#continous-run)
   - [Setup environment variables](#setup-environment-variables)
   - [Tests](#tests)
@@ -27,15 +27,13 @@ This bot:
 - [Music](#music)
 - [Useful Links](#useful-links)
 
-## Usage
-
-[Table Of Contents](#table-of-contents)
+## Setup
 
 You can follow a [guide](https://discordjs.guide/#before-you-begin) to get started
 
 Setup your bot application in the [Discord developer portal](https://discord.com/developers/applications)
 
-Install yarn -- [guide](https://yarnpkg.com/getting-started)
+Install yarn -- [guide](https://yarnpkg.com/getting-started/install)
 
 ### Continous Run
 

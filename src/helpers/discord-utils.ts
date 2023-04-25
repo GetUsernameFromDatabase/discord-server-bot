@@ -1,4 +1,4 @@
-import type { VoiceResult1, VoiceResult2 } from '@/utils';
+import type { VoiceResult1, VoiceResult2 } from '@/helpers/utils';
 import type {
   ChatInputCommandSuccessPayload,
   Command,

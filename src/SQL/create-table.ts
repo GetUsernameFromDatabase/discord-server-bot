@@ -1,5 +1,8 @@
 import type { TColumnDefinition } from '@/sql/columns';
 import type { TCreateTableStatement, TTableConstraint } from '@/sql/tables';
+import type { Optional } from '@/typescript-utils';
+import type { Database, RunResult } from 'sqlite3';
+import { rejectAndLog } from './error-handling';
 /**
  * {@link https://sqlite.org/lang_createtable.html}
  */
@@ -70,4 +73,29 @@ function generateTableColumns(columns: TColumnDefinition[]) {
     }
     return columnDefinition;
   });
+}
+
+/**
+ * SQLite links:\
+ * {@link [SQLite Create Table](https://sqlite.org/lang_createtable.html)}\
+ * {@link [Datatypes](https://sqlite.org/datatype3.html)}
+ */
+export function makeSureTableExists(
+  name: string,
+  database: Database,
+  tableOptions: Optional<TCreateTableStatement, 'name' | 'options'>
+) {
+  const query = getCreateTableQuery({
+    name,
+    options: { ifNotExists: true },
+    ...tableOptions,
+  });
+
+  const result = new Promise<RunResult>((resolve, reject) => {
+    database.run(query, function (error) {
+      if (error) rejectAndLog(query, error, reject);
+      resolve(this);
+    });
+  });
+  return { result, query };
 }

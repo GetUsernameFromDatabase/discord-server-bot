@@ -1,11 +1,10 @@
-import { getCreateTableQuery } from '../SQL/create-table';
+import { makeSureTableExists as ensureTableExists } from '../SQL/create-table';
 import path from 'node:path';
 import * as sqlite3 from 'sqlite3';
 import type {
   TCreateTableStatement,
   TCreateTableStatementOptionals,
 } from '@/sql/tables';
-import type { Optional } from '@/utils';
 import type {
   TColumnDefinition,
   TColumnDefinitionNameless,
@@ -15,12 +14,15 @@ import type {
   TCreateUpdateOnTriggerOptions,
   TInsertOptions,
 } from '@/sql/base-store';
+import type { Optional, PickByKeysOrFull } from '@/typescript-utils';
+import { getQueryParts, getSelectPart } from '../SQL/query-parts';
+import { rejectAndLog } from '../SQL/error-handling';
 
 export interface TBaseStoreSQLOptions {
   tableStatement: TCreateTableStatementOptionals;
 }
 
-export abstract class BaseStoreSQL<TSqlRecord> {
+export abstract class BaseStoreSQL<TSqlRecord extends object> {
   databaseLocation: string;
   database: sqlite3.Database;
   tableName: string;
@@ -47,38 +49,58 @@ export abstract class BaseStoreSQL<TSqlRecord> {
     });
   }
 
-  select(whereValues: Partial<TSqlRecord> | 'ALL') {
-    const { bindings, wherePart } = this.getQueryParts(whereValues);
+  /**
+   * Raw Base Version -- Extended class most likely has something better
+   */
+  select<K extends keyof TSqlRecord>(
+    whereValues: Partial<TSqlRecord> | 'ALL',
+    pickedValues?: K[]
+  ) {
+    const { bindings, wherePart } = getQueryParts(whereValues);
+    const where = wherePart.join(' AND ');
+    const selectPart = getSelectPart(pickedValues);
 
-    let query = `SELECT * FROM ${this.tableName}`;
+    let query = `SELECT ${selectPart} FROM ${this.tableName}`;
     if (whereValues !== 'ALL') {
-      query += ` WHERE ${wherePart.join(' AND ')}`;
+      query += ` WHERE ${where}`;
     }
 
-    return new Promise<TSqlRecord[]>((resolve, reject) => {
+    return new Promise<PickByKeysOrFull<TSqlRecord, K>[]>((resolve, reject) => {
       this.database.all(query, bindings, (error, rows) => {
-        if (error) reject(error);
+        if (error) rejectAndLog(query, error, reject);
         resolve(rows as TSqlRecord[]);
       });
     });
   }
 
-  get(whereValues: Partial<TSqlRecord>) {
-    const { bindings, wherePart } = this.getQueryParts(whereValues);
+  /**
+   * Raw Base Version -- Extended class most likely has something better
+   */
+  get<K extends keyof TSqlRecord>(
+    whereValues: Partial<TSqlRecord>,
+    pickedValues?: K[]
+  ) {
+    const { bindings, wherePart } = getQueryParts(whereValues);
     const where = wherePart.join(' AND ');
+    const selectPart = getSelectPart(pickedValues);
 
-    const query = `SELECT * FROM ${this.tableName} WHERE ${where}`;
+    const query = `SELECT ${selectPart} FROM ${this.tableName} WHERE ${where}`;
     // TODO: check the value if empty
-    return new Promise<TSqlRecord | undefined>((resolve, reject) => {
-      this.database.get(query, bindings, (error, rows) => {
-        if (error) reject(error);
-        resolve(rows as TSqlRecord);
-      });
-    });
+    return new Promise<PickByKeysOrFull<TSqlRecord, K> | undefined>(
+      (resolve, reject) => {
+        this.database.get(query, bindings, (error, rows) => {
+          if (error) rejectAndLog(query, error, reject);
+          resolve(rows as TSqlRecord);
+        });
+      }
+    );
   }
 
+  /**
+   * Raw Base Version -- Extended class most likely has something better
+   */
   delete(whereValues: Partial<TSqlRecord> | 'ALL') {
-    const { bindings, wherePart } = this.getQueryParts(whereValues);
+    const { bindings, wherePart } = getQueryParts(whereValues);
 
     let query = `DELETE FROM ${this.tableName}`;
     if (whereValues !== 'ALL') {
@@ -87,16 +109,18 @@ export abstract class BaseStoreSQL<TSqlRecord> {
 
     return new Promise<sqlite3.RunResult>((resolve, reject) => {
       this.database.run(query, bindings, function (error) {
-        if (error) reject(error);
+        if (error) rejectAndLog(query, error, reject);
         resolve(this);
       });
     });
   }
 
+  /**
+   * Raw Base Version -- Extended class most likely has something better
+   */
   insert(values: TSqlRecord, options?: TInsertOptions) {
     // TODO: accept values[]
-    const { bindings, columnPart, valuePart, setPart } =
-      this.getQueryParts(values);
+    const { bindings, columnPart, valuePart, setPart } = getQueryParts(values);
 
     let query = `INSERT ${options?.or ? `OR ${options.or}` : ''} 
     INTO ${this.tableName} (${columnPart})
@@ -107,7 +131,7 @@ export abstract class BaseStoreSQL<TSqlRecord> {
 
     return new Promise<sqlite3.RunResult>((resolve, reject) => {
       this.database.run(query, bindings, function (error) {
-        if (error) reject(error);
+        if (error) rejectAndLog(query, error, reject);
         resolve(this);
       });
     });
@@ -143,7 +167,7 @@ export abstract class BaseStoreSQL<TSqlRecord> {
     WHERE rowid = new.rowid ; END;`;
     return new Promise<sqlite3.RunResult>((resolve, reject) => {
       this.database.run(query, function (error) {
-        if (error) reject(error);
+        if (error) rejectAndLog(query, error, reject);
         resolve(this);
       });
     });
@@ -151,6 +175,7 @@ export abstract class BaseStoreSQL<TSqlRecord> {
 
   /**
    * Converts column creation options to column definitions
+   * TODO: externalise to SQL section
    */
   protected convertColumnCreationOptions(
     enforcedColumns: TColumnCreatorOptions<TSqlRecord>
@@ -168,72 +193,17 @@ export abstract class BaseStoreSQL<TSqlRecord> {
    * - `name: this.tableName`
    * - `options: { ifNotExists: true }`
    *
-   * SQLite links:\
-   * {@link [SQLite Create Table](https://sqlite.org/lang_createtable.html)}\
-   * {@link [Datatypes](https://sqlite.org/datatype3.html)}
+   * {@link ensureTableExists}
    */
   protected makeSureTableExists(
     tableOptions: Optional<TCreateTableStatement, 'name' | 'options'>
   ) {
-    const query = getCreateTableQuery({
-      name: this.tableName,
-      options: { ifNotExists: true },
-      ...tableOptions,
-    });
+    const { query, result } = ensureTableExists(
+      this.tableName,
+      this.database,
+      tableOptions
+    );
     globalThis.logger.debug(`TableMaker[${this.constructor.name}]:`, query);
-    return new Promise<sqlite3.RunResult>((resolve, reject) => {
-      this.database.run(query, function (error) {
-        if (error) reject(error);
-        resolve(this);
-      });
-    });
-  }
-
-  /**
-   * Gets parts usable for queries -- convenience function, 
-   *  most likely inefficient
-   // TODO: make sure to check if something is added that uses setPart
-   */
-  protected getQueryParts(values?: Partial<TSqlRecord> | 'ALL'): {
-    bindings: { [key: string]: unknown };
-    wherePart: string[];
-    columnPart: string;
-    valuePart: string;
-    setPart: string;
-  } {
-    const bindings: { [key: string]: unknown } = {};
-    const wherePart: string[] = [];
-    if (!values || typeof values === 'string') {
-      return {
-        bindings,
-        wherePart,
-        columnPart: '',
-        valuePart: '',
-        setPart: '',
-      };
-    }
-
-    const columnPart = [];
-    const valuePart = [];
-    const setPart = [];
-
-    for (const [key, value] of Object.entries(values)) {
-      bindings[`$${key}`] = value;
-      wherePart.push(`${key} = $${key}`);
-      columnPart.push(key);
-      valuePart.push(`$${key}`);
-      const setValue = typeof value === 'string' ? `"${value}"` : String(value);
-      setPart.push(`${key} = ${setValue}`);
-    }
-
-    /** Comma Seperated Join */
-    const csj = ', ';
-    return {
-      bindings,
-      wherePart,
-      columnPart: columnPart.join(csj),
-      valuePart: valuePart.join(csj),
-      setPart: setPart.join(csj),
-    };
+    return result;
   }
 }
