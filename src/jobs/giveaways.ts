@@ -5,7 +5,7 @@ import { BaseCronJob } from './base';
 import { Cron } from '@sapphire/time-utilities';
 
 export class GiveawayNotifier extends BaseCronJob {
-  static cron = new Cron('46 * * * *');
+  static cron = new Cron('10 * * * *');
   async job() {
     const { client } = container;
     const store = client.sqlStores.GiveawayChannel;
