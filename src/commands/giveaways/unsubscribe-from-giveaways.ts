@@ -22,7 +22,7 @@ export class UnsubscribeToGiveawaysCommand extends Command {
   ) {
     await interaction.deferReply();
 
-    const { client, user, channelId } = interaction;
+    const { client, channelId } = interaction;
     const channel =
       interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
@@ -30,7 +30,7 @@ export class UnsubscribeToGiveawaysCommand extends Command {
     }
 
     const store = client.sqlStores.GiveawayChannel;
-    const result = await store.deleteChannel(channel, user);
+    const result = await store.deleteChannel(channel);
     if (!result.changes) {
       return interaction.editReply(`Channel was not subscribed before`);
     }

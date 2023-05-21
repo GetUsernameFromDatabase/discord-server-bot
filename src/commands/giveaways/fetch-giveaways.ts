@@ -4,7 +4,7 @@ import { PermissionsBitField } from 'discord.js';
 import {
   GetGiveaways,
   GiveawayFetchMessages,
-} from '../../giveaways/giveaway-fetching';
+} from '../../giveaways/giveaway-fetching.js';
 
 export class FetchGiveawaysCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -17,13 +17,21 @@ export class FetchGiveawaysCommand extends Command {
 
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand((builder) => {
-      builder.setName(this.name).setDescription(this.description);
+      builder
+        .setName(this.name)
+        .setDescription(this.description)
+        .addBooleanOption((option) =>
+          option
+            .setName('force')
+            .setDescription('Does not check if previously sent')
+        );
     });
   }
 
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
+    const force = interaction.options.getBoolean('force') ?? false;
     await interaction.deferReply();
 
     const { channelId } = interaction;
@@ -34,7 +42,10 @@ export class FetchGiveawaysCommand extends Command {
     }
 
     await interaction.editReply('Will search for new giveaways');
-    const result = await GetGiveaways(channel, { noFilter: true });
+    const result = await GetGiveaways(channel, {
+      noFilter: true,
+      ignorePreviousMessage: force,
+    });
 
     if (result === 'SUCCESS') {
       void interaction.followUp('Giveaway fetch finished!');

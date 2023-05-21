@@ -1,14 +1,21 @@
+import type { PartialPick } from './typescript-utils';
+
 export type TGiveawayChannelType = 'DM' | 'GUILD';
 
 export interface TGiveawayChannelRecordsSQL {
-  id?: number;
+  id: number;
   parent_id: string;
   type: TGiveawayChannelType;
   channel: string;
 }
 
+export type TGiveawayChannelRecordsInsertSQL = PartialPick<
+  TGiveawayChannelRecordsSQL,
+  'id'
+>;
+
 export interface TGiveawayRecordSQL {
-  channel_parent_id?: number;
+  channel_parent_id: number;
   title: string;
   url: string;
   /** ISO String */
@@ -39,4 +46,9 @@ export interface PostGiveawayOptions {
    * Default: `false`
    */
   noFilter: boolean;
+  /**
+   * Does not check previous messages when sending giveaways\
+   * Default: `false`
+   */
+  ignorePreviousMessage: boolean;
 }
