@@ -1,3 +1,4 @@
+import type { TGiveawayChannelType } from '@/giveaways';
 import type { VoiceResult1, VoiceResult2 } from '@/helpers/utils';
 import type {
   ChatInputCommandSuccessPayload,
@@ -13,6 +14,7 @@ import {
   GuildTextBasedChannel,
   Interaction,
   PermissionsBitField,
+  TextBasedChannel,
   User,
 } from 'discord.js';
 
@@ -146,3 +148,16 @@ export const date = {
     return `<t:${unixTime}>`;
   },
 };
+
+export function getChannelParentID(channel: TextBasedChannel): {
+  id: string;
+  type: TGiveawayChannelType;
+} {
+  if (channel.isDMBased()) {
+    const userID = channel.recipientId;
+    return { id: userID, type: 'DM' };
+  } else {
+    const guildID = channel.guildId;
+    return { id: guildID, type: 'GUILD' };
+  }
+}

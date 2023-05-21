@@ -32,17 +32,36 @@ export function getCreateTableQuery(table: TCreateTableStatement): string {
 
 function generateTableConstraints(constraints: TTableConstraint) {
   let tableConstraints = '';
+  let firstConstraint = true;
+  function accountForFirstConstraint() {
+    if (!firstConstraint) tableConstraints += ', ';
+    firstConstraint = false;
+  }
   if (constraints.primaryKey) {
+    accountForFirstConstraint();
     tableConstraints += `PRIMARY KEY (${constraints.primaryKey.join(', ')})`;
-  } else if (constraints.unique) {
+  }
+  if (constraints.unique) {
+    accountForFirstConstraint();
     tableConstraints += `UNIQUE (${constraints.unique.join(', ')})`;
-  } else if (constraints.check) {
+  }
+  if (constraints.check) {
+    accountForFirstConstraint();
     tableConstraints += `CHECK (${constraints.check})`;
-  } else if (constraints.foreignKey) {
+  }
+  if (constraints.foreignKey) {
+    accountForFirstConstraint();
     tableConstraints +=
       `FOREIGN KEY (${constraints.foreignKey.column}) REFERENCES` +
       ` ${constraints.foreignKey.references.table}` +
       `(${constraints.foreignKey.references.column})`;
+    if (constraints.foreignKey.onDelete) {
+      tableConstraints += ` ON DELETE ${constraints.foreignKey.onDelete}`;
+    }
+    if (constraints.foreignKey.onUpdate) {
+      tableConstraints += ` ON UPDATE ${constraints.foreignKey.onUpdate}`;
+    }
+    firstConstraint = false;
   }
   return tableConstraints;
 }

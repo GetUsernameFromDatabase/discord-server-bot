@@ -22,17 +22,20 @@ export interface TBaseStoreSQLOptions {
   tableStatement: TCreateTableStatementOptionals;
 }
 
-export abstract class BaseStoreSQL<TSqlRecord extends object> {
+export abstract class BaseStoreSQL<
+  TRecordSQL extends object,
+  TInsertSQL extends object
+> {
   databaseLocation: string;
   database: sqlite3.Database;
   tableName: string;
-  columns: TColumnCreatorOptions<TSqlRecord>;
+  columns: TColumnCreatorOptions<TRecordSQL>;
   additionalOptions?: TBaseStoreSQLOptions;
 
   constructor(
     location: string,
     tableName: string,
-    columns: TColumnCreatorOptions<TSqlRecord>,
+    columns: TColumnCreatorOptions<TRecordSQL>,
     options?: TBaseStoreSQLOptions
   ) {
     this.databaseLocation = path.resolve(location);
@@ -42,7 +45,14 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
     this.additionalOptions = options;
   }
 
-  initialize() {
+  async initialize() {
+    await new Promise((resolve, reject) => {
+      const query = 'PRAGMA foreign_keys = ON;';
+      this.database.run(query, function (error) {
+        if (error) rejectAndLog(query, error, reject);
+        resolve(this);
+      });
+    });
     return this.makeSureTableExists({
       columns: this.convertColumnCreationOptions(this.columns),
       ...this.additionalOptions?.tableStatement,
@@ -52,8 +62,8 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
   /**
    * Raw Base Version -- Extended class most likely has something better
    */
-  select<K extends keyof TSqlRecord>(
-    whereValues: Partial<TSqlRecord> | 'ALL',
+  select<K extends keyof TRecordSQL>(
+    whereValues: Partial<TRecordSQL> | 'ALL',
     pickedValues?: K[]
   ) {
     const { bindings, wherePart } = getQueryParts(whereValues);
@@ -65,10 +75,10 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
       query += ` WHERE ${where}`;
     }
 
-    return new Promise<PickByKeysOrFull<TSqlRecord, K>[]>((resolve, reject) => {
+    return new Promise<PickByKeysOrFull<TRecordSQL, K>[]>((resolve, reject) => {
       this.database.all(query, bindings, (error, rows) => {
         if (error) rejectAndLog(query, error, reject);
-        resolve(rows as TSqlRecord[]);
+        resolve(rows as TRecordSQL[]);
       });
     });
   }
@@ -76,8 +86,8 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
   /**
    * Raw Base Version -- Extended class most likely has something better
    */
-  get<K extends keyof TSqlRecord>(
-    whereValues: Partial<TSqlRecord>,
+  get<K extends keyof TRecordSQL>(
+    whereValues: Partial<TRecordSQL>,
     pickedValues?: K[]
   ) {
     const { bindings, wherePart } = getQueryParts(whereValues);
@@ -86,11 +96,11 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
 
     const query = `SELECT ${selectPart} FROM ${this.tableName} WHERE ${where}`;
     // TODO: check the value if empty
-    return new Promise<PickByKeysOrFull<TSqlRecord, K> | undefined>(
+    return new Promise<PickByKeysOrFull<TRecordSQL, K> | undefined>(
       (resolve, reject) => {
         this.database.get(query, bindings, (error, rows) => {
           if (error) rejectAndLog(query, error, reject);
-          resolve(rows as TSqlRecord);
+          resolve(rows as TRecordSQL);
         });
       }
     );
@@ -99,7 +109,7 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
   /**
    * Raw Base Version -- Extended class most likely has something better
    */
-  delete(whereValues: Partial<TSqlRecord> | 'ALL') {
+  delete(whereValues: Partial<TRecordSQL> | 'ALL') {
     const { bindings, wherePart } = getQueryParts(whereValues);
 
     let query = `DELETE FROM ${this.tableName}`;
@@ -118,7 +128,7 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
   /**
    * Raw Base Version -- Extended class most likely has something better
    */
-  insert(values: TSqlRecord, options?: TInsertOptions) {
+  insert(values: TInsertSQL, options?: TInsertOptions) {
     // TODO: accept values[]
     const { bindings, columnPart, valuePart, setPart } = getQueryParts(values);
 
@@ -142,7 +152,7 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
    * {@link https://stackoverflow.com/a/67298398}
    */
   createUpdateOnTrigger(
-    column: keyof TSqlRecord,
+    column: keyof TRecordSQL,
     options?: Partial<TCreateUpdateOnTriggerOptions>
   ) {
     const o: TCreateUpdateOnTriggerOptions = {
@@ -178,7 +188,7 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
    * TODO: externalise to SQL section
    */
   protected convertColumnCreationOptions(
-    enforcedColumns: TColumnCreatorOptions<TSqlRecord>
+    enforcedColumns: TColumnCreatorOptions<TRecordSQL>
   ) {
     return Object.entries<TColumnDefinitionNameless>(enforcedColumns).map(
       ([key, value]) => {
@@ -203,7 +213,7 @@ export abstract class BaseStoreSQL<TSqlRecord extends object> {
       this.database,
       tableOptions
     );
-    globalThis.logger.debug(`TableMaker[${this.constructor.name}]:`, query);
+    globalThis.logger.debug(`SQL[${this.constructor.name}]:`, query);
     return result;
   }
 }

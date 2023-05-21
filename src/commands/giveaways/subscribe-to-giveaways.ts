@@ -27,7 +27,7 @@ export class SubscribeToGiveawaysCommand extends Command {
   ) {
     await interaction.deferReply();
 
-    const { client, user, channelId } = interaction;
+    const { client, channelId } = interaction;
     const channel =
       interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
@@ -35,7 +35,7 @@ export class SubscribeToGiveawaysCommand extends Command {
     }
 
     const store = client.sqlStores.GiveawayChannel;
-    await store.saveChannel(channel, user);
+    await store.saveChannel(channel);
 
     const { discordTime, toUnixTimecode } = client.utils.date;
     const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());

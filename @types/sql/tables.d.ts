@@ -6,6 +6,13 @@ import type { TColumnDefinition } from './columns';
 
 export type TDatabaseName = 'main' | 'temp' | string;
 
+export type OnActions =
+  | 'NO ACTION'
+  | 'RESTRICT'
+  | 'SET NULL'
+  | 'SET DEFAULT'
+  | 'CASCADE';
+
 export interface TTableConstraint {
   primaryKey?: string[];
   unique?: string[];
@@ -16,6 +23,8 @@ export interface TTableConstraint {
       table: string;
       column: string;
     };
+    onDelete?: OnActions;
+    onUpdate?: OnActions;
   };
 }
 

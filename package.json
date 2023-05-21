@@ -15,11 +15,14 @@
     "lint:fix": "yarn lint --fix",
     "clean": "yarn dlx rimraf dist",
     "build:index": " yarn vscode-generate-index-standalone src",
-    "build": "yarn clean && yarn build:index && swc src -d dist -s",
+    "build": "yarn build:index && swc src -d dist -s",
+    "build:clean": "yarn clean && yarn build",
     "watch": "swc src -d dist -w",
     "start": "node dist/index.js",
     "start:watch": "run-p watch start",
     "start:pm2": "yarn build && yarn start:watch",
+    "dev": "yarn build:clean && yarn start",
+    "dev:watch": "yarn build:clean && yarn start:watch",
     "dev:piece": "yarn dlx ts-node development/index.ts --project tsconfig.json"
   },
   "dependencies": {

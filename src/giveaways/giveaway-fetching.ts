@@ -14,7 +14,6 @@ import type {
   GiveawaySites,
   PostGiveawayOptions,
 } from '@/giveaways.js';
-import { FetchedGiveawayStore } from '../store/giveaway-store.js';
 import { stores } from '../store/index.js';
 
 const SiteFetchers: GiveawaySites = {
@@ -75,30 +74,17 @@ async function FilterSentGiveaways(
   const store = stores.FetchedGiveaways;
   const fetchHistory = await store.selectWithChannel(channel, ['title', 'url']);
   if (!fetchHistory) return;
-  // TODO: FINISH THIS
-  // that will be sent since channel reaches channel.fetch maximum message amount
-  // const giveawayStore = new FetchedGiveawayStore();
-  // const storedData = giveawayStore.read() ?? [];
 
-  // const savedGiveaways = storedData.map(({ title }) => title.toLowerCase());
-  // const filteredGiveaways = [];
-  // for (const giv of FetchedGiveaways) {
-  //   const { title, url } = giv;
-  //   const index = savedGiveaways.indexOf(title.toLowerCase());
-  //   const now = new Date().toISOString();
-
-  //   if (index === -1) {
-  //     filteredGiveaways.push(giv);
-  //     storedData.push({ title, url, created_date: now, updated_date: now });
-  //   } else {
-  //     storedData[index].updated_date = now;
-  //   }
-  // }
-  // return {
-  //   filteredGiveaways,
-  //   // Update store so latter can be run when sending giveaways was successful
-  //   updateStore: () => giveawayStore.update(storedData),
-  // };
+  const staleGiveaways: GiveawayObject[] = [];
+  const freshGiveaways = FetchedGiveaways.filter((x) => {
+    const { title, url } = x;
+    if (fetchHistory.includes({ title, url })) {
+      staleGiveaways.push(x);
+      return false;
+    }
+    return true;
+  });
+  return { fresh: freshGiveaways, stale: staleGiveaways };
 }
 
 async function PostGiveaways(
@@ -107,27 +93,40 @@ async function PostGiveaways(
   inputOptions?: Partial<PostGiveawayOptions>
 ): Promise<keyof typeof GiveawayFetchMessages> {
   if (fetchedGiveaways.length === 0) return logFetchResult('NONE_FOUND');
-  const options: PostGiveawayOptions = { noFilter: false, ...inputOptions };
+  const options: PostGiveawayOptions = {
+    noFilter: false,
+    ignorePreviousMessage: false,
+    ...inputOptions,
+  };
 
   // Reversing this to make newer giveaways be sent last as the newest message
-  const giveaways = fetchedGiveaways.reverse();
-  // const { filteredGiveaways, updateStore } =
-  //   FilterSentGiveaways(fetchedGiveaways);
-  const giveawaysToSend = giveaways; //options.noFilter ? giveaways : filteredGiveaways;
+  let giveaways = fetchedGiveaways.reverse();
+  const filteredGiveaways = options.noFilter
+    ? undefined
+    : await FilterSentGiveaways(channel, giveaways);
+  if (filteredGiveaways) {
+    giveaways = filteredGiveaways.fresh;
+  }
 
-  if (giveawaysToSend.length === 0) {
+  if (giveaways.length === 0) {
     return logFetchResult('NO_NEW');
   }
-  globalThis.logger.info(`Sendable giveaway amount: ${giveawaysToSend.length}`);
+  globalThis.logger.info(`Sendable giveaway amount: ${giveaways.length}`);
 
-  const giveawayMessages = giveawaysToSend.map((giv) => {
+  const giveawayMessages = giveaways.map((giv) => {
     const { body, ...rest } = giv;
     const embedBuilder = GetMessageEmbed(body, rest);
     return BuildMessageableEmbeds([embedBuilder]);
   });
-  const sendSuccess = await MassMessageSend(channel, giveawayMessages, true);
+
+  const sendSuccess = await MassMessageSend(
+    channel,
+    giveawayMessages,
+    !options.ignorePreviousMessage
+  );
   if (sendSuccess) {
-    // updateStore();
+    const store = stores.FetchedGiveaways;
+    await store.saveSentGiveaways(channel, giveaways);
     return logFetchResult('SUCCESS');
   }
   return logFetchResult('FAILED_TO_SEND');

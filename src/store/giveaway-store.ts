@@ -1,15 +1,20 @@
 import type {
+  GiveawayObject,
+  TGiveawayChannelRecordsInsertSQL,
   TGiveawayChannelRecordsSQL,
-  TGiveawayChannelType,
   TGiveawayRecordSQL,
 } from '@/giveaways';
-import type { TextBasedChannel, User } from 'discord.js';
+import type { TextBasedChannel } from 'discord.js';
 import { BaseStoreSQL } from './base-store';
 import { envParseString } from '@skyra/env-utilities';
 import type { TInsertOptions } from '@/sql/base-store';
 import type { RunResult } from 'sqlite3';
+import { getChannelParentID } from '../helpers/discord-utils';
 
-export class GiveawayChannelStore extends BaseStoreSQL<TGiveawayChannelRecordsSQL> {
+export class GiveawayChannelStore extends BaseStoreSQL<
+  TGiveawayChannelRecordsSQL,
+  TGiveawayChannelRecordsInsertSQL
+> {
   static tableName = 'channels_to_notify';
 
   constructor() {
@@ -27,39 +32,21 @@ export class GiveawayChannelStore extends BaseStoreSQL<TGiveawayChannelRecordsSQ
     );
   }
 
-  saveChannel(channel: TextBasedChannel, user?: User) {
-    const { parentID, type } = this.getParent(channel, user);
+  saveChannel(channel: TextBasedChannel) {
+    const { id, type } = getChannelParentID(channel);
     return this.insert(
-      { parent_id: parentID, type, channel: channel.id },
+      { parent_id: id, type, channel: channel.id },
       { onConflictUpdate: true }
     );
   }
 
-  deleteChannel(channel: TextBasedChannel, user?: User) {
-    const { parentID, type } = this.getParent(channel, user);
-    return this.delete({ parent_id: parentID, type });
+  deleteChannel(channel: TextBasedChannel) {
+    const { id, type } = getChannelParentID(channel);
+    return this.delete({ parent_id: id, type });
   }
 
   deleteChannelUsingRecord(record: Partial<TGiveawayChannelRecordsSQL>) {
     return this.delete(record);
-  }
-
-  getParent(
-    channel: TextBasedChannel,
-    user?: User
-  ): {
-    parentID: string;
-    type: TGiveawayChannelType;
-  } {
-    if (channel.isDMBased()) {
-      if (!user)
-        throw new Error(
-          `Since channel ${channel.id} is DM based, user is required`
-        );
-      return { parentID: user.id, type: 'DM' };
-    } else {
-      return { parentID: channel.guildId, type: 'GUILD' };
-    }
   }
 }
 
@@ -67,7 +54,10 @@ export class GiveawayChannelStore extends BaseStoreSQL<TGiveawayChannelRecordsSQ
  * Make sure to initialize {@link GiveawayChannelStore} before this, as it
  *  depends on it's table
  */
-export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
+export class FetchedGiveawayStore extends BaseStoreSQL<
+  TGiveawayRecordSQL,
+  TGiveawayRecordSQL
+> {
   static tableName = 'fetched_giveaways';
 
   constructor() {
@@ -84,7 +74,6 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
         title: {
           type: 'TEXT',
           notNull: true,
-          primaryKey: true,
           collate: 'RTRIM',
         },
         url: { type: 'TEXT', notNull: true, collate: 'RTRIM' },
@@ -108,7 +97,10 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
                 column: 'id',
                 table: GiveawayChannelStore.tableName,
               },
+              onDelete: 'CASCADE',
+              onUpdate: 'CASCADE',
             },
+            unique: ['channel_parent_id', 'title'],
           },
         },
       }
@@ -126,6 +118,11 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
     options?: TInsertOptions
   ) {
     return super.insert(values, options || { onConflictUpdate: true });
+  }
+
+  async getNotifyChannel(channel: TextBasedChannel) {
+    const channelStore = this.getCoupledTables().GiveawayChannelStore;
+    return channelStore.get({ channel: channel.id });
   }
 
   async insertWithChannel(
@@ -150,12 +147,32 @@ export class FetchedGiveawayStore extends BaseStoreSQL<TGiveawayRecordSQL> {
     return this.select({ channel_parent_id: notifyChannel.id }, pickedValues);
   }
 
-  async getNotifyChannel(channel: TextBasedChannel) {
-    const channelStore = this.getCoupledTables().GiveawayChannelStore;
-    return channelStore.get({ channel: channel.id });
+  async saveSentGiveaways(
+    channel: TextBasedChannel,
+    giveaways: GiveawayObject[]
+  ) {
+    const { id } = getChannelParentID(channel);
+    const notifyChannel = await this.getNotifyChannel(channel);
+    if (!notifyChannel)
+      return globalThis.logger.info(
+        `Channel ${id} not subscribed. Will not store sent giveaways`
+      );
+    const giveawayInserts = giveaways.map((x) =>
+      this.insert({
+        title: x.title,
+        url: x.url,
+        channel_parent_id: notifyChannel.id,
+      })
+    );
+    /** Giveaway Inserts Promise */
+    const gip = await Promise.all(giveawayInserts);
+    globalThis.logger.info(
+      `SQL[${this.constructor.name}]: Stored ${gip.length} giveaways`
+    );
+    return gip;
   }
 
-  protected getCoupledTables() {
+  getCoupledTables() {
     return { GiveawayChannelStore: new GiveawayChannelStore() };
   }
 }
