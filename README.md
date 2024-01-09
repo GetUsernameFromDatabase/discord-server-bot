@@ -1,6 +1,6 @@
 # Discord Server Bot <!-- omit in toc -->
 
-**USNTABLE**: Due to conversion to typescript and dependencies major version changes
+**UNSTABLE**: Due to conversion to typescript and dependencies major version changes
 I also haven't had the time to work on this much of late
 
 This is a discord server bot made for personal use  
