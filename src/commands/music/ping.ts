@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
 import { ApplicationCommandType } from 'discord.js';

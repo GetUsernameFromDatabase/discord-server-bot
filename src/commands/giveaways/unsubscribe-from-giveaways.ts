@@ -22,18 +22,19 @@ export class UnsubscribeToGiveawaysCommand extends Command {
   ) {
     await interaction.deferReply();
 
-    const { client, channelId } = interaction;
+    const { channelId } = interaction;
     const channel =
       interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
       return interaction.editReply('Error: Channel not found');
     }
 
-    const store = client.sqlStores.GiveawayChannel;
-    const result = await store.deleteChannel(channel);
-    if (!result.changes) {
-      return interaction.editReply(`Channel was not subscribed before`);
-    }
-    await interaction.editReply(`Successfully unsubscribed`);
+    return interaction.editReply('WIP');
+    // const store = client.sqlStores.GiveawayChannel;
+    // const result = await store.deleteChannel(channel);
+    // if (!result.changes) {
+    //   return interaction.editReply(`Channel was not subscribed before`);
+    // }
+    // await interaction.editReply(`Successfully unsubscribed`);
   }
 }

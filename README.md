@@ -14,6 +14,7 @@ This bot:
 ## Table Of Contents
 
 - [Table Of Contents](#table-of-contents)
+- [TODO](#todo)
 - [Setup](#setup)
   - [Continous Run](#continous-run)
   - [Setup environment variables](#setup-environment-variables)
@@ -30,13 +31,17 @@ This bot:
 
 ## TODO
 
-- rework my sql builder with https://github.com/kysely-org/kysely (or something like that) for a more suistanable solution
-  - also switch to https://github.com/WiseLibs/better-sqlite3
+- rework my sql builder with <https://github.com/kysely-org/kysely> (or something like that) for a more suistanable solution
+  - also switch to <https://github.com/WiseLibs/better-sqlite3>
 - refocus to work with multiple servers, current focus is on just my own personal server
 - docker containerization
 - update music bot
 - see if it is possible to have customizable rights
   - should be able to have minimum rights needed and give more if wanted by developer, just some checks are required before initiating action
+- tests for parts that are uncoupled from discord client
+- redo this readme -- outdated information
+- hide some useful nuggets like
+  - `npm exec -- tsc --showConfig > tsconfig.final.json`
 
 ## Setup
 

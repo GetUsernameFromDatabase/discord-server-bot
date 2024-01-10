@@ -1,5 +1,4 @@
-import type { TGiveawayChannelType } from '@/giveaways';
-import type { VoiceResult1, VoiceResult2 } from '@/helpers/utils';
+// https://github.com/itsauric/auricle-music-bot/blob/master/src/lib/utils.ts
 import type {
   ChatInputCommandSuccessPayload,
   Command,
@@ -14,7 +13,6 @@ import {
   GuildTextBasedChannel,
   Interaction,
   PermissionsBitField,
-  TextBasedChannel,
   User,
 } from 'discord.js';
 
@@ -24,6 +22,17 @@ function isGuildTextBasedChannel(
   if ('applicationId' in interaction) return false;
   return true;
 }
+
+export interface VoiceResult1 {
+  client: string | undefined;
+  member: string | undefined;
+  clientToMember: string | undefined;
+}
+
+export interface VoiceResult2 {
+  events: number;
+}
+
 export function voice(
   interaction: Command.ChatInputCommandInteraction
 ): VoiceResult1;
@@ -148,16 +157,3 @@ export const date = {
     return `<t:${unixTime}>`;
   },
 };
-
-export function getChannelParentID(channel: TextBasedChannel): {
-  id: string;
-  type: TGiveawayChannelType;
-} {
-  if (channel.isDMBased()) {
-    const userID = channel.recipientId;
-    return { id: userID, type: 'DM' };
-  } else {
-    const guildID = channel.guildId;
-    return { id: guildID, type: 'GUILD' };
-  }
-}

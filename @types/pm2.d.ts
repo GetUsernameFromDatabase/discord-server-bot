@@ -7,14 +7,12 @@
 /**
  * Either connects to a running pm2 daemon (“God”) or launches and daemonizes one.
  * Once launched, the pm2 process will keep running after the script exits.
- *
  * @param errback - Called when finished connecting to or launching the pm2 daemon process.
  */
 export function connect(errback: ErrorCallback): void;
 /**
  * Either connects to a running pm2 daemon (“God”) or launches and daemonizes one.
  * Once launched, the pm2 process will keep running after the script exits.
- *
  * @param noDaemonMode - (Default: false) If true is passed for the first argument
  * pm2 will not be run as a daemon and will die when the related script exits.
  * By default, pm2 stays alive after your script exits.
@@ -25,7 +23,6 @@ export function connect(noDaemonMode: boolean, errback: ErrorCallback): void;
 
 /**
  * Starts a script that will be managed by pm2.
- *
  * @param options - Options
  * @param errback - An errback called when the script has been started.
  * The proc parameter will be a pm2 process object.
@@ -33,7 +30,6 @@ export function connect(noDaemonMode: boolean, errback: ErrorCallback): void;
 export function start(options: StartOptions, errback: ErrorProcCallback): void;
 /**
  * Starts a script that will be managed by pm2.
- *
  * @param jsonConfigFile - The path to a JSON file that can contain the same options as the options parameter.
  * @param errback - An errback called when the script has been started.
  * The proc parameter will be a pm2 process object.
@@ -41,7 +37,6 @@ export function start(options: StartOptions, errback: ErrorProcCallback): void;
 export function start(jsonConfigFile: string, errback: ErrorProcCallback): void;
 /**
  * Starts a script that will be managed by pm2.
- *
  * @param script - The path of the script to run.
  * @param errback - An errback called when the script has been started.
  * The proc parameter will be a pm2 process object.
@@ -49,7 +44,6 @@ export function start(jsonConfigFile: string, errback: ErrorProcCallback): void;
 export function start(script: string, errback: ErrorProcCallback): void;
 /**
  * Starts a script that will be managed by pm2.
- *
  * @param script - The path of the script to run.
  * @param options - Options
  * @param errback - An errback called when the script has been started.
@@ -62,7 +56,6 @@ export function start(
 ): void;
 /**
  * Starts a script that will be managed by pm2.
- *
  * @param script - The path of the script to run.
  * @param jsonConfigFile - The path to a JSON file that can contain the same options as the options parameter.
  * @param errback - An errback called when the script has been started.
@@ -81,7 +74,6 @@ export function disconnect(): void;
 
 /**
  * Stops a process but leaves the process meta-data in pm2’s list
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback - called when the process is stopped
@@ -93,7 +85,6 @@ export function stop(
 
 /**
  * Stops and restarts the process.
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback - called when the process is restarted
@@ -106,7 +97,6 @@ export function restart(
 /**
  * Stops the process and removes it from pm2’s list.
  * The process will no longer be accessible by its name
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback - called when the process is deleted
@@ -122,7 +112,6 @@ export { del as delete };
  * Zero-downtime rolling restart. At least one process will be kept running at
  * all times as each instance is restarted individually.
  * Only works for scripts started in cluster mode.
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback - called when the process is reloaded
@@ -136,7 +125,6 @@ export function reload(
  * Zero-downtime rolling restart. At least one process will be kept running at
  * all times as each instance is restarted individually.
  * Only works for scripts started in cluster mode.
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param options - An object containing configuration
@@ -154,14 +142,12 @@ export function reload(
  * Kills the pm2 daemon (same as pm2 kill). Note that when the daemon is killed, all its
  * processes are also killed. Also note that you still have to explicitly disconnect
  * from the daemon even after you kill it.
- *
  * @param errback
  */
 export function killDaemon(errback: ErrorProcDescCallback): void;
 
 /**
  * Returns various information about a process: eg what stdout/stderr and pid files are used.
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback
@@ -173,7 +159,6 @@ export function describe(
 
 /**
  * Gets the list of running processes being managed by pm2.
- *
  * @param errback
  */
 export function list(errback: ErrorProcDescsCallback): void;
@@ -181,7 +166,6 @@ export function list(errback: ErrorProcDescsCallback): void;
 /**
  * Writes the process list to a json file at the path in the DUMP_FILE_PATH environment variable
  * (“~/.pm2/dump.pm2” by default).
- *
  * @param errback
  */
 export function dump(errback: ErrorResultCallback): void;
@@ -192,7 +176,6 @@ export function dump(errback: ErrorResultCallback): void;
 
 /**
  * Flushes the logs.
- *
  * @param process - Can either be the name as given in the pm2.start options,
  * a process id, or the string “all” to indicate that all scripts should be restarted.
  * @param errback
@@ -205,14 +188,12 @@ export function flush(
 /**
  * Rotates the log files. The new log file will have a higher number
  * in it (the default format being ${process.name}-${out|err}-${number}.log).
- *
  * @param errback
  */
 export function reloadLogs(errback: ErrorResultCallback): void;
 
 /**
  * Opens a message bus.
- *
  * @param errback The bus will be an Axon Sub Emitter object used to listen to and send events.
  */
 export function launchBus(errback: ErrorBusCallback): void;
@@ -231,7 +212,6 @@ export function sendSignalToProcessName(
 
 /**
  * - Registers the script as a process that will start on machine boot. The current process list will be dumped and saved for resurrection on reboot.
- *
  * @param platform
  * @param errback
  */
@@ -239,7 +219,6 @@ export function startup(platform: Platform, errback: ErrorResultCallback): void;
 
 /**
  * - Send an set of data as object to a specific process
- *
  * @param proc_id
  * @param packet
  * @param cb

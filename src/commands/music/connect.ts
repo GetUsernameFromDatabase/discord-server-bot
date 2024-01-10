@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Command } from '@sapphire/framework';
-import { useMasterPlayer, useQueue } from 'discord-player';
+import { useMainPlayer, useQueue } from 'discord-player';
 import { GuildMember } from 'discord.js';
 
 export class DisconnectCommand extends Command {
@@ -37,7 +39,7 @@ export class DisconnectCommand extends Command {
           ephemeral: true,
         });
       const queue = useQueue(interaction.guild!.id);
-      const player = useMasterPlayer();
+      const player = useMainPlayer();
 
       if (queue)
         return interaction.reply({

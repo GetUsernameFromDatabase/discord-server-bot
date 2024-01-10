@@ -1,7 +1,13 @@
 import { ActivityType, ActivityOptions } from 'discord.js';
-import type { CustomBotActivity } from '@/discord/bot-activity.js';
 import type { CustomClient } from './custom-client';
 import { Time } from '@sapphire/duration';
+
+export interface TBotActivity {
+  name: string;
+  duration: number;
+  type: ActivityOptions['type'];
+  several: boolean;
+}
 
 /**
  * @param {string} name Name of the activity displayed
@@ -32,14 +38,14 @@ export function CreateActivity(
 
 export default class BotActivity {
   iteration = 0; // Current activity index
-  activities: CustomBotActivity[];
+  activities: TBotActivity[];
   client: CustomClient;
 
-  constructor(client: CustomClient, activities: CustomBotActivity[] = []) {
+  constructor(client: CustomClient, activities: TBotActivity[] = []) {
     this.client = client;
     // Repeats activities that should
-    const nonRepAct: CustomBotActivity[] = [];
-    const repAct: CustomBotActivity[] = activities.filter((x) => {
+    const nonRepAct: TBotActivity[] = [];
+    const repAct: TBotActivity[] = activities.filter((x) => {
       if (x.several === true) return true;
       nonRepAct.push(x);
       return false;

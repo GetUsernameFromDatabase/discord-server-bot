@@ -11,7 +11,7 @@ export class PlayerEvent extends Listener {
   }
 
   public run(queue: GuildQueue, error: Error) {
-    globalThis.logger.warn(
+    container.logger.warn(
       `[${queue.guild.name}] Error emitted from the queue: ${error.message}`
     );
   }

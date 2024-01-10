@@ -52,6 +52,7 @@
     "unicorn/number-literal-case": "off",
     "unicorn/no-nested-ternary": "off",
     "unicorn/prefer-module": "off",
-    "unicorn/prefer-top-level-await": "off"
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/no-null": "off"
   }
 }

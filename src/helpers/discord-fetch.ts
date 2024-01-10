@@ -3,7 +3,6 @@ import type { Collection, Message, TextBasedChannel } from 'discord.js';
 
 /**
  * Messages should be all the same type
- *
  * @param channel channel from where to fetch messages
  * @param limit Messages to send
  */

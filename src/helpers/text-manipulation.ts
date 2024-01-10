@@ -3,14 +3,13 @@
  * @param limit Maximum segment size - DEFAULT: 1024
  */
 export function SegmentString(string: string, limit: number = 1024) {
-  // https://regex101.com/ I love this site
+  // useful site https://regex101.com/
   const rgx = new RegExp(`[\\s\\S]{1,${limit}}(?<=\\n|$)`, 'g');
   return string.match(rgx);
 }
 
 /**
  * This goes by the assumption that credits are at the bottom line
- *
  * @param body String where the credit is
  * @param referenceURL CreditURL
  * @returns Modified body

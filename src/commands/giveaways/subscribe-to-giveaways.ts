@@ -27,23 +27,25 @@ export class SubscribeToGiveawaysCommand extends Command {
   ) {
     await interaction.deferReply();
 
-    const { client, channelId } = interaction;
+    const { channelId } = interaction;
     const channel =
       interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
       return interaction.editReply('Error: Channel not found');
     }
 
-    const store = client.sqlStores.GiveawayChannel;
-    await store.saveChannel(channel);
+    return interaction.editReply('WIP');
 
-    const { discordTime, toUnixTimecode } = client.utils.date;
-    const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
+    // const store = client.sqlStores.GiveawayChannel;
+    // await store.saveChannel(channel);
 
-    await interaction.editReply(
-      `${'This channel is subscribed to giveaways'}\nNext fetch will happen at: ${discordTime(
-        nextUnixTimecode
-      )}`
-    );
+    // const { discordTime, toUnixTimecode } = client.utils.date;
+    // const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
+
+    // await interaction.editReply(
+    //   `${'This channel is subscribed to giveaways'}\nNext fetch will happen at: ${discordTime(
+    //     nextUnixTimecode
+    //   )}`
+    // );
   }
 }

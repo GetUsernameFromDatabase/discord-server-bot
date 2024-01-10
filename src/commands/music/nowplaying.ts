@@ -51,9 +51,8 @@ export class NowPlayingCommand extends Command {
         { name: 'Author', value: track.author },
         {
           name: 'Progress',
-          value: `${queue.node.createProgressBar() ?? 'NONE'} (${
-            timeline.timestamp?.progress
-          }%)`,
+          value: `${queue.node.createProgressBar() ?? 'NONE'} (${timeline
+            .timestamp?.progress}%)`,
         },
         {
           name: 'Extractor',

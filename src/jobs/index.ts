@@ -1,4 +1,6 @@
-import type { TGenericJobs } from '@/jobs.js';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import type { TGenericJobs } from '@t/jobs';
 import type { BaseCronJob } from './base.js';
 
 interface TJobs extends TGenericJobs {

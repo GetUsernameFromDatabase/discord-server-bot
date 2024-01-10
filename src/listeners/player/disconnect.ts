@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { container, Listener } from '@sapphire/framework';
 import type { GuildQueue } from 'discord-player';
 import type { GuildTextBasedChannel } from 'discord.js';

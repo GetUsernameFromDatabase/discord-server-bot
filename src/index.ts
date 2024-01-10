@@ -1,4 +1,3 @@
-import type { ILogger } from '@sapphire/framework';
 import { CustomClient } from './custom-client';
 
 async function main() {
@@ -9,14 +8,9 @@ async function main() {
     return client.login();
   } catch (error) {
     client.logger.fatal(error);
-    client.destroy();
+    await client.destroy();
     throw error;
   }
 }
 
 void main();
-
-/* eslint-disable no-var */
-declare global {
-  var logger: ILogger;
-}

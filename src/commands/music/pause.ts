@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Command } from '@sapphire/framework';
 import { useQueue, useTimeline } from 'discord-player';
 

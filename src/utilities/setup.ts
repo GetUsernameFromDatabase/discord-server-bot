@@ -17,7 +17,6 @@ declare module '@skyra/env-utilities' {
   // eslint-disable-next-line unicorn/prevent-abbreviations
   interface Env {
     OWNERS: ArrayString;
-    GIVEAWAY_DATABASE_NAME: string;
     DISCORD_TOKEN: string;
     DEV: BooleanString;
   }

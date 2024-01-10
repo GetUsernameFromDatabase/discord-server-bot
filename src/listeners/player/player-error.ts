@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { container, Listener } from '@sapphire/framework';
 import type { GuildQueue, Track } from 'discord-player';
 import type { GuildTextBasedChannel } from 'discord.js';
@@ -20,7 +22,7 @@ export class PlayerEvent extends Listener {
     const permissions = voice(queue.metadata.channel);
     if (permissions.events) return;
 
-    globalThis.logger.error(error);
+    container.logger.error(error);
     return queue.metadata.channel
       .send(`${emojis.error} | There was an error with **${track.title}**`)
       .then((m: { delete: () => void }) => setTimeout(() => m.delete(), 5000));

@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Command } from '@sapphire/framework';
-import { useMasterPlayer } from 'discord-player';
+import { useMainPlayer } from 'discord-player';
 import type { GuildMember } from 'discord.js';
 
 export class PlayCommand extends Command {
@@ -28,9 +30,9 @@ export class PlayCommand extends Command {
   public override async autocompleteRun(
     interaction: Command.AutocompleteInteraction
   ) {
-    const player = useMasterPlayer()!;
-    const query = interaction.options.getString('query');
-    const results = await player.search(query!);
+    const query = interaction.options.getString('query') || [];
+    const player = useMainPlayer();
+    const results = await player.search(query);
 
     let tracks;
     tracks = results.tracks
@@ -49,14 +51,15 @@ export class PlayCommand extends Command {
         .slice(0, 1);
     }
 
-    return interaction.respond(tracks);
+    // eslint-disable-next-line unicorn/no-null
+    return interaction.respond(tracks).catch(() => null);
   }
 
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
     const { emojis, voice, options } = this.container.client.utils;
-    const player = useMasterPlayer()!;
+    const player = useMainPlayer()!;
     const permissions = voice(interaction);
     const query = interaction.options.getString('query')!;
     const member = interaction.member as GuildMember;
@@ -101,7 +104,7 @@ export class PlayCommand extends Command {
       await interaction.editReply({
         content: `${emojis.error} | An **error** has occurred`,
       });
-      return globalThis.logger.error(error);
+      return this.container.logger.error(error);
     }
   }
 }

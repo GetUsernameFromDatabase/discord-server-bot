@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { lyricsExtractor } from '@discord-player/extractor';
 import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';

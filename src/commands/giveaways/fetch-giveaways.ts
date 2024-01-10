@@ -1,10 +1,12 @@
 import { getTextBasedChannel } from '#lib/discord-fetch';
-import { Command } from '@sapphire/framework';
-import { PermissionsBitField } from 'discord.js';
+import { getEmbedBuilder, stringsToEmbedField } from '#lib/discord-messaging';
 import {
   GetGiveaways,
-  GiveawayFetchMessages,
-} from '../../giveaways/giveaway-fetching.js';
+  GiveawayStatuses,
+  isGiveawayStatus,
+} from '@/services/giveaway/index.js';
+import { Command } from '@sapphire/framework';
+import { PermissionsBitField } from 'discord.js';
 
 export class FetchGiveawaysCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -31,7 +33,7 @@ export class FetchGiveawaysCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
-    const force = interaction.options.getBoolean('force') ?? false;
+    // const force = interaction.options.getBoolean('force') ?? false;
     await interaction.deferReply();
 
     const { channelId } = interaction;
@@ -42,15 +44,34 @@ export class FetchGiveawaysCommand extends Command {
     }
 
     await interaction.editReply('Will search for new giveaways');
-    const result = await GetGiveaways(channel, {
-      noFilter: true,
-      ignorePreviousMessage: force,
-    });
-
-    if (result === 'SUCCESS') {
-      void interaction.followUp('Giveaway fetch finished!');
-    } else {
-      void interaction.editReply(GiveawayFetchMessages[result]);
+    const giveaways = await GetGiveaways();
+    if (isGiveawayStatus(giveaways)) {
+      const status = GiveawayStatuses[giveaways];
+      return interaction.editReply(status.log_message);
     }
+
+    for (const giveaway of giveaways) {
+      const embedFields = stringsToEmbedField(giveaway.body);
+      const builder = getEmbedBuilder()
+        .setTitle(giveaway.title)
+        .addFields(embedFields);
+      if (giveaway.imageURL) {
+        builder.setImage(giveaway.imageURL);
+      }
+      const builtEmbed = builder.toJSON();
+      await channel.send({ embeds: [builtEmbed] });
+      return;
+    }
+    return;
+    // const result = await GetGiveaways(channel, {
+    //   noFilter: true,
+    //   ignorePreviousMessage: force,
+    // });
+
+    // if (result === 'SUCCESS') {
+    //   void interaction.followUp('Giveaway fetch finished!');
+    // } else {
+    //   void interaction.editReply(GiveawayFetchMessages[result]);
+    // }
   }
 }

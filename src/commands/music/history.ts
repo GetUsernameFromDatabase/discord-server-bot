@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
 import { useHistory, useQueue } from 'discord-player';
