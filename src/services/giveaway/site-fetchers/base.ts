@@ -1,14 +1,8 @@
 import * as cheerio from 'cheerio';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
+import { GiveawayObject } from '../giveaway';
 
-export interface GiveawayObject {
-  title: string;
-  url: string;
-  body: string;
-  imageURL?: string;
-}
-
-export abstract class BaseGiveawaySite {
+export abstract class BaseGiveawaySiteFetcher {
   abstract readonly url: string;
 
   abstract getGiveaways(): Promise<GiveawayObject[]>;

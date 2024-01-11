@@ -3,7 +3,7 @@ import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
 
 export class UnsubscribeToGiveawaysCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Stop sending giveaways here.',

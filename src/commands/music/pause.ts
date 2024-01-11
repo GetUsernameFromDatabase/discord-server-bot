@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { useQueue, useTimeline } from 'discord-player';
 
 export class PauseCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Pauses or resumes the current track',

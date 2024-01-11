@@ -1,4 +1,5 @@
-import { BaseGiveawaySite, GiveawayObject } from './base-giveaway-site';
+import { BaseGiveawaySiteFetcher } from './base';
+import { GiveawayObject } from '../giveaway';
 import { fetch, FetchResultTypes } from '@sapphire/fetch';
 
 /**
@@ -6,7 +7,7 @@ import { fetch, FetchResultTypes } from '@sapphire/fetch';
  *
  * TODO: create test cases for this
  */
-class GrabFreeGamesSteamGiveawaySite extends BaseGiveawaySite {
+class GrabFreeGamesSteamSiteFetcher extends BaseGiveawaySiteFetcher {
   url =
     'https://steamcommunity.com/groups/GrabFreeGames/announcements/listing?';
 
@@ -43,4 +44,4 @@ class GrabFreeGamesSteamGiveawaySite extends BaseGiveawaySite {
   }
 }
 
-export default new GrabFreeGamesSteamGiveawaySite();
+export default new GrabFreeGamesSteamSiteFetcher();

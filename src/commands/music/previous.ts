@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { useHistory, useQueue } from 'discord-player';
 
 export class PreviousCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Plays the previous track',

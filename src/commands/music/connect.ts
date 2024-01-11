@@ -5,7 +5,7 @@ import { useMainPlayer, useQueue } from 'discord-player';
 import { GuildMember } from 'discord.js';
 
 export class DisconnectCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description:

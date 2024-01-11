@@ -5,7 +5,7 @@ async function main() {
 
   try {
     client.logger.info('Logging in...');
-    return client.login();
+    await client.login();
   } catch (error) {
     client.logger.fatal(error);
     await client.destroy();

@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { useQueue, useTimeline } from 'discord-player';
 
 export class VolumeCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Changes the volume of the track and entire queue',

@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { EqualizerConfigurationPreset, useQueue } from 'discord-player';
 
 export class EqualizerCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'The equaliser filter that can be applied to tracks',

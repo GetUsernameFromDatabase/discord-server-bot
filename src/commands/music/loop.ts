@@ -11,7 +11,7 @@ const repeatModes = [
 ];
 
 export class LoopCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Loops the current playing track or the entire queue',

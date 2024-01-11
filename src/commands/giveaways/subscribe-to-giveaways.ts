@@ -5,7 +5,7 @@ import cronstrue from 'cronstrue';
 import { GiveawayNotifier } from '../../jobs/giveaways';
 
 export class SubscribeToGiveawaysCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: `Start sending giveaways here ${cronstrue.toString(

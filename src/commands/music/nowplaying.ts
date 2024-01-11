@@ -3,7 +3,7 @@ import { useQueue, useTimeline } from 'discord-player';
 import { EmbedBuilder } from 'discord.js';
 
 export class NowPlayingCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Displays the current track in an embed',

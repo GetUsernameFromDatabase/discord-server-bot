@@ -5,7 +5,7 @@ import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
 
 export class QueueCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Displays the queue in an embed',

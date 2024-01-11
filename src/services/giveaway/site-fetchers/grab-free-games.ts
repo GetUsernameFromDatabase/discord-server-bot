@@ -1,13 +1,12 @@
-import { BaseGiveawaySite, GiveawayObject } from './base-giveaway-site';
+import { BaseGiveawaySiteFetcher } from './base';
+import { GiveawayObject } from '../giveaway';
 import * as cheerio from 'cheerio';
 import { fetch, FetchResultTypes } from '@sapphire/fetch';
 
 /**
- * This implementation is not in active use therefore might not be reliable
- *
  * TODO: create test cases for this
  */
-class GrabFreeGamesGiveawaySite extends BaseGiveawaySite {
+class GrabFreeGamesSiteFetcher extends BaseGiveawaySiteFetcher {
   url = 'https://grabfreegames.com/free';
 
   async getGiveaways() {
@@ -56,4 +55,4 @@ class GrabFreeGamesGiveawaySite extends BaseGiveawaySite {
   }
 }
 
-export default new GrabFreeGamesGiveawaySite();
+export default new GrabFreeGamesSiteFetcher();

@@ -8,7 +8,7 @@ type SupportedBiquadFilters = keyof typeof BiquadFilterType | 'Off';
 
 // TODO: add run `runIn: 'GUILD_TEXT'` to all music commands
 export class BiquadCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'The biquad filter that can be applied to tracks',

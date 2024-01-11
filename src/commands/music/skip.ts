@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
 
 export class SkipCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Skips the current track and automatically plays the next',

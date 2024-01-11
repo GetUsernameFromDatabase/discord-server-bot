@@ -5,7 +5,7 @@ import { Command } from '@sapphire/framework';
 import { ApplicationCommandType } from 'discord.js';
 
 export class PingCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Returns the round trip and heartbeat',

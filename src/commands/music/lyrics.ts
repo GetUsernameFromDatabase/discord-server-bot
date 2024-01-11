@@ -8,7 +8,7 @@ import { EmbedBuilder } from 'discord.js';
 const genius = lyricsExtractor();
 
 export class LyricsCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Displays lyrics of the given track',

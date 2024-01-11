@@ -1,15 +1,11 @@
 import { getTextBasedChannel } from '#lib/discord-fetch';
-import { getEmbedBuilder, stringsToEmbedField } from '#lib/discord-messaging';
-import {
-  GetGiveaways,
-  GiveawayStatuses,
-  isGiveawayStatus,
-} from '@/services/giveaway/index.js';
+import { FetchAndSendGiveaways } from '@/services/giveaway';
+import { GiveawayStatusEnum } from '@/services/giveaway/giveaway-status';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
 
 export class FetchGiveawaysCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'Send giveaways to this channel',
@@ -44,34 +40,11 @@ export class FetchGiveawaysCommand extends Command {
     }
 
     await interaction.editReply('Will search for new giveaways');
-    const giveaways = await GetGiveaways();
-    if (isGiveawayStatus(giveaways)) {
-      const status = GiveawayStatuses[giveaways];
-      return interaction.editReply(status.log_message);
-    }
+    const giveawayStatus = await FetchAndSendGiveaways(channel);
 
-    for (const giveaway of giveaways) {
-      const embedFields = stringsToEmbedField(giveaway.body);
-      const builder = getEmbedBuilder()
-        .setTitle(giveaway.title)
-        .addFields(embedFields);
-      if (giveaway.imageURL) {
-        builder.setImage(giveaway.imageURL);
-      }
-      const builtEmbed = builder.toJSON();
-      await channel.send({ embeds: [builtEmbed] });
-      return;
+    if (giveawayStatus.status === GiveawayStatusEnum.SUCCESS) {
+      return interaction.followUp('Giveaway fetch finished!');
     }
-    return;
-    // const result = await GetGiveaways(channel, {
-    //   noFilter: true,
-    //   ignorePreviousMessage: force,
-    // });
-
-    // if (result === 'SUCCESS') {
-    //   void interaction.followUp('Giveaway fetch finished!');
-    // } else {
-    //   void interaction.editReply(GiveawayFetchMessages[result]);
-    // }
+    return interaction.editReply(giveawayStatus.statusInformation.log_message);
   }
 }

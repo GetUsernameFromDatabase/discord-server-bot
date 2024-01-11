@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework';
 import { PCMAudioFilters, PCMFilters, useQueue } from 'discord-player';
 
 export class PulsatorCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       description: 'The DSP filters that can be applied to tracks',
