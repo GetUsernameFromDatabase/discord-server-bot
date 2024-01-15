@@ -1,11 +1,11 @@
 import * as cheerio from 'cheerio';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
-import { GiveawayObject } from '../giveaway';
+import { Giveaway } from '../giveaway';
 
 export abstract class BaseGiveawaySiteFetcher {
   abstract readonly url: string;
 
-  abstract getGiveaways(): Promise<GiveawayObject[]>;
+  abstract getGiveaways(): Promise<Giveaway[]>;
 
   protected cheerioLoad(
     data: string | cheerio.AnyNode | cheerio.AnyNode[] | Buffer

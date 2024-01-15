@@ -1,20 +1,5 @@
 import { container } from '@sapphire/framework';
-import type { Collection, Message, TextBasedChannel } from 'discord.js';
-
-/**
- * Messages should be all the same type
- * @param channel channel from where to fetch messages
- * @param limit Messages to send
- */
-export async function FetchMessages(
-  channel: TextBasedChannel,
-  limit = 50
-): Promise<void | Collection<string, Message>> {
-  const maxChanMsgs = await channel.messages
-    .fetch({ limit })
-    .catch((error) => globalThis.logger.error(error));
-  return maxChanMsgs;
-}
+import type { TextBasedChannel } from 'discord.js';
 
 export async function getTextBasedChannel(
   ChannelID: string
@@ -26,4 +11,17 @@ export async function getTextBasedChannel(
     return;
   }
   return channel;
+}
+
+export function getChannelParentID(channel: TextBasedChannel): {
+  id: string;
+  type: 'DM' | 'GUILD';
+} {
+  if (channel.isDMBased()) {
+    const userID = channel.recipientId;
+    return { id: userID, type: 'DM' };
+  } else {
+    const guildID = channel.guildId;
+    return { id: guildID, type: 'GUILD' };
+  }
 }

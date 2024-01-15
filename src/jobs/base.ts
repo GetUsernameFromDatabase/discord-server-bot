@@ -1,3 +1,4 @@
+import { LogLevel } from '@sapphire/framework';
 import { Cron } from '@sapphire/time-utilities';
 
 export abstract class BaseCronJob {
@@ -8,18 +9,23 @@ export abstract class BaseCronJob {
     return;
   }
 
+  protected get logHeader() {
+    return `CronJob[${this.constructor.name}]`;
+  }
+
+  protected log(message: string, logLevel: LogLevel = LogLevel.Info) {
+    const formattedMessage = `${this.logHeader}: ${message}`;
+    // might look weird if console is globalThis.logger
+    return globalThis.logger.write(logLevel, formattedMessage);
+  }
+
   protected churn() {
     const self = this.constructor as typeof BaseCronJob;
-    const next = self.cron.next();
     const now = new Date();
-
-    globalThis.logger.debug(
-      `CronJob[${this.constructor.name}]: next job will run at ${next
-        .toString()
-        .slice(0, 33)}`
-    );
-
+    const next = self.cron.next(now);
     const delta = next.getTime() - now.getTime();
+
+    this.log(`next job will run at ${next.toString().slice(0, 33)}`);
     return setTimeout(() => {
       this.job();
       this.churn();

@@ -1,5 +1,5 @@
 import { BaseGiveawaySiteFetcher } from './base';
-import { GiveawayObject } from '../giveaway';
+import { Giveaway } from '../giveaway';
 import * as cheerio from 'cheerio';
 import { fetch, FetchResultTypes } from '@sapphire/fetch';
 
@@ -19,7 +19,7 @@ class GrabFreeGamesSiteFetcher extends BaseGiveawaySiteFetcher {
     }
 
     const giveaways = await Promise.all(giveawayPromises);
-    return giveaways.filter(Boolean) as GiveawayObject[];
+    return giveaways.filter(Boolean) as Giveaway[];
   }
 
   private getContentFromArticle(article: string) {
@@ -45,13 +45,7 @@ class GrabFreeGamesSiteFetcher extends BaseGiveawaySiteFetcher {
     if (typeof body !== 'string') return;
 
     const mdBody = this.htmlToMarkdown(body);
-    const giveaway: GiveawayObject = {
-      title,
-      url,
-      body: mdBody,
-      imageURL: imgURL,
-    };
-    return giveaway;
+    return new Giveaway({ title, url, body: mdBody, imageURL: imgURL });
   }
 }
 

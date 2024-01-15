@@ -1,4 +1,5 @@
-import { getTextBasedChannel } from '#lib/discord-fetch';
+import { getChannelParentID, getTextBasedChannel } from '#lib/discord-fetch';
+import { DB } from '@/database/database';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
 
@@ -29,12 +30,15 @@ export class UnsubscribeToGiveawaysCommand extends Command {
       return interaction.editReply('Error: Channel not found');
     }
 
-    return interaction.editReply('WIP');
-    // const store = client.sqlStores.GiveawayChannel;
-    // const result = await store.deleteChannel(channel);
-    // if (!result.changes) {
-    //   return interaction.editReply(`Channel was not subscribed before`);
-    // }
-    // await interaction.editReply(`Successfully unsubscribed`);
+    const channelParentId = getChannelParentID(channel);
+    const query = DB.deleteFrom('channel_purposes')
+      .where('channel_container', '=', channelParentId.id)
+      .where('channel_id', '=', channel.id);
+    const result = await query.executeTakeFirst();
+
+    if (result.numDeletedRows > 0) {
+      return interaction.editReply(`Successfully unsubscribed`);
+    }
+    return interaction.editReply(`Channel was not subscribed before`);
   }
 }

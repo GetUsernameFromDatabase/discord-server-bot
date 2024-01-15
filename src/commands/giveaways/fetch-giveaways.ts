@@ -1,5 +1,5 @@
 import { getTextBasedChannel } from '#lib/discord-fetch';
-import { FetchAndSendGiveaways } from '@/services/giveaway';
+import { GiveawayService } from '@/services/giveaway/giveaway-service';
 import { GiveawayStatusEnum } from '@/services/giveaway/giveaway-status';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
@@ -20,8 +20,10 @@ export class FetchGiveawaysCommand extends Command {
         .setDescription(this.description)
         .addBooleanOption((option) =>
           option
-            .setName('force')
-            .setDescription('Does not check if previously sent')
+            .setName('unfiltered')
+            .setDescription(
+              'Does not check if giveaways have been previously sent'
+            )
         );
     });
   }
@@ -29,7 +31,7 @@ export class FetchGiveawaysCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
-    // const force = interaction.options.getBoolean('force') ?? false;
+    const unfiltered = interaction.options.getBoolean('unfiltered') ?? false;
     await interaction.deferReply();
 
     const { channelId } = interaction;
@@ -40,9 +42,13 @@ export class FetchGiveawaysCommand extends Command {
     }
 
     await interaction.editReply('Will search for new giveaways');
-    const giveawayStatus = await FetchAndSendGiveaways(channel);
+    let giveawayService = await new GiveawayService().initialize();
+    if (!unfiltered) {
+      giveawayService = await giveawayService.filterGiveaways(channel);
+    }
 
-    if (giveawayStatus.status === GiveawayStatusEnum.SUCCESS) {
+    const giveawayStatus = await giveawayService.sendGiveaways(channel);
+    if (giveawayStatus.statusCode === GiveawayStatusEnum.SUCCESS) {
       return interaction.followUp('Giveaway fetch finished!');
     }
     return interaction.editReply(giveawayStatus.statusInformation.log_message);

@@ -1,5 +1,5 @@
 import { BaseGiveawaySiteFetcher } from './base';
-import { GiveawayObject } from '../giveaway';
+import { Giveaway } from '../giveaway';
 import { fetch, FetchResultTypes } from '@sapphire/fetch';
 
 /**
@@ -14,7 +14,7 @@ class GrabFreeGamesSteamSiteFetcher extends BaseGiveawaySiteFetcher {
   async getGiveaways() {
     const data = await fetch(this.url, FetchResultTypes.Text);
     const $ = this.cheerioLoad(data);
-    const announcements: GiveawayObject[] = [];
+    const announcements: Giveaway[] = [];
 
     for (const element of $('div.announcement')) {
       const annTitle = $(element).children().first();
@@ -28,7 +28,7 @@ class GrabFreeGamesSteamSiteFetcher extends BaseGiveawaySiteFetcher {
 
       let mdBody = this.htmlToMarkdown(html);
       mdBody = this.modifyCredits(mdBody, url);
-      announcements.push({ title, url, body: mdBody });
+      announcements.push(new Giveaway({ title, url, body: mdBody }));
     }
     return announcements;
   }

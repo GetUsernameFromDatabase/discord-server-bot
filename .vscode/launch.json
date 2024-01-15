@@ -9,6 +9,15 @@
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "yarn",
       "runtimeArgs": ["dev:piece"],
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "dev debug",
+      "protocol": "inspector",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev"],
     }
   ]
 }

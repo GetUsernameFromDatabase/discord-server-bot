@@ -49,9 +49,9 @@ export class GiveawayStatus {
   }
 
   // --- static part ends
-  status: GiveawayStatusEnum;
+  statusCode: GiveawayStatusEnum;
   constructor(status: GiveawayStatusEnum, logOnCreate: boolean = false) {
-    this.status = status;
+    this.statusCode = status;
 
     if (logOnCreate) {
       this.logGiveawayStatusResult();
@@ -59,10 +59,10 @@ export class GiveawayStatus {
   }
 
   logGiveawayStatusResult() {
-    return GiveawayStatus.logGiveawayFetchResult(this.status);
+    return GiveawayStatus.logGiveawayFetchResult(this.statusCode);
   }
 
   get statusInformation() {
-    return GiveawayStatus.statusInformation[this.status];
+    return GiveawayStatus.statusInformation[this.statusCode];
   }
 }

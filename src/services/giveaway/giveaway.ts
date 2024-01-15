@@ -1,6 +1,8 @@
 import { getEmbedBuilder, stringsToEmbedField } from '#lib/discord-messaging';
+import { DB } from '@/database/database';
 import { MessageBuilder } from '@sapphire/discord.js-utilities';
 import { TextBasedChannel, hyperlink } from 'discord.js';
+import { sql } from 'kysely';
 
 export interface GiveawayObject {
   title: string;
@@ -16,6 +18,12 @@ export class Giveaway {
 
   giveaway: GiveawayObject;
   constructor(giveawayObject: GiveawayObject) {
+    for (const key in giveawayObject) {
+      const value = giveawayObject[key as keyof GiveawayObject];
+      if (typeof value === 'string') {
+        giveawayObject[key as keyof GiveawayObject] = value.trim();
+      }
+    }
     this.giveaway = giveawayObject;
   }
 
@@ -43,5 +51,15 @@ export class Giveaway {
 
   sendToChannel(channel: TextBasedChannel) {
     return channel.send(this.asMessage());
+  }
+
+  storeIntoDatabase() {
+    const { title, url } = this.giveaway;
+    const query = DB.insertInto('giveaways')
+      .onConflict((oc) =>
+        oc.doUpdateSet({ last_ping_at: sql`CURRENT_TIMESTAMP` })
+      )
+      .values({ title, url });
+    void query.execute();
   }
 }

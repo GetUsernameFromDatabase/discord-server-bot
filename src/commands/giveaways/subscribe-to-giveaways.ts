@@ -1,8 +1,9 @@
-import { getTextBasedChannel } from '#lib/discord-fetch';
+import { getChannelParentID, getTextBasedChannel } from '#lib/discord-fetch';
 import { Command } from '@sapphire/framework';
 import { PermissionsBitField } from 'discord.js';
 import cronstrue from 'cronstrue';
 import { GiveawayNotifier } from '../../jobs/giveaways';
+import { DB } from '@/database/database';
 
 export class SubscribeToGiveawaysCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -27,25 +28,27 @@ export class SubscribeToGiveawaysCommand extends Command {
   ) {
     await interaction.deferReply();
 
-    const { channelId } = interaction;
+    const { client, channelId } = interaction;
     const channel =
       interaction.channel ?? (await getTextBasedChannel(channelId));
     if (!channel) {
       return interaction.editReply('Error: Channel not found');
     }
 
-    return interaction.editReply('WIP');
+    const channelParentId = getChannelParentID(channel);
+    const query = DB.replaceInto('channel_purposes').values({
+      channel_container: channelParentId.id,
+      channel_id: channel.id,
+      channel_purpose: 'givaways',
+    });
+    await query.execute();
 
-    // const store = client.sqlStores.GiveawayChannel;
-    // await store.saveChannel(channel);
+    const { discordTime, toUnixTimecode } = client.utils.date;
+    const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
 
-    // const { discordTime, toUnixTimecode } = client.utils.date;
-    // const nextUnixTimecode = toUnixTimecode(GiveawayNotifier.cron.next());
-
-    // await interaction.editReply(
-    //   `${'This channel is subscribed to giveaways'}\nNext fetch will happen at: ${discordTime(
-    //     nextUnixTimecode
-    //   )}`
-    // );
+    return interaction.editReply(
+      `This channel is subscribed to giveaways\n` +
+        `Next fetch will happen at ${discordTime(nextUnixTimecode)}`
+    );
   }
 }
