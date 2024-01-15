@@ -5,6 +5,4 @@ export type PartialPick<T, F extends keyof T> = Omit<T, F> &
 export type PickByKeys<T, K extends keyof T> = {
   [P in K]: T[P];
 };
-export type PickByKeysOrFull<T, K extends keyof T | undefined> =
-  | PickByKeys<T, K>
-  | T;
+export type PickByKeysOrFull<T, K extends keyof T> = PickByKeys<T, K> | T;
