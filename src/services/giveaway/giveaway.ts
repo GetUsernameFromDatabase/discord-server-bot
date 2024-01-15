@@ -60,6 +60,6 @@ export class Giveaway {
         oc.doUpdateSet({ last_ping_at: sql`CURRENT_TIMESTAMP` })
       )
       .values({ title, url });
-    void query.execute();
+    return query.execute();
   }
 }

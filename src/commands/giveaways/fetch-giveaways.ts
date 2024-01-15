@@ -44,7 +44,8 @@ export class FetchGiveawaysCommand extends Command {
     await interaction.editReply('Will search for new giveaways');
     let giveawayService = await new GiveawayService().initialize();
     if (!unfiltered) {
-      giveawayService = await giveawayService.filterGiveaways(channel);
+      giveawayService =
+        await giveawayService.filterGiveawaysWithChannel(channel);
     }
 
     const giveawayStatus = await giveawayService.sendGiveaways(channel);

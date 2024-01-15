@@ -42,7 +42,8 @@ export class GiveawayNotifier extends BaseCronJob {
         return;
       }
 
-      const filteredService = await giveawayService.filterGiveaways(channel);
+      const filteredService =
+        await giveawayService.filterGiveawaysWithChannel(channel);
       await filteredService.sendGiveaways(channel);
     }
   }

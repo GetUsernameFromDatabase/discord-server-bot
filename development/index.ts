@@ -12,15 +12,14 @@ globalThis.logger = {
 // use environment variables
 import { resolve } from 'node:path';
 import { setup } from '@skyra/env-utilities';
-import { DB } from '@/database/database';
+import { GiveawayService } from '@/services/giveaway/giveaway-service';
 const DotenvConfigOutput = setup({ path: resolve(__dirname, '..', '.env') });
 console.log('DOTENV_CONFIG_OUTPUT:', DotenvConfigOutput, '\n\n');
 // --- Start custom code
 
 async function main() {
-  DB;
-  await new Promise((resolve) => setTimeout(resolve, 10_000));
-  return;
+  console.log('----- Starting -----');
+  await new GiveawayService().initialize();
 }
 
 void main();
