@@ -24,37 +24,42 @@ export class DisconnectCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction
   ) {
-    if (interaction.member instanceof GuildMember) {
-      const { emojis, voice, options } = this.container.client.utils;
-      const permissions = voice(interaction);
+    if (!(interaction.member instanceof GuildMember)) {
+      return interaction.reply('You need to be GuildMember');
+    }
 
-      if (permissions.member)
-        return interaction.reply({
-          content: permissions.member,
-          ephemeral: true,
-        });
-      if (permissions.client)
-        return interaction.reply({
-          content: permissions.client,
-          ephemeral: true,
-        });
-      const queue = useQueue(interaction.guild!.id);
-      const player = useMainPlayer();
+    const { emojis, voice, options } = this.container.client.utils;
+    const permissions = voice(interaction);
 
-      if (queue)
-        return interaction.reply({
-          content: `${emojis.error} | I am **already** in a voice channel`,
-          ephemeral: true,
-        });
-
-      const newQueue = player?.queues.create(
-        interaction.guild!.id,
-        options(interaction)
-      );
-      await newQueue?.connect(interaction.member.voice.channel!.id);
+    if (permissions.member) {
       return interaction.reply({
-        content: `${emojis.success} | I have **successfully connected** to the voice channel`,
+        content: permissions.member,
+        ephemeral: true,
       });
     }
+    if (permissions.client) {
+      return interaction.reply({
+        content: permissions.client,
+        ephemeral: true,
+      });
+    }
+
+    const player = useMainPlayer();
+    const queue = useQueue(interaction.guild!.id);
+    if (queue) {
+      return interaction.reply({
+        content: `${emojis.error} | I am **already** in a voice channel`,
+        ephemeral: true,
+      });
+    }
+
+    const newQueue = player?.queues.create(
+      interaction.guild!.id,
+      options(interaction)
+    );
+    await newQueue?.connect(interaction.member.voice.channel!.id);
+    return interaction.reply({
+      content: `${emojis.success} | I have **successfully connected** to the voice channel`,
+    });
   }
 }

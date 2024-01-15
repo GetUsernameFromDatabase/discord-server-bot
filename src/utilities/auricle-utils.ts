@@ -60,8 +60,10 @@ export function voice(
   const memberVoice = (interaction.member as GuildMember).voice;
   return {
     get member() {
-      if (!memberVoice.channel)
+      if (!memberVoice.channel) {
         return `${emojis.error} | You **need** to be in a voice channel.`;
+      }
+      return;
     },
     get client() {
       const resolved = new PermissionsBitField([
@@ -73,19 +75,23 @@ export function voice(
         ?.permissionsFor(interaction.guild!.members.me!)
         .missing(resolved);
 
-      if (missingPerms && missingPerms.length > 0)
+      if (missingPerms && missingPerms.length > 0) {
         return `${
           emojis.error
         } | I am **missing** the required voice channel permissions: \`${missingPerms.join(
           ', '
         )}\``;
+      }
+      return;
     },
     get clientToMember() {
       if (
         interaction.guild?.members.me?.voice.channelId &&
         memberVoice.channelId !== interaction.guild?.members.me?.voice.channelId
-      )
+      ) {
         return `${emojis.error} | You are **not** in my voice channel`;
+      }
+      return;
     },
   };
 }
