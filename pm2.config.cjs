@@ -8,8 +8,8 @@ const apps = [
     name: name,
     script: 'yarn',
     args: 'start:pm2',
-    output: './log.log',
-    error: './error.log',
+    output: './logs/log.log',
+    error: './logs/error.log',
     watch: 'src',
     // these folders should be taken care of by [sapphire HMR plugin](https://www.npmjs.com/package/@sapphire/plugin-hmr)
     ignore_watch: ['src/commands', 'src/listeners', 'src/preconditions'],
@@ -19,7 +19,7 @@ const apps = [
   },
   {
     name: name + '_updater',
-    script: 'updater.sh',
+    script: 'sh updater.sh',
     cron: "30 */6 * * *",
     autorestart: false,
   }

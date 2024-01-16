@@ -1,0 +1,14 @@
+version: '3'
+
+volumes:
+  data:
+
+services:
+  discord-bot:
+    build:
+      context: ./
+      dockerfile: dockerfile
+    env_file: '.env'
+    volumes:
+      - data:/app/data
+      - data:/app/logs

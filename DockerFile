@@ -1,20 +1,16 @@
-FROM keymetrics/pm2:latest-alpine
+# syntax=docker/dockerfile:1
 
-# Not tested nor used -- copy paste from https://pm2.io/docs/runtime/integration/docker/#set-a-dockerfile essentially
+FROM node:21-alpine
 
-# Bundle APP files
-COPY src src/
-COPY package.json .
-COPY ecosystem.config.js .
+WORKDIR /app
+COPY . .
 
-# Install app dependencies
-ENV NPM_CONFIG_LOGLEVEL warn
-RUN npm install --production
+RUN apk add --no-cache bash
+RUN apk add --no-cache git
 
-# Expose the listening port of your app
-# EXPOSE 8000
+RUN corepack enable
+RUN npm install --global pm2
+RUN pm2 install pm2-logrotate
+RUN yarn install
 
-# Show current folder structure in logs
-RUN ls -al -R
-
-CMD [ "pm2-runtime", "start", "pm2.config.js" ]
+CMD ["pm2-runtime",  "start", "pm2.config.cjs"]
