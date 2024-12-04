@@ -278,6 +278,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@keyv/serialize@npm:*":
+  version: 1.0.1
+  resolution: "@keyv/serialize@npm:1.0.1"
+  dependencies:
+    buffer: "npm:^6.0.3"
+  checksum: b47418bed4fb17e16e136d1071f71d12de6f566bbf4d484a611a2d7063e0e79aedb3164b51153054101b6b7eb2a2b349469d438f70a5fbac22a68f136a535ec4
+  languageName: node
+  linkType: hard
+
 "@mole-inc/bin-wrapper@npm:^8.0.1":
   version: 8.0.1
   resolution: "@mole-inc/bin-wrapper@npm:8.0.1"
@@ -1408,6 +1417,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: "npm:^1.3.1"
+    ieee754: "npm:^1.2.1"
+  checksum: b6bc68237ebf29bdacae48ce60e5e28fc53ae886301f2ad9496618efac49427ed79096750033e7eab1897a4f26ae374ace49106a5758f38fb70c78c9fda2c3b1
+  languageName: node
+  linkType: hard
+
 "builtin-modules@npm:^3.3.0":
   version: 3.3.0
   resolution: "builtin-modules@npm:3.3.0"
@@ -1435,14 +1454,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "cache-manager@npm:5.3.2"
+"cache-manager@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "cache-manager@npm:6.3.0"
   dependencies:
-    lodash.clonedeep: "npm:^4.5.0"
-    lru-cache: "npm:^10.1.0"
-    promise-coalesce: "npm:^1.1.2"
-  checksum: 4120c4c8f1d2d9658fe854e0539e9c58001f53b685b3d8325b8481e5ccf73b665598c87c7286ba04502910cab52e17ab2a43b848dca968787cb2c7ddc0ba2114
+    keyv: "npm:^5.2.1"
+  checksum: 388cf6c53afee06b8361f57ece3f222419488a30679d05f74e1b358038b57b1841a1266d48d7130ab88849ab207a6145bddbb43cb1d90be203bb3f62f4b8aa04
   languageName: node
   linkType: hard
 
@@ -1904,7 +1921,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.18.1"
     "@typescript-eslint/parser": "npm:^6.18.1"
     better-sqlite3: "npm:^9.2.2"
-    cache-manager: "npm:^5.3.2"
+    cache-manager: "npm:^6.3.0"
     cheerio: "npm:^1.0.0-rc.12"
     colorette: "npm:^2.0.20"
     cronstrue: "npm:^2.47.0"
@@ -3665,6 +3682,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"keyv@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "keyv@npm:5.2.1"
+  dependencies:
+    "@keyv/serialize": "npm:*"
+  checksum: 2eade1f67820eb0ea849554faa82fedc7ff8beec13daccc0a8cc0fa6c496dcb33dafabc44b7a26997844af1b83cab86f7ed753dd1a014fdd8fc08eb3ed60e712
+  languageName: node
+  linkType: hard
+
 "kysely@npm:^0.27.2":
   version: 0.27.2
   resolution: "kysely@npm:0.27.2"
@@ -3735,13 +3761,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.clonedeep@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "lodash.clonedeep@npm:4.5.0"
-  checksum: 957ed243f84ba6791d4992d5c222ffffca339a3b79dbe81d2eaf0c90504160b500641c5a0f56e27630030b18b8e971ea10b44f928a977d5ced3c8948841b555f
-  languageName: node
-  linkType: hard
-
 "lodash.merge@npm:^4.6.2":
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
@@ -3770,7 +3789,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^10.0.1, lru-cache@npm:^10.1.0, lru-cache@npm:^9.1.1 || ^10.0.0":
+"lru-cache@npm:^10.0.1, lru-cache@npm:^9.1.1 || ^10.0.0":
   version: 10.1.0
   resolution: "lru-cache@npm:10.1.0"
   checksum: 207278d6fa711fb1f94a0835d4d4737441d2475302482a14785b10515e4c906a57ebf9f35bf060740c9560e91c7c1ad5a04fd7ed030972a9ba18bce2a228e95b
@@ -4775,13 +4794,6 @@ __metadata:
   version: 3.0.0
   resolution: "proc-log@npm:3.0.0"
   checksum: 02b64e1b3919e63df06f836b98d3af002b5cd92655cab18b5746e37374bfb73e03b84fe305454614b34c25b485cc687a9eebdccf0242cda8fda2475dd2c97e02
-  languageName: node
-  linkType: hard
-
-"promise-coalesce@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "promise-coalesce@npm:1.1.2"
-  checksum: 6f951b5db40ca78d09ad0f72adea0a2e9c5bdb0fc5b3ef218c611e2191c6ce2e9f752f815630fd07875dd1c9f04cc7327d6bada04b662dce986ce86ab88c2d5e
   languageName: node
   linkType: hard
 
