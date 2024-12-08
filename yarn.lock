@@ -1273,14 +1273,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^9.2.2":
-  version: 9.2.2
-  resolution: "better-sqlite3@npm:9.2.2"
+"better-sqlite3@npm:^11.7.0":
+  version: 11.7.0
+  resolution: "better-sqlite3@npm:11.7.0"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: fc843a9ceb883e5c16eed8a3e7d85c15b52e3588a24424ad66391fc0bf5b94de2fa70016a716ad685cea8810e3233e958c0c1f350f35a5f18762021e313e297d
+  checksum: a09bb28c0292bb7c037896ee99197815841275bca2d14f63b58994188239f292642c8c7ea3e0206d8ea6c7530d7b03d7343138ebeb9a4cc855c0b3663e00c812
   languageName: node
   linkType: hard
 
@@ -1903,7 +1903,7 @@ __metadata:
     "@types/ws": "npm:^8.5.10"
     "@typescript-eslint/eslint-plugin": "npm:^6.18.1"
     "@typescript-eslint/parser": "npm:^6.18.1"
-    better-sqlite3: "npm:^9.2.2"
+    better-sqlite3: "npm:^11.7.0"
     cache-manager: "npm:^5.3.2"
     cheerio: "npm:^1.0.0-rc.12"
     colorette: "npm:^2.0.20"
