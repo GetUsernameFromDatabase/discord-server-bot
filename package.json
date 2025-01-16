@@ -25,7 +25,7 @@
     "dev:piece": "node -r @swc-node/register development/index.ts"
   },
   "dependencies": {
-    "@discord-player/equalizer": "^0.2.3",
+    "@discord-player/equalizer": "^7.1.0",
     "@discord-player/extractor": "^4.4.5",
     "@discord-player/utils": "^0.2.2",
     "@distube/ytdl-core": "^4.13.3",

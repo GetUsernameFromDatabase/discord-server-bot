@@ -47,6 +47,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@discord-player/equalizer@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "@discord-player/equalizer@npm:7.1.0"
+  checksum: e8393895a0bb6497b4828236c72a63d58abb3a5cb703e1d08521942df64f0fd24aa2d0122a458de3bd89cbe10d8079a815033a688e296d7581f88ad31cff96d7
+  languageName: node
+  linkType: hard
+
 "@discord-player/extractor@npm:^4.4.5":
   version: 4.4.5
   resolution: "@discord-player/extractor@npm:4.4.5"
@@ -1880,7 +1887,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "discord-server-bot@workspace:."
   dependencies:
-    "@discord-player/equalizer": "npm:^0.2.3"
+    "@discord-player/equalizer": "npm:^7.1.0"
     "@discord-player/extractor": "npm:^4.4.5"
     "@discord-player/utils": "npm:^0.2.2"
     "@distube/ytdl-core": "npm:^4.13.3"
