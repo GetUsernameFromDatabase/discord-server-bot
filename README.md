@@ -1,7 +1,6 @@
 # Discord Server Bot <!-- omit in toc -->
 
-**UNSTABLE**: Due to conversion to typescript and dependencies major version changes
-I also haven't had the time to work on this much of late
+> **NO LONGER MAINTAINED**  
 
 This is a discord server bot made for personal use  
 _aka usage for multiple servers is not prioritized during development and testing_
@@ -14,7 +13,6 @@ This bot:
 ## Table Of Contents
 
 - [Table Of Contents](#table-of-contents)
-- [TODO](#todo)
 - [Setup](#setup)
   - [Continous Run](#continous-run)
   - [Setup environment variables](#setup-environment-variables)
@@ -28,20 +26,6 @@ This bot:
 - [Memes](#memes)
 - [Music](#music)
 - [Useful Links](#useful-links)
-
-## TODO
-
-- rework my sql builder with <https://github.com/kysely-org/kysely> (or something like that) for a more suistanable solution
-  - also switch to <https://github.com/WiseLibs/better-sqlite3>
-- refocus to work with multiple servers, current focus is on just my own personal server
-- docker containerization
-- update music bot
-- see if it is possible to have customizable rights
-  - should be able to have minimum rights needed and give more if wanted by developer, just some checks are required before initiating action
-- tests for parts that are uncoupled from discord client
-- redo this readme -- outdated information
-- hide some useful nuggets like
-  - `npm exec -- tsc --showConfig > tsconfig.final.json`
 
 ## Setup
 
