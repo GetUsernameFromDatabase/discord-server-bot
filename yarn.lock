@@ -1920,7 +1920,7 @@ __metadata:
     eslint-plugin-promise: "npm:^6.1.1"
     eslint-plugin-regexp: "npm:^2.2.0"
     eslint-plugin-unicorn: "npm:^50.0.1"
-    kysely: "npm:^0.27.2"
+    kysely: "npm:^0.28.0"
     mediaplex: "npm:^0.0.9"
     node-html-markdown: "npm:^1.3.0"
     npm-run-all: "npm:^4.1.5"
@@ -3665,10 +3665,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kysely@npm:^0.27.2":
-  version: 0.27.2
-  resolution: "kysely@npm:0.27.2"
-  checksum: eb2cca2bdec14a3e7d430e1fbf08cc3015fa425bfc0e9508dbbfc4351f6c0df23ec8bc54c5b417b5e4481af5a8b855fad53c51e2e3c4a893f9f907ef913ce278
+"kysely@npm:^0.28.0":
+  version: 0.28.17
+  resolution: "kysely@npm:0.28.17"
+  checksum: 50690d745016d25f09574fe58c7e31f84427845497f30c84280131bc1f9f60d118c53640a184e225708a1f54f2b54ac12fdf3a0dfc6405527487ad96ff594f42
   languageName: node
   linkType: hard
 
